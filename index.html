@@ -124,8 +124,7 @@ const TOPICS = [
     { id:"insurance", label:"시니어 보험·건강보험" }
 ];
 
-
-/* ✅ 2) 주제별 질문 세트 */
+/* ✅ 2) 질문 세트 */
 const QUESTIONS = {
     joint: [
         { q: "어떤 불편이 있나요?", opts: ["계단 통증","걷기/앉았다 일어설 때 통증","쑤심/뻐근함","운동 후 통증","기타/모름"] },
@@ -184,20 +183,17 @@ const QUESTIONS = {
     ]
 };
 
-
-/* ✅ 3) 화면 상태 */
+/* ✅ 3) 상태 */
 let state = {
     topic: null,
     step: 0,
     answers: []
 };
 
-
 /* ✅ 화면 렌더링 */
 const app = document.getElementById("app");
 
-
-/* ✅ 첫 화면 – 주제 선택 */
+/* ✅ 주제 선택 */
 function renderTopics() {
     state = { topic:null, step:0, answers:[] };
 
@@ -211,7 +207,6 @@ function renderTopics() {
     `;
 }
 
-
 /* ✅ 주제 선택 처리 */
 function selectTopic(id) {
     state.topic = id;
@@ -219,7 +214,6 @@ function selectTopic(id) {
     state.answers = [];
     renderQuestion();
 }
-
 
 /* ✅ 질문 렌더링 */
 function renderQuestion() {
@@ -236,8 +230,7 @@ function renderQuestion() {
     `;
 }
 
-
-/* ✅ 답변 선택 후 다음 단계 */
+/* ✅ 답변 선택 → 다음 단계 */
 function selectAnswer(ans) {
     state.answers.push(ans);
     state.step++;
@@ -249,13 +242,12 @@ function selectAnswer(ans) {
     }
 }
 
-
-/* ✅ AI 서버에 분석 요청 */
+/* ✅ ✅ ✅ AI 서버로 POST 요청 — 여기만 수정됨 */
 async function sendToAI() {
     app.innerHTML = `<div class="loading-box">AI가 분석 중입니다… 잠시만 기다려주세요 ⏳</div>`;
 
     try {
-        const res = await fetch("/ai-analyze", {
+        const res = await fetch("https://noeulbit-bot.onrender.com/ai-analyze", {
             method: "POST",
             headers: { "Content-Type":"application/json" },
             body: JSON.stringify({
@@ -280,8 +272,7 @@ async function sendToAI() {
     }
 }
 
-
-/* ✅ 초기 실행 */
+/* ✅ 처음 실행 */
 renderTopics();
 </script>
 
