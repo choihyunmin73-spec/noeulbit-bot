@@ -1,178 +1,198 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>노을빛하루 무료 건강 체크</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>노을빛하루 무료 건강 체크</title>
 
-    <style>
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background: #f6f7fb;
-            margin: 0;
-            padding: 0;
-        }
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
 
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        }
-
-        h2 {
-            font-size: 25px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            font-size: 15px;
-            color: #666;
-            margin-bottom: 25px;
-        }
-
-        .step-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .question-title {
-            font-size: 17px;
-            margin-bottom: 20px;
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 12px;
-            font-size: 16px;
-            background: #eef3ff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.25s;
-            text-align: left;
-        }
-
-        .option-btn:hover {
-            background: #d9e5ff;
-        }
-
-        .loading {
-            padding: 20px;
-            background: #f3f3f3;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .result-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 15px;
-            white-space: pre-line;
-        }
-    </style>
+  <style>
+    body { font-family: 'Pretendard', sans-serif; background:#f3f4f6; }
+    .bubble { border-radius:1rem; padding:.8rem 1rem; box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+    .bot { background:#fff; }
+    .user { background:#e0f2fe; }
+    .chip { border:1px solid #e5e7eb; border-radius:999px; padding:.6rem 1rem; cursor:pointer; text-align:center; }
+    .chip:hover { background:#f1f5f9; }
+    .btn { background:#0284c7; color:white; font-weight:700; border-radius:.75rem; padding:.8rem 1rem; }
+  </style>
 </head>
 
 <body>
-<div class="container">
 
-    <h2>🔹 노을빛하루 무료 건강 체크</h2>
-    <p class="subtitle">
-        아래 질문에 선택만 하시면, AI가 무료로 건강 상태를 체크하고 필요한 정보를 안내해드립니다.
+<main class="mx-auto max-w-2xl p-6">
+
+  <!-- Header -->
+  <header class="mb-5">
+    <h1 class="text-2xl font-bold text-slate-800">노을빛하루 무료 건강 체크</h1>
+    <p class="text-slate-500 text-sm mt-1">
+      아래 질문들을 선택하면, AI가 무료로 건강 상태를 체크하고 필요한 정보를 안내드립니다.
     </p>
+  </header>
 
-    <div id="chat-area"></div>
+  <!-- 전체 1컬럼 챗봇 -->
+  <section class="bg-white p-5 rounded-xl shadow">
 
-</div>
+    <!-- Chat -->
+    <div id="chat" class="space-y-3 max-h-[70vh] overflow-auto pr-1">
+      <div class="bubble bot">
+        확인하고 싶은 항목을 선택해 주세요 😊
+      </div>
+
+      <div id="topicChips" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+    </div>
+
+    <!-- Input -->
+    <form id="userForm" class="mt-4 flex gap-2" onsubmit="return false;">
+      <input id="userInput"
+        class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
+        placeholder="메시지를 입력하거나 선택지를 눌러주세요" />
+      <button id="sendBtn" class="btn" disabled>보내기</button>
+    </form>
+
+  </section>
+
+  <footer class="text-center text-xs text-slate-400 mt-6">
+    © 노을빛하루 — Senior-friendly Advisor
+  </footer>
+
+</main>
 
 <script>
-    let currentStep = 0;
-    let answers = [];
+/* ✅ 1) 주제 목록 */
+const TOPICS = [
+  { id:"joint", label:"무릎·관절" },
+  { id:"bp", label:"혈압" },
+  { id:"sugar", label:"혈당·당뇨" },
+  { id:"scam", label:"보이스피싱" },
+  { id:"welfare", label:"복지·지원금" },
+  { id:"phone", label:"스마트폰 문제" },
+  { id:"sleep", label:"불면증·수면" },
+  { id:"senior_ins", label:"시니어 보험·건강보험" }
+];
 
-    const steps = [
-        {
-            question: "Q1. 최근 혈압 측정 시기?",
-            options: ["1주 이내", "1개월 이내", "3개월 이내", "기억 안남"]
-        },
-        {
-            question: "Q2. 고혈압 약 복용 여부",
-            options: ["복용 중", "처방받았으나 중단", "복용 안함"]
-        },
-        {
-            question: "Q3. 통증 강도는 어느 정도인가요?",
-            options: ["1~3 약함", "4~6 중간", "7~8 강함", "9~10 매우 심함"]
-        },
-        {
-            question: "Q4. 아침에 뻣뻣함이 있나요?",
-            options: ["예", "아니요"]
-        }
-    ];
+/* ✅ 2) 주제별 세부 설문 */
+const CHECKS = {
 
-    function renderStep() {
-        const area = document.getElementById("chat-area");
-        area.innerHTML = "";
+  /* (예: 기존 joint/bp/sugar 등은 그대로 넣으면 됨) */
 
-        const step = steps[currentStep];
+  sleep: [
+    { q:"평균 수면 시간은?", opts:["4시간 이하","4~6시간","6~7시간","7시간 이상"] },
+    { q:"잠드는 데 어려움이 있나요?", opts:["예","아니오"] },
+    { q:"새벽에 자주 깨나요?", opts:["예","아니오"] },
+    { q:"아침에 상쾌한가요?", opts:["예","아니오","보통"] },
+    { q:"낮 피로감이 있나요?", opts:["자주 있음","가끔 있음","거의 없음"] }
+  ],
 
-        const stepTitle = document.createElement("div");
-        stepTitle.className = "step-title";
-        stepTitle.textContent = `질문 ${currentStep + 1} / ${steps.length}`;
-        area.appendChild(stepTitle);
+  senior_ins: [
+    { q:"현재 가입된 보험이 있나요?", opts:["있음","없음","모름"] },
+    { q:"월 보험료는 어떤가요?", opts:["부담됨","적당함","전혀 부담 없음"] },
+    { q:"최근 병원 진료 경험이 있나요?", opts:["예","아니오"] },
+    { q:"보험 상담을 받아본 적 있나요?", opts:["있음","없음"] },
+    { q:"가장 걱정되는 부분은?", opts:["의료비 증가","보장 부족","보험 갱신·해지","상담 필요"] }
+  ]
+};
 
-        const qText = document.createElement("div");
-        qText.className = "question-title";
-        qText.textContent = step.question;
-        area.appendChild(qText);
+let currentTopic = null;
+let currentStep = 0;
+let answers = [];
 
-        step.options.forEach(option => {
-            const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.innerText = option;
+const chat = document.getElementById("chat");
+const chips = document.getElementById("topicChips");
 
-            btn.onclick = () => {
-                answers.push(option);
-                currentStep++;
+/* ✅ 3) 주제 선택 버튼 생성 */
+TOPICS.forEach(t=>{
+  const c = document.createElement("div");
+  c.className="chip";
+  c.innerText=t.label;
+  c.onclick=()=> startSurvey(t.id, t.label);
+  chips.appendChild(c);
+});
 
-                if (currentStep < steps.length) {
-                    renderStep();
-                } else {
-                    sendToServer();
-                }
-            };
+/* ✅ 챗봇 말풍선 표시 */
+function bot(msg){
+  const b=document.createElement("div");
+  b.className="bubble bot";
+  b.innerText=msg;
+  chat.appendChild(b);
+  chat.scrollTop=chat.scrollHeight;
+}
+function user(msg){
+  const u=document.createElement("div");
+  u.className="bubble user ml-auto max-w-[85%]";
+  u.innerText=msg;
+  chat.appendChild(u);
+  chat.scrollTop=chat.scrollHeight;
+}
 
-            area.appendChild(btn);
-        });
-    }
+/* ✅ 설문 시작 */
+function startSurvey(id, label){
+  currentTopic = id;
+  currentStep = 0;
+  answers = [];
 
-    async function sendToServer() {
-        const area = document.getElementById("chat-area");
-        area.innerHTML = `<div class="loading">AI가 분석 중입니다… 잠시만 기다려주세요.</div>`;
+  user(label);
+  bot(`"${label}" 관련 상태를 확인해볼게요.`);
 
-        try {
-            const res = await fetch("/analyze", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ answers })
-            });
+  setTimeout(()=> renderStep(), 500);
+}
 
-            const data = await res.json();
+/* ✅ 단계별 질문 렌더링 */
+function renderStep(){
+  const step = CHECKS[currentTopic][currentStep];
 
-            area.innerHTML = `
-                <h3>✅ 건강 체크 결과</h3>
-                <div class="result-box">${data.result}</div>
-            `;
-        } catch (err) {
-            area.innerHTML = `<div class="result-box">❌ 서버 연결이 원활하지 않습니다.</div>`;
-        }
-    }
+  const q = document.createElement("div");
+  q.className="bubble bot";
+  q.innerText=step.q;
+  chat.appendChild(q);
 
-    window.onload = renderStep;
+  step.opts.forEach(opt=>{
+    const btn=document.createElement("div");
+    btn.className="chip mt-1";
+    btn.innerText=opt;
+
+    btn.onclick=()=>{
+      user(opt);
+      answers.push(opt);
+      currentStep++;
+
+      if(currentStep < CHECKS[currentTopic].length){
+        setTimeout(()=> renderStep(), 400);
+      } else {
+        sendToAI();
+      }
+    };
+
+    chat.appendChild(btn);
+  });
+
+  chat.scrollTop=chat.scrollHeight;
+}
+
+/* ✅ AI에게 분석 요청 */
+async function sendToAI(){
+  bot("AI가 분석 중입니다… ⏳");
+
+  try{
+    const res = await fetch("/analyze",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        topic: currentTopic,
+        answers: answers
+      })
+    });
+
+    const data = await res.json();
+
+    bot("✅ 분석 결과");
+    bot(data.result);
+
+  } catch(e){
+    bot("❌ 분석 중 오류가 발생했습니다.");
+  }
+}
 </script>
 
 </body>
