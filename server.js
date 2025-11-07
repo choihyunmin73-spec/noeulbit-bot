@@ -1,64 +1,62 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import OpenAI from "openai";
-import path from "path";
-import { fileURLToPath } from "url";
+import { OpenAI } from "openai";
 
-// 현재 파일 경로
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// .env 불러오기
-dotenv.config();
-
-// OpenAI 클라이언트 생성
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
-
-// Express 서버 생성
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// index.html 제공
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
 
-// 분석 API
+/* ✅ 모든 주제를 AI가 자동 분석하는 엔드포인트 */
 app.post("/analyze", async (req, res) => {
-    try {
-        const { answers } = req.body;
+  try {
+    const { topic, answers } = req.body;
 
-        // GPT 요청
-        const completion = await client.responses.create({
-            model: "gpt-4o-mini",   // ✅ 최신 모델
-            input: `
-            시니어 건강 분석 챗봇입니다.
-            사용자의 선택 답변: ${answers.join(", ")}
-            
-            아래 형식으로 답변하세요:
-            1) 통증 원인 분석
-            2) 생활 관리 조언
-            3) 필요 시 병원 방문 기준
-            4) 추천 건강 정보(시니어 친화적 톤)
-            `
-        });
+    const topicNames = {
+      joint: "무릎·관절",
+      bp: "혈압",
+      sugar: "혈당·당뇨",
+      scam: "보이스피싱",
+      welfare: "복지·지원금",
+      phone: "스마트폰 문제",
+      sleep: "불면증·수면",
+      senior_ins: "시니어 보험·건강보험"
+    };
 
-        const output = completion.output_text || "분석 결과를 생성하지 못했습니다.";
+    const name = topicNames[topic] || topic;
 
-        res.json({ result: output });
+    const prompt = `
+당신은 시니어에게 쉬운 표현으로 설명하는 전문 상담가입니다.
+아래 정보를 기반으로 건강/생활 상태를 분석하세요.
 
-    } catch (error) {
-        console.error("🚨 서버 분석 오류:", error);
-        res.json({ result: "❌ 서버 오류가 발생했습니다. 다시 시도해주세요." });
-    }
+[주제] ${name}
+[사용자 답변] ${answers.join(", ")}
+
+아래 형식을 꼭 지키세요:
+
+1) 현재 상태 요약
+2) 위험 신호 여부 (필요한 경우만)
+3) 생활 개선 방법 3~5개
+4) 병원·전문가 상담이 필요한 기준
+5) 너무 어렵지 않게, 따뜻한 말투로
+
+반말 금지. 의료 진단처럼 단정 금지.
+    `;
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.35
+    });
+
+    res.json({ result: completion.choices[0].message.content });
+
+  } catch (err) {
+    res.json({ result: "❌ AI 분석 중 오류가 발생했습니다." });
+  }
 });
 
-// 서버 실행
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`✅ 노을빛하루 메가 챗봇 서버 실행됨: http://localhost:${PORT}`);
-});
+app.listen(3000, () => console.log("✅ AI 분석 서버 실행 중"));
