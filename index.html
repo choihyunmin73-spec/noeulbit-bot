@@ -1,156 +1,126 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>노을빛하루 메가 챗봇</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>노을빛하루 메가 챗봇</title>
 
-    <style>
-        body {
-            font-family: "Noto Sans KR", sans-serif;
-            margin: 0;
-            background: #f5f7fb;
-        }
+  <style>
+    body {font-family: "Noto Sans KR", sans-serif; background:#f5f7fb; margin:0;}
+    .wrap { max-width:900px; margin:40px auto; padding:0 16px; }
 
-        .container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 20px;
-        }
+    /* 헤더 */
+    .header { display:flex; gap:14px; align-items:center; margin-bottom:22px; }
+    .icon { width:48px; height:48px; background:#d9e7ff; color:#1e3a8a;
+        border-radius:50%; display:flex; align-items:center; justify-content:center;
+        font-weight:700; font-size:20px; }
+    .title { font-size:24px; font-weight:800; }
+    .subtitle { color:#666; font-size:14px; margin-top:2px; }
 
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+    /* 메인 카드 */
+    .card {
+      background:white; padding:26px; border-radius:14px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.06);
+    }
+    .hello { font-size:18px; font-weight:700; margin-bottom:18px; }
 
-        .header-icon {
-            width: 48px;
-            height: 48px;
-            background: #d9e7ff;
-            color: #1e3a8a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 20px;
-            margin-right: 12px;
-        }
+    /* ✅ 3×4 그리드 */
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin-bottom:20px;
+    }
 
-        .title {
-            font-size: 24px;
-            font-weight: 700;
-        }
+    @media (max-width:800px){ .grid { grid-template-columns:repeat(2, 1fr); } }
+    @media (max-width:520px){ .grid { grid-template-columns:1fr; } }
 
-        .subtitle {
-            color: #555;
-            font-size: 14px;
-        }
+    .chip {
+      padding:14px;
+      background:#eef4ff;
+      border-radius:22px;
+      text-align:center;
+      font-size:15px;
+      cursor:pointer;
+      border:1px solid #d3e1ff;
+      transition:.15s;
+    }
+    .chip:hover { background:#d9e7ff; }
 
-        /* ✅ 주제 선택 카드 */
-        .main-box {
-            background: white;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            margin-top: 10px;
-        }
+    /* 입력창 */
+    .inputRow {
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+    }
+    .inputBox {
+      flex:1; padding:12px; border-radius:8px;
+      border:1px solid #ccd; font-size:14px;
+    }
+    .sendBtn {
+      background:#3b82f6; color:white;
+      padding:12px 22px; border:none; border-radius:8px;
+      cursor:pointer; font-size:15px;
+    }
+    .sendBtn:hover { background:#2563eb; }
+  </style>
 
-        .welcome {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 18px;
-        }
-
-        .topic-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .topic-btn {
-            padding: 12px 20px;
-            background: #eef4ff;
-            border-radius: 25px;
-            border: 1px solid #d3e1ff;
-            cursor: pointer;
-            font-size: 15px;
-            transition: 0.2s;
-        }
-
-        .topic-btn:hover {
-            background: #d9e7ff;
-        }
-
-        .input-box {
-            margin-top: 25px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-field {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccd;
-            font-size: 14px;
-        }
-
-        .send-btn {
-            background: #3b82f6;
-            color: white;
-            padding: 12px 22px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        .send-btn:hover {
-            background: #2563eb;
-        }
-    </style>
+  <script>
+    function goTopic(name){
+      // ✅ 버튼 클릭 → 다음 페이지로 이동
+      // 필요 시 /topic?name= 으로 유지
+      window.location.href = "/topic?name=" + encodeURIComponent(name);
+    }
+  </script>
 </head>
 
 <body>
-    <div class="container">
+  <div class="wrap">
 
-        <!-- ✅ 상단 헤더 -->
-        <div class="header">
-            <div class="header-icon">NH</div>
-            <div>
-                <div class="title">노을빛하루 메가 챗봇</div>
-                <div class="subtitle">시니어 건강 · 생활 · 스마트폰 · 보안 · 복지 종합 상담</div>
-            </div>
-        </div>
-
-        <!-- ✅ ✅ 불필요한 안내 문구 제거됨 ✅ -->
-
-        <!-- ✅ ✅ 오른쪽 박스(진단 진행·솔루션) 완전히 제거됨 ✅ -->
-
-        <!-- ✅ 주제 선택 박스만 유지 -->
-        <div class="main-box">
-            <div class="welcome">
-                안녕하세요. 노을빛하루입니다 😊<br>
-                아래에서 필요한 주제를 선택해 주세요.
-            </div>
-
-            <div class="topic-grid">
-                <div class="topic-btn">무릎·관절 통증</div>
-                <div class="topic-btn">혈압 관리</div>
-                <div class="topic-btn">혈당·당뇨</div>
-                <div class="topic-btn">스마트폰 문제</div>
-                <div class="topic-btn">보이스피싱 예방</div>
-                <div class="topic-btn">정부지원·복지</div>
-                <div class="topic-btn">수면·피로</div>
-            </div>
-
-            <div class="input-box">
-                <input class="input-field" placeholder="메시지를 입력하거나 위 선택지를 눌러보세요.">
-                <button class="send-btn">보내기</button>
-            </div>
-        </div>
+    <!-- 헤더 -->
+    <div class="header">
+      <div class="icon">NH</div>
+      <div>
+        <div class="title">노을빛하루 메가 챗봇</div>
+        <div class="subtitle">시니어 건강 · 복지 · 생활 · 스마트폰 · 보이스피싱 상담</div>
+      </div>
     </div>
+
+    <!-- 메인 카드 -->
+    <div class="card">
+      <div class="hello">
+        안녕하세요. 노을빛하루입니다 😊<br>
+        아래에서 필요한 주제를 선택해 주세요.
+      </div>
+
+      <!-- ✅ 12개 주제 3×4 -->
+      <div class="grid">
+
+        <div class="chip" onclick="goTopic('관절')">관절</div>
+        <div class="chip" onclick="goTopic('혈압')">혈압</div>
+        <div class="chip" onclick="goTopic('혈당')">혈당</div>
+
+        <div class="chip" onclick="goTopic('불면증')">불면증</div>
+        <div class="chip" onclick="goTopic('어깨·목 통증')">어깨·목 통증</div>
+        <div class="chip" onclick="goTopic('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
+
+        <div class="chip" onclick="goTopic('노안·시력저하')">노안·시력저하</div>
+        <div class="chip" onclick="goTopic('치매·기억력 문제')">치매·기억력 문제</div>
+        <div class="chip" onclick="goTopic('전립선·배뇨 문제')">전립선·배뇨 문제</div>
+
+        <div class="chip" onclick="goTopic('종합 건강 체크')">종합 건강 체크</div>
+        <div class="chip" onclick="goTopic('보이스피싱')">보이스피싱</div>
+        <div class="chip" onclick="goTopic('복지·생활지원금')">복지·생활지원금</div>
+
+      </div>
+
+      <!-- 입력 박스 -->
+      <div class="inputRow">
+        <input class="inputBox" placeholder="메시지를 입력하거나 위 선택지를 눌러보세요.">
+        <button class="sendBtn">보내기</button>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
