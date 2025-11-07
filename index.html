@@ -1,159 +1,240 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>노을빛하루 메가 챗봇</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>노을빛하루 메가 챗봇 | 시니어 종합 상담</title>
 
-    <style>
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background: #f6f7fb;
-            margin: 0;
-            padding: 0;
-        }
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        .container {
-            max-width: 720px;
-            margin: 30px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        }
+  <!-- Pretendard -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
 
-        h2 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .step-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 12px;
-            font-size: 16px;
-            background: #eef3ff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.25s;
-            text-align: left;
-        }
-
-        .option-btn:hover {
-            background: #d9e5ff;
-        }
-
-        .loading {
-            padding: 20px;
-            background: #f3f3f3;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .result-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 15px;
-            white-space: pre-line;
-        }
-    </style>
+  <style>
+    :root { --brand:#0ea5e9; }
+    body { font-family: 'Pretendard', system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif; }
+    .bubble { border-radius: 1rem; padding: .75rem 1rem; box-shadow: 0 4px 16px rgba(0,0,0,.06) }
+    .bot { background:#f8fafc; }
+    .user { background:#e0f2fe; }
+    .chip { border:1px solid #e5e7eb; border-radius:999px; padding:.5rem .9rem; display:inline-flex; gap:.5rem; align-items:center; }
+    .chip input { display:none; }
+    .chip.active { background:#e6f4ff; border-color:#bae6fd }
+    .card { border-radius:1rem; box-shadow:0 10px 30px rgba(2, 132, 199, .08); }
+    .btn { background:linear-gradient(180deg, #38bdf8, #0ea5e9); color:white; border-radius:.75rem; padding:.8rem 1rem; font-weight:700; box-shadow:0 8px 20px rgba(14,165,233,.25) }
+    .btn:disabled { opacity:.5; }
+  </style>
 </head>
 
-<body>
-<div class="container">
+<body class="bg-slate-50 min-h-screen">
+  <main class="mx-auto max-w-4xl p-4 sm:p-6">
+    <header class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 rounded-2xl bg-sky-500/10 grid place-items-center text-sky-600 font-bold">NH</div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold">노을빛하루 메가 챗봇</h1>
+        <p class="text-slate-500 text-sm">시니어 건강 · 생활 · 스마트폰 · 보안 · 복지 종합 상담</p>
+      </div>
+    </header>
 
-    <h2>🔒 노을빛하루 메가 챗봇</h2>
-    <p>타이핑 없이 버튼만 선택하면 분석·추천이 자동으로 나옵니다.</p>
+    <!-- 안내 -->
+    <section class="mb-4 text-sm text-slate-600">
+      <div class="p-3 sm:p-4 bg-white card">
+        <p class="leading-relaxed">
+          이 챗봇 링크는 유튜브 <strong>모든 영상 설명란/댓글 고정</strong>에 넣어두세요.<br>
+          사용자가 주제를 선택하면 맞춤 플로우로 자동 이동합니다.
+        </p>
+      </div>
+    </section>
 
-    <div id="chat-area"></div>
+    <div class="grid md:grid-cols-2 gap-4 md:gap-6">
+      <!-- 좌측 채팅 UI -->
+      <section class="bg-white p-3 sm:p-5 card">
+        <div id="chat" class="space-y-3 max-h-[70vh] overflow-auto pr-1">
+          <div class="bubble bot">
+            안녕하세요. <strong>노을빛하루</strong>입니다 😊<br/>
+            아래에서 <strong>필요한 주제</strong>를 선택해 주세요.
+          </div>
+          <div id="topicChips" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+        </div>
 
-</div>
+        <form id="userForm" class="mt-4 flex gap-2" onsubmit="return false;">
+          <input id="userInput" class="flex-1 rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300" placeholder="메시지를 입력하거나 위 선택지를 눌러주세요" />
+          <button id="sendBtn" class="btn" disabled>보내기</button>
+        </form>
+      </section>
 
-<script>
-    let currentStep = 0;
-    let answers = [];
+      <!-- 우측 정보 영역 -->
+      <section class="bg-white p-4 sm:p-5 card space-y-4">
+        <h2 class="font-bold">진단 진행</h2>
+        <div id="flowPanel" class="text-sm text-slate-600">
+          <p>
+            주제를 선택하면 간단한 체크 5~7문항 후<br>
+            <strong>맞춤 분석</strong>과 <strong>생활 조언</strong>, <strong>추천 솔루션</strong>이 제공됩니다.
+          </p>
+        </div>
 
-    const steps = [
-        {
-            question: "어떤 불편이 있나요?",
-            options: ["계단 통증", "걷기·앉았다 일어설 때 통증", "쑤심/뻐근함", "운동 후 통증", "기타/모름"]
-        },
-        {
-            question: "증상이 얼마나 지속되었나요?",
-            options: ["1주 미만", "1~4주", "1~3개월", "3개월 이상", "잘 모르겠음"]
-        },
-        {
-            question: "통증 강도는 어느 정도인가요?",
-            options: ["약함", "중간", "심함", "매우 심함"]
-        },
-        {
-            question: "어떤 상황에서 더 아픈가요?",
-            options: ["걷기", "계단", "쪼그려앉기", "장시간 서있기", "아무 때나"]
-        }
-    ];
+        <div class="border-t pt-3">
+          <h3 class="font-semibold mb-2">추천 솔루션(샘플)</h3>
+          <ul class="list-disc pl-5 text-sm text-slate-600" id="recommendList">
+            <li>관절: 2주 체험 패키지 / 온라인 맞춤 상담</li>
+            <li>혈압: 혈압 관리 앱 / 원격 건강 코칭</li>
+            <li>스마트폰: 시니어 원격 최적화</li>
+            <li>보이스피싱: 금융보안 서비스</li>
+            <li>복지: 받을 수 있는 지원금 간편 진단</li>
+          </ul>
+        </div>
+      </section>
+    </div>
 
-    function renderStep() {
-        const area = document.getElementById("chat-area");
-        area.innerHTML = "";
+    <footer class="text-center text-xs text-slate-400 mt-6">
+      © Noeulbit Haru — Senior-Friendly Assistant.
+    </footer>
+  </main>
 
-        const step = steps[currentStep];
+  <script>
+// ============================
+// 1) 주제 버튼 리스트
+// ============================
+const TOPICS = [
+  { id: 'joint', label: '무릎·관절 통증' },
+  { id: 'bp', label: '혈압 관리' },
+  { id: 'sugar', label: '혈당·당뇨' },
+  { id: 'phone', label: '스마트폰 문제' },
+  { id: 'scam', label: '보이스피싱 예방' },
+  { id: 'welfare', label: '정부지원·복지' },
+  { id: 'sleep', label: '수면·피로' },
+];
 
-        const q = document.createElement("div");
-        q.className = "step-title";
-        q.innerText = `질문 ${currentStep + 1} / ${steps.length}\n${step.question}`;
-        area.appendChild(q);
+// ============================
+// 2) 각 주제별 질문 세트
+// ============================
+const CHECKS = {
+  joint: [
+    { q:'언제부터 통증이 있었나요?', opts:['1개월 미만','1~3개월','3~6개월','6개월 이상'] },
+    { q:'어떤 때 더 아프신가요?', opts:['걷기','계단','쪼그려 앉기','가만히 있어도 아픔'] },
+    { q:'통증 강도는 어느 정도인가요?', opts:['1~3 약함','4~6 중간','7~8 강함','9~10 매우 심함'] },
+    { q:'아침에 뻣뻣함이 있나요?', opts:['예','아니오'] },
+    { q:'최근 치료 경험이 있나요?', opts:['예','아니오'] },
+  ],
+  bp: [
+    { q:'최근 혈압 측정 시기?', opts:['1주 이내','1개월 이내','3개월 이내','기억 안남'] },
+    { q:'고혈압 약 복용 여부', opts:['복용 중','처방받았으나 중단','복용 안함'] },
+    { q:'증상 여부', opts:['어지러움','두통','가슴통증','없음'] },
+    { q:'운동 빈도', opts:['주 0회','주 1~2회','주 3~4회','매일'] },
+    { q:'짜게 먹는 편인가요?', opts:['자주','보통','거의 없음'] },
+  ],
+  phone:[
+    { q:'불편한 문제 유형', opts:['느림','사진 안 찍힘','저장공간 부족','배터리 문제','와이파이 불안정'] },
+    { q:'휴대폰 기종', opts:['갤럭시','아이폰','LG','기타'] },
+    { q:'저장공간 부족 여부', opts:['예','아니오','모름'] },
+    { q:'수상한 앱 설치 경험', opts:['예','아니오','모름'] },
+  ],
+};
 
-        step.options.forEach(option => {
-            const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.innerText = option;
+// ============================
+// 3) 전역 상태
+// ============================
+let currentTopic=null;
+let answers=[];
+let step=0;
 
-            btn.onclick = () => {
-                answers.push(option);
-                currentStep++;
+const chat=document.getElementById('chat');
+const topicChips=document.getElementById('topicChips');
+const flowPanel=document.getElementById('flowPanel');
 
-                if (currentStep < steps.length) {
-                    renderStep();  // ✅ 자동 다음 질문
-                } else {
-                    sendToServer(); // ✅ 마지막 질문 후 자동 분석
-                }
-            };
+function addBubble(t,role='bot'){
+  const div=document.createElement('div');
+  div.className=`bubble ${role==='bot'?'bot':'user'}`;
+  div.innerHTML=t;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+}
 
-            area.appendChild(btn);
-        });
-    }
+// ============================
+// 4) 주제 선택 렌더링
+// ============================
+function renderTopics(){
+  topicChips.innerHTML='';
+  TOPICS.forEach(t=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='chip';
+    b.innerHTML=t.label;
+    b.onclick=()=>selectTopic(t.id);
+    topicChips.appendChild(b);
+  });
+}
 
-    async function sendToServer() {
-        const area = document.getElementById("chat-area");
-        area.innerHTML = `<div class="loading">분석 중입니다… 잠시만 기다려주세요.</div>`;
+// ============================
+// 5) 주제 선택 처리
+// ============================
+function selectTopic(id){
+  currentTopic=id;
+  answers=[];
+  step=0;
+  addBubble(`<strong>선택:</strong> ${TOPICS.find(t=>t.id===id).label}`,'user');
+  addBubble('간단한 체크를 진행할게요. 아래 보기 중 하나를 눌러주세요.');
+  flowPanel.innerHTML=`현재 주제: <strong>${TOPICS.find(t=>t.id===id).label}</strong>`;
+  showNextQuestion();
+}
 
-        try {
-            const res = await fetch("/analyze", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ answers })
-            });
+// ============================
+// 6) 질문 렌더링
+// ============================
+function showNextQuestion(){
+  const list=CHECKS[currentTopic]||[];
+  if(step>=list.length){ analyzeAndRecommend(); return; }
 
-            const data = await res.json();
+  const {q,opts}=list[step];
+  addBubble(`<strong>Q${step+1}.</strong> ${q}`);
 
-            area.innerHTML = `
-                <h3>분석 결과</h3>
-                <div class="result-box">${data.result}</div>
-            `;
-        } catch (err) {
-            area.innerHTML = `<div class="result-box">❌ 서버 오류가 발생했습니다.</div>`;
-        }
-    }
+  const optBox=document.createElement('div');
+  optBox.className='grid grid-cols-2 gap-2 mt-2';
 
-    window.onload = renderStep;
-</script>
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='chip !bg-white hover:bg-slate-100';
+    btn.innerHTML=o;
+    btn.onclick=()=>selectOption(o);
+    optBox.appendChild(btn);
+  });
+
+  chat.appendChild(optBox);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function selectOption(selected){
+  answers.push({q:CHECKS[currentTopic][step].q,a:selected});
+  addBubble(`<strong>선택:</strong> ${selected}`,'user');
+  step++;
+  showNextQuestion();
+}
+
+// ============================
+// 7) 분석 API 호출
+// ============================
+async function analyzeAndRecommend(){
+  addBubble('분석 중입니다…');
+
+  try{
+    const res=await fetch('/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ topic:currentTopic, answers })
+    });
+
+    const data=await res.json();
+    addBubble(data.reply||'분석 실패');
+  }catch(e){
+    addBubble('서버 연결이 원활하지 않습니다.');
+  }
+}
+
+// 초기 렌더링
+renderTopics();
+  </script>
 </body>
 </html>
