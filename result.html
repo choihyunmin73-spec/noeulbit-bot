@@ -2,97 +2,93 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>노을빛하루 종합 진단 결과</title>
-
 <style>
-  body {
-    font-family: "Noto Sans KR", sans-serif;
-    background:#f1f5ff;
-    margin:0;
-  }
-
-  .wrap {
-    max-width:900px;
-    margin:40px auto;
-    padding:16px;
-  }
-
-  .card {
-    background:white;
-    padding:32px;
-    border-radius:16px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.07);
-  }
-
-  h2 {
-    margin:0;
-    font-size:24px;
-    font-weight:800;
-    color:#1e3a8a;
-  }
-
-  .subtitle {
-    margin-top:6px;
-    color:#4b5563;
-    font-size:14px;
-  }
-
-  /* ✅ 결과 텍스트 박스 */
-  .resultBox {
-    margin-top:24px;
-    background:#eef4ff;
-    padding:22px;
-    border-left:6px solid #3b82f6;
-    border-radius:12px;
-    font-size:16px;
-    line-height:1.6;
-    white-space:pre-line;
-  }
-
-  /* ✅ 다시하기 버튼 */
-  .btn {
-    margin-top:28px;
-    width:100%;
-    background:#3b82f6;
-    color:white;
-    padding:14px 0;
-    border:none;
-    border-radius:10px;
-    font-size:17px;
-    cursor:pointer;
-    font-weight:600;
-  }
-  .btn:hover {
-    background:#2563eb;
-  }
-
+  body{margin:0;font-family:'Noto Sans KR',sans-serif;background:#f5f7fb}
+  .wrap{max-width:920px;margin:30px auto}
+  .card{background:#fff;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,.08);padding:28px}
+  .h1{font-size:22px;font-weight:800;margin:0 0 6px}
+  .sub{color:#64748b;margin-bottom:18px}
+  .pill{display:inline-block;padding:6px 12px;border-radius:999px;font-size:13px;margin-right:8px}
+  .pill.blue{background:#e8f0ff;color:#0f4fff}
+  .pill.amber{background:#fff1cf;color:#b45309}
+  .pill.red{background:#ffe5e5;color:#b91c1c}
+  .box{background:#f1f6ff;border-radius:12px;padding:18px;margin:16px 0}
+  h3{margin:18px 0 8px;font-size:18px}
+  ul{margin:8px 0 0 18px;color:#1f2937}
+  .btn{display:block;width:100%;text-align:center;background:#2f6efc;color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;margin-top:18px;cursor:pointer}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .muted{color:#6b7280;font-size:14px}
+  .badge{display:inline-block;padding:4px 8px;border-radius:8px;background:#eef2ff;color:#3730a3;font-size:12px;margin-right:6px}
 </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="card">
+      <div class="h1">💠 노을빛하루 종합 진단 결과</div>
+      <div class="sub">AI가 선택하신 문항을 바탕으로 초기 건강 상태와 조치를 안내해 드립니다.</div>
 
-<div class="wrap">
-  <div class="card">
-    
-    <h2>🔹 노을빛하루 종합 진단 결과</h2>
-    <div class="subtitle">AI가 입력하신 문답을 바탕으로 분석한 결과입니다.</div>
+      <div id="headerPills"></div>
 
-    <!-- ✅ AI가 생성한 결과가 여기 표시됨 -->
-    <div class="resultBox" id="resultText"></div>
+      <div class="box" id="summaryBox"></div>
 
-    <button class="btn" onclick="location.href='/'">← 다시 진단하기</button>
+      <div class="grid">
+        <div class="card">
+          <h3>✅ 셀프 케어 가이드</h3>
+          <ul id="tipList"></ul>
+        </div>
+        <div class="card">
+          <h3>⚠️ 이런 증상이면 즉시 조치</h3>
+          <ul id="rfList"></ul>
+          <p class="muted" id="rfNote"></p>
+        </div>
+      </div>
 
+      <div class="card">
+        <h3>🧾 선택한 항목</h3>
+        <div id="chipArea"></div>
+      </div>
+
+      <button class="btn" onclick="location.href='/'">← 다시 진단하기</button>
+    </div>
   </div>
-</div>
 
 <script>
-  // URL 파라미터에서 text(결과) 읽기
-  const params = new URLSearchParams(location.search);
-  const text = params.get("text");
+(function(){
+  // payload 를 URL로 전달받음
+  const q = new URLSearchParams(location.search);
+  const raw = q.get("payload") || "{}";
+  let data = {};
+  try { data = JSON.parse(decodeURIComponent(raw)); } catch(e){}
 
-  // 결과 출력
-  document.getElementById("resultText").innerText = text;
+  // 헤더 필
+  const pills = [];
+  pills.push(`<span class="pill blue">주제: ${data.topic || '—'}</span>`);
+  const sevClass = data.severity === '높음' ? 'red' : data.severity === '중간' ? 'amber' : 'blue';
+  pills.push(`<span class="pill ${sevClass}">위험도: ${data.severity || '—'}</span>`);
+  document.getElementById('headerPills').innerHTML = pills.join(' ');
+
+  // 요약
+  const sum = `
+    <div><span class="badge">권장 조치</span> ${data.action || ''}</div>
+    <div style="margin-top:6px;"><span class="badge">권장 진료과</span> ${data.dept || ''}</div>
+  `;
+  document.getElementById('summaryBox').innerHTML = sum;
+
+  // 팁
+  const tips = (data.tips || []).map(t => `<li>${t}</li>`).join('') || '<li>해당 없음</li>';
+  document.getElementById('tipList').innerHTML = tips;
+
+  // 레드플래그
+  const rfs = (data.redflags || []).map(r => `<li>${r}</li>`).join('') || '<li>특별한 응급 경고 없음</li>';
+  document.getElementById('rfList').innerHTML = rfs;
+  document.getElementById('rfNote').innerText =
+    (data.redflags && data.redflags.length) ? "※ 위 증상 발생 시 지체 없이 119 또는 응급실 방문을 권합니다." : "";
+
+  // 선택 항목 칩
+  const chips = (data.checks || []).map(c => `<span class="pill blue" style="margin-bottom:8px;">${c}</span>`).join(' ');
+  document.getElementById('chipArea').innerHTML = chips || '<span class="muted">선택 항목 없음</span>';
+})();
 </script>
-
 </body>
 </html>
