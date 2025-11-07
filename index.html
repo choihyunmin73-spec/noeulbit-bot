@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>노을빛하루 메가 건강 체크</title>
+    <title>노을빛하루 무료 건강 체크</title>
 
     <style>
         body {
@@ -14,7 +14,7 @@
         }
 
         .container {
-            max-width: 900px; /* ✅ 더 넓게 확장 */
+            max-width: 900px;
             margin: 30px auto;
             background: white;
             padding: 25px;
@@ -36,6 +36,12 @@
 
         .step-title {
             font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .question-title {
+            font-size: 17px;
             margin-bottom: 20px;
         }
 
@@ -78,10 +84,8 @@
 
     <h2>🔹 노을빛하루 무료 건강 체크</h2>
     <p class="subtitle">
-        아래 질문에 선택만 하면, AI가 무료로 건강 상태를 체크하고 필요한 정보를 안내해드립니다.
+        아래 질문에 선택만 하시면, AI가 무료로 건강 상태를 체크하고 필요한 정보를 안내해드립니다.
     </p>
-
-    <!-- ✅ 오른쪽 패널 완전 삭제됨, 전체 폭 확장 -->
 
     <div id="chat-area"></div>
 
@@ -116,10 +120,15 @@
 
         const step = steps[currentStep];
 
-        const q = document.createElement("div");
-        q.className = "step-title";
-        q.innerText = `질문 ${currentStep + 1} / ${steps.length}\n${step.question}`;
-        area.appendChild(q);
+        const stepTitle = document.createElement("div");
+        stepTitle.className = "step-title";
+        stepTitle.textContent = `질문 ${currentStep + 1} / ${steps.length}`;
+        area.appendChild(stepTitle);
+
+        const qText = document.createElement("div");
+        qText.className = "question-title";
+        qText.textContent = step.question;
+        area.appendChild(qText);
 
         step.options.forEach(option => {
             const btn = document.createElement("button");
