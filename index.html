@@ -1,100 +1,136 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<title>노을빛하루 AI 분석 서비스</title>
+<meta charset="UTF-8">
+<title>노을빛하루 AI 건강 분석 서비스</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
     body {
-        margin: 0;
-        font-family: 'Noto Sans KR', sans-serif;
-        background: #f5f7fb;
+        background:#f5f7fb;
+        margin:0;
+        font-family:'Noto Sans KR',sans-serif;
     }
 
-    /* 헤더 */
     .header {
-        background: linear-gradient(90deg, #0f4fff, #3b7bff);
-        padding: 25px;
-        text-align: center;
-        color: white;
-        font-size: 26px;
-        font-weight: 700;
+        background:#0f4fff;
+        color:white;
+        font-weight:800;
+        font-size:24px;
+        text-align:center;
+        padding:22px;
+        box-shadow:0 3px 12px rgba(0,0,0,0.15);
     }
 
-    /* 전체 컨테이너 */
-    .wrapper {
-        max-width: 880px;
-        margin: 30px auto;
-        background: white;
-        padding: 40px;
-        border-radius: 18px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    .wrap {
+        max-width:950px;
+        margin:20px auto;
+        padding:15px;
     }
 
-    h2 {
-        font-size: 22px;
-        margin-bottom: 25px;
-        color: #0f4fff;
+    .desc-box {
+        background:white;
+        padding:22px;
+        border-radius:16px;
+        box-shadow:0 4px 18px rgba(0,0,0,0.08);
+        margin-bottom:22px;
     }
 
-    /* 버튼 12개 그리드 */
+    .desc-title {
+        font-size:20px;
+        font-weight:800;
+        margin-bottom:8px;
+    }
+
+    .desc-sub {
+        font-size:15px;
+        color:#6b7280;
+        line-height:1.6;
+    }
+
     .grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:12px;
+        margin-top:20px;
     }
 
-    .topic-btn {
-        padding: 16px;
-        background: #eef4ff;
-        border-radius: 12px;
-        text-align: center;
-        cursor: pointer;
-        font-size: 17px;
-        border: 2px solid transparent;
-        transition: 0.25s;
-        user-select: none;
+    .btn-topic {
+        background:white;
+        border-radius:14px;
+        padding:18px 12px;
+        text-align:center;
+        font-size:17px;
+        font-weight:600;
+        border:2px solid #dce3ff;
+        cursor:pointer;
+        transition:0.25s;
+        box-shadow:0 3px 12px rgba(0,0,0,0.06);
+    }
+    .btn-topic:hover {
+        border-color:#0f4fff;
+        background:#eef3ff;
+        transform:translateY(-3px);
     }
 
-    .topic-btn:hover {
-        background: #dbe7ff;
-        border-color: #0f4fff;
+    /* ✅ 모바일 최적화 */
+    @media(max-width:480px){
+        .header { font-size:20px; padding:18px; }
+        .desc-title { font-size:18px; }
+        .desc-box { padding:18px; }
+        .grid {
+            grid-template-columns:repeat(2,1fr);
+            gap:10px;
+        }
+        .btn-topic {
+            font-size:16px;
+            padding:16px 10px;
+        }
     }
 </style>
 </head>
 
 <body>
 
-    <div class="header">
-        🏥 노을빛하루 AI 분석 서비스
-    </div>
+<div class="header">🏥 노을빛하루 AI 건강 분석 서비스</div>
 
-    <div class="wrapper">
-        <h2>진단할 항목을 선택해 주세요</h2>
+<div class="wrap">
 
-        <div class="grid">
-
-            <div class="topic-btn" onclick="selectTopic('관절 통증')">관절 통증</div>
-            <div class="topic-btn" onclick="selectTopic('혈압 관리')">혈압 관리</div>
-            <div class="topic-btn" onclick="selectTopic('혈당·당뇨')">혈당·당뇨</div>
-
-            <div class="topic-btn" onclick="selectTopic('불면증·수면장애')">불면증·수면장애</div>
-            <div class="topic-btn" onclick="selectTopic('어깨·목 통증')">어깨·목 통증</div>
-            <div class="topic-btn" onclick="selectTopic('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
-
-            <div class="topic-btn" onclick="selectTopic('노안·시력저하')">노안·시력저하</div>
-            <div class="topic-btn" onclick="selectTopic('치매·기억력 문제')">치매·기억력 문제</div>
-            <div class="topic-btn" onclick="selectTopic('전립선·배뇨 문제')">전립선·배뇨 문제</div>
-
-            <div class="topic-btn" onclick="selectTopic('종합 건강 체크')">종합 건강 체크</div>
-            <div class="topic-btn" onclick="selectTopic('보이스피싱 예방')">보이스피싱 예방</div>
-            <div class="topic-btn" onclick="selectTopic('복지·생활지원금')">복지·생활지원금</div>
-
+    <div class="desc-box">
+        <div class="desc-title">어떤 증상이 가장 궁금하신가요?</div>
+        <div class="desc-sub">
+            아래 항목 중 하나를 선택하시면<br>
+            **8개의 간단한 문답**으로 현재 상태를 분석해드립니다.<br><br>
+            📌 *의료적 진단이 아닌 건강관리 가이드입니다.*
         </div>
     </div>
 
+    <!-- ✅ 12개 주제 (3 × 4줄 구성) -->
+    <div class="grid">
+
+        <div class="btn-topic" onclick="go('관절 통증')">관절 통증</div>
+        <div class="btn-topic" onclick="go('혈압 관리')">혈압 관리</div>
+        <div class="btn-topic" onclick="go('혈당·당뇨')">혈당·당뇨</div>
+
+        <div class="btn-topic" onclick="go('불면증·수면장애')">불면증 · 수면장애</div>
+        <div class="btn-topic" onclick="go('어깨·목 통증')">어깨 · 목 통증</div>
+        <div class="btn-topic" onclick="go('심장·호흡·가슴통증')">심장 · 호흡 · 가슴통증</div>
+
+        <div class="btn-topic" onclick="go('노안·시력저하')">노안 · 시력저하</div>
+        <div class="btn-topic" onclick="go('치매·기억력 문제')">치매 · 기억력 문제</div>
+        <div class="btn-topic" onclick="go('전립선·배뇨 문제')">전립선 · 배뇨 문제</div>
+
+        <div class="btn-topic" onclick="go('종합 건강 체크')">종합 건강 체크</div>
+        <div class="btn-topic" onclick="go('보이스피싱 예방')">보이스피싱</div>
+        <div class="btn-topic" onclick="go('복지·생활지원금')">복지 · 생활지원금</div>
+
+    </div>
+
+</div>
+
 <script>
-function selectTopic(topic) {
-    window.location.href = `/question?topic=${encodeURIComponent(topic)}`;
+function go(topic){
+    location.href = `/question.html?topic=${encodeURIComponent(topic)}`;
 }
 </script>
 
