@@ -3,211 +3,154 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>노을빛하루 AI 건강 분석 서비스</title>
+    <title>노을빛하루 메가 챗봇</title>
 
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            background: #F2F4F7;
             font-family: "Noto Sans KR", sans-serif;
-            color: #1A2A43;
-        }
-
-        /* ✅ 대학병원 상단 헤더 */
-        .header {
-            width: 100%;
-            padding: 32px 20px;
-            background: linear-gradient(135deg, #1A2A43, #3C6FF3);
-            color: white;
-            text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            margin: 0;
+            background: #f5f7fb;
         }
 
         .container {
-            max-width: 960px;
-            margin: 35px auto;
-            padding: 0 22px;
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 20px;
         }
 
-        /* ✅ 병원 카드 */
-        .medical-card {
-            background: white;
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-            border: 1px solid #E2E5EB;
-            margin-bottom: 30px;
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
         }
 
-        .medical-title {
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: #d9e7ff;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
             font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .title {
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 18px;
-            border-left: 6px solid #3C6FF3;
-            padding-left: 12px;
         }
 
-        /* ✅ 체크박스 정갈한 병원 스타일 */
-        .checkbox-list label {
-            display: block;
-            font-size: 15px;
-            padding: 6px 0;
-            cursor: pointer;
+        .subtitle {
+            color: #555;
+            font-size: 14px;
         }
 
-        .checkbox-list input[type=checkbox] {
-            width: 16px;
-            height: 16px;
-            accent-color: #3C6FF3;
-            margin-right: 6px;
-        }
-
-        hr {
-            border: 0;
-            border-top: 1px solid #E2E5EB;
-            margin: 20px 0;
-        }
-
-        /* ✅ 버튼 */
-        .btn-primary {
-            width: 100%;
-            padding: 16px 0;
-            background: #3C6FF3;
-            color: white;
-            font-size: 18px;
-            font-weight: 700;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: 0.25s;
-        }
-        .btn-primary:hover {
-            background: #2f5cd6;
-        }
-
-        /* ✅ 결과 박스 */
-        .result-box {
-            background: #EEF2FF;
-            padding: 32px;
-            border-left: 8px solid #3C6FF3;
+        /* ✅ 주제 선택 카드 */
+        .main-box {
+            background: white;
+            padding: 25px;
             border-radius: 14px;
-            display: none;
-            white-space: pre-wrap;
-            line-height: 1.65;
-            font-size: 16px;
-            color: #1A2A43;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.07);
-            border: 1px solid #DFE4EF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            margin-top: 10px;
         }
 
-        .btn-restart {
-            margin-top: 25px;
-            width: 100%;
-            padding: 14px 0;
-            background: #D8DEE9;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
+        .welcome {
+            font-size: 18px;
             font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        .topic-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .topic-btn {
+            padding: 12px 20px;
+            background: #eef4ff;
+            border-radius: 25px;
+            border: 1px solid #d3e1ff;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .topic-btn:hover {
+            background: #d9e7ff;
+        }
+
+        .input-box {
+            margin-top: 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccd;
+            font-size: 14px;
+        }
+
+        .send-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
             cursor: pointer;
         }
-        .btn-restart:hover {
-            background: #C7CEDB;
-        }
 
-        @media(max-width: 640px) {
-            .medical-card { padding: 22px; }
-            .result-box { padding: 24px; }
-            .header { font-size: 24px; }
+        .send-btn:hover {
+            background: #2563eb;
         }
     </style>
 </head>
 
 <body>
-
-    <!-- ✅ 상단 병원 헤더 -->
-    <div class="header">
-        🏥 노을빛하루 AI 건강 분석 서비스
-    </div>
-
     <div class="container">
 
-        <!-- ✅ 1단계 -->
-        <div class="medical-card">
-            <div class="medical-title">1️⃣ 분석 분야 선택</div>
-
-            <select id="category" style="width:100%; padding:15px; border-radius:12px; font-size:16px; border:1px solid #C8D0DE;">
-                <option value="joint">관절 건강</option>
-                <option value="cardio">심혈관 건강</option>
-                <option value="diabetes">당뇨 위험</option>
-                <option value="neuro">신경·신체 반응</option>
-            </select>
+        <!-- ✅ 상단 헤더 -->
+        <div class="header">
+            <div class="header-icon">NH</div>
+            <div>
+                <div class="title">노을빛하루 메가 챗봇</div>
+                <div class="subtitle">시니어 건강 · 생활 · 스마트폰 · 보안 · 복지 종합 상담</div>
+            </div>
         </div>
 
-        <!-- ✅ 2단계 -->
-        <div class="medical-card">
-            <div class="medical-title">2️⃣ 현재 증상을 선택해주세요</div>
+        <!-- ✅ ✅ 불필요한 안내 문구 제거됨 ✅ -->
 
-            <div class="checkbox-list">
+        <!-- ✅ ✅ 오른쪽 박스(진단 진행·솔루션) 완전히 제거됨 ✅ -->
 
-                <label><input type="checkbox" value="stair_pain"> 계단 통증</label>
-                <label><input type="checkbox" value="duration_lt_1w"> 1주 미만</label>
-                <label><input type="checkbox" value="duration_ge_1w"> 1주 이상</label>
-                <label><input type="checkbox" value="mild"> 약함</label>
-                <label><input type="checkbox" value="moderate"> 중등도</label>
-                <label><input type="checkbox" value="severe"> 심함</label>
-
-                <hr>
-
-                <label><input type="checkbox" value="walk"> 걷기 시 통증</label>
-                <label><input type="checkbox" value="swelling"> 붓기 동반</label>
-                <label><input type="checkbox" value="heat"> 열감 동반</label>
-                <label><input type="checkbox" value="night_pain"> 야간 통증</label>
-
-                <hr>
-
-                <label><input type="checkbox" value="chest_pain"> 가슴 통증</label>
-                <label><input type="checkbox" value="dyspnea"> 호흡곤란</label>
-                <label><input type="checkbox" value="numbness"> 저림·마비</label>
-                <label><input type="checkbox" value="vision_change"> 시야 변화</label>
+        <!-- ✅ 주제 선택 박스만 유지 -->
+        <div class="main-box">
+            <div class="welcome">
+                안녕하세요. 노을빛하루입니다 😊<br>
+                아래에서 필요한 주제를 선택해 주세요.
             </div>
 
-            <button class="btn-primary" onclick="submitHealthCheck()">AI 건강 분석 실행</button>
+            <div class="topic-grid">
+                <div class="topic-btn">무릎·관절 통증</div>
+                <div class="topic-btn">혈압 관리</div>
+                <div class="topic-btn">혈당·당뇨</div>
+                <div class="topic-btn">스마트폰 문제</div>
+                <div class="topic-btn">보이스피싱 예방</div>
+                <div class="topic-btn">정부지원·복지</div>
+                <div class="topic-btn">수면·피로</div>
+            </div>
+
+            <div class="input-box">
+                <input class="input-field" placeholder="메시지를 입력하거나 위 선택지를 눌러보세요.">
+                <button class="send-btn">보내기</button>
+            </div>
         </div>
-
-        <!-- ✅ 결과 -->
-        <div id="result" class="result-box"></div>
-
-        <button class="btn-restart" onclick="location.reload()">← 처음으로 돌아가기</button>
-
     </div>
-
-<script>
-async function submitHealthCheck() {
-    const category = document.getElementById("category").value;
-
-    const answers = Array.from(
-        document.querySelectorAll("input[type=checkbox]:checked")
-    ).map(c => c.value);
-
-    const response = await fetch("/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, answers })
-    });
-
-    const data = await response.json();
-
-    const result = document.getElementById("result");
-    result.style.display = "block";
-    result.innerText = data.text;
-}
-</script>
-
 </body>
 </html>
