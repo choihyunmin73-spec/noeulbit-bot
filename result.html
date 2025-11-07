@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노을빛하루 종합 진단 결과</title>
+
+<style>
+  body {
+    font-family: "Noto Sans KR", sans-serif;
+    background:#f1f5ff;
+    margin:0;
+  }
+
+  .wrap {
+    max-width:900px;
+    margin:40px auto;
+    padding:16px;
+  }
+
+  .card {
+    background:white;
+    padding:32px;
+    border-radius:16px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.07);
+  }
+
+  h2 {
+    margin:0;
+    font-size:24px;
+    font-weight:800;
+    color:#1e3a8a;
+  }
+
+  .subtitle {
+    margin-top:6px;
+    color:#4b5563;
+    font-size:14px;
+  }
+
+  /* ✅ 결과 텍스트 박스 */
+  .resultBox {
+    margin-top:24px;
+    background:#eef4ff;
+    padding:22px;
+    border-left:6px solid #3b82f6;
+    border-radius:12px;
+    font-size:16px;
+    line-height:1.6;
+    white-space:pre-line;
+  }
+
+  /* ✅ 다시하기 버튼 */
+  .btn {
+    margin-top:28px;
+    width:100%;
+    background:#3b82f6;
+    color:white;
+    padding:14px 0;
+    border:none;
+    border-radius:10px;
+    font-size:17px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn:hover {
+    background:#2563eb;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    
+    <h2>🔹 노을빛하루 종합 진단 결과</h2>
+    <div class="subtitle">AI가 입력하신 문답을 바탕으로 분석한 결과입니다.</div>
+
+    <!-- ✅ AI가 생성한 결과가 여기 표시됨 -->
+    <div class="resultBox" id="resultText"></div>
+
+    <button class="btn" onclick="location.href='/'">← 다시 진단하기</button>
+
+  </div>
+</div>
+
+<script>
+  // URL 파라미터에서 text(결과) 읽기
+  const params = new URLSearchParams(location.search);
+  const text = params.get("text");
+
+  // 결과 출력
+  document.getElementById("resultText").innerText = text;
+</script>
+
+</body>
+</html>
