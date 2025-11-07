@@ -37,31 +37,30 @@
         margin-bottom:20px;
     }
 
+    /* ✅ 파란/노란/빨간 PILLS */
     .pill {
         display:inline-block;
         background:#eef2ff;
         padding:7px 12px;
         border-radius:999px;
         margin-right:8px;
-        margin-bottom:8px;
+        margin-bottom:6px;
         font-size:13px;
         color:#3742b1;
     }
-
     .pill.red { background:#ffe7e7; color:#b91c1c; }
     .pill.amber { background:#fff3cd; color:#b54706; }
 
     h3 {
-        font-size:20px;
+        font-size:19px;
         margin-top:15px;
         margin-bottom:12px;
-        font-weight:700;
     }
 
-    li { 
-        margin-bottom:8px; 
+    li {
+        margin-bottom:8px;
         font-size:16px;
-        line-height:1.5;
+        line-height:1.45;
     }
 
     .btn {
@@ -75,22 +74,14 @@
         margin-top:18px;
     }
 
-    #analysis {
-        font-size:16px;
-        line-height:1.65;
-        color:#333;
-        padding:8px 0;
-    }
-
     /* ✅ 모바일 최적화 */
     @media(max-width:480px){
         .wrap { margin:15px; }
         .card { padding:20px; }
         .title { font-size:22px; }
         h3 { font-size:18px; }
-        li { font-size:16px; }
-        .btn { font-size:18px; padding:16px; }
-        #analysis { font-size:15px; }
+        li { font-size:15px; }
+        .btn { font-size:17px; padding:16px; }
     }
 </style>
 </head>
@@ -99,23 +90,16 @@
 
 <div class="wrap">
 
-    <!-- ✅ MAIN SUMMARY CARD -->
+    <!-- ✅ 결과 헤더 -->
     <div class="card">
         <div class="title">💠 노을빛하루 종합 진단 결과</div>
         <div class="sub">선택한 문항 기반으로 초기 건강 상태를 안내합니다.</div>
 
         <div id="pills"></div>
-
         <div id="summary" style="margin-top:15px;"></div>
     </div>
 
-    <!-- ✅ 상세 분석 보고서 -->
-    <div class="card">
-        <h3>🩺 상세 분석 보고서</h3>
-        <div id="analysis"></div>
-    </div>
-
-    <!-- ✅ 셀프 케어 가이드 -->
+    <!-- ✅ 셀프 케어 -->
     <div class="card">
         <h3>✅ 셀프 케어 가이드</h3>
         <ul id="tips"></ul>
@@ -123,69 +107,74 @@
 
     <!-- ✅ 위험 신호 -->
     <div class="card">
-        <h3>⚠️ 지금 즉시 확인해야 할 신호</h3>
+        <h3>⚠️ 이런 증상이면 즉시 조치</h3>
         <ul id="redflags"></ul>
         <div id="rf-note" style="color:#d62828;font-size:14px;margin-top:8px;"></div>
     </div>
 
-    <!-- ✅ 사용자가 선택한 답변 -->
+    <!-- ✅ 선택한 항목 -->
     <div class="card">
         <h3>🧾 선택한 항목</h3>
         <div id="selected"></div>
     </div>
 
+    <!-- ✅ 다시하기 버튼 -->
     <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
 
 </div>
 
 <script>
 (function(){
-    const q = new URLSearchParams(location.search);
-    const raw = q.get("payload");
-    let data = {};
-    try { data = JSON.parse(decodeURIComponent(raw)); } catch(e){}
 
-    /* ✅ 페이지 상단 PILL */
+    /* ✅ 전달된 payload 파싱 */
+    const params = new URLSearchParams(location.search);
+    const raw = params.get("payload");
+
+    let data = {};
+    try {
+        data = JSON.parse(decodeURIComponent(raw));
+    } catch(e) {
+        console.error("❌ 데이터 파싱 오류", e);
+    }
+
+    /* ✅ 1) 제목 아래 파란 정보칩 */
     const pills = [];
     pills.push(`<span class="pill">주제: ${data.topic}</span>`);
 
     const sevClass =
         data.severity === "높음" ? "red" :
-        data.severity === "중간" ? "amber" : "";
+        data.severity === "중간" ? "amber" :
+        "";
 
     pills.push(`<span class="pill ${sevClass}">위험도: ${data.severity}</span>`);
 
     document.getElementById("pills").innerHTML = pills.join(" ");
 
-    /* ✅ SUMMARY */
+
+    /* ✅ 2) 주요 요약 정보 */
     document.getElementById("summary").innerHTML =
-        `<div style="font-size:17px; line-height:1.6;">
-            <b>권장 조치:</b> ${data.action}<br>
-            <b>권장 진료과:</b> ${data.dept}
-        </div>`;
+        `<div><b>권장 조치:</b> ${data.action}</div>
+         <div style="margin-top:6px;"><b>권장 진료과:</b> ${data.dept}</div>`;
 
-    /* ✅ 상세 분석 보고서 */
-    const analysisText = `
-        ${data.analysis.join("<br>")}
-    `;
-    document.getElementById("analysis").innerHTML = analysisText;
 
-    /* ✅ 셀프 케어 */
+    /* ✅ 3) 셀프 케어 */
     document.getElementById("tips").innerHTML =
         data.tips.map(t => `<li>${t}</li>`).join("");
 
-    /* ✅ 위험 신호 */
-    document.getElementById("redflags").innerHTML =
-        data.redflags.length > 0
-            ? data.redflags.map(r => `<li>${r}</li>`).join("")
-            : "<li>특별한 응급 신호 없음</li>";
 
-    if(data.redflags.length > 0){
+    /* ✅ 4) 위험 신호(redflags) */
+    document.getElementById("redflags").innerHTML =
+        (data.redflags && data.redflags.length > 0)
+            ? data.redflags.map(r => `<li>${r}</li>`).join("")
+            : "<li>특별한 응급 신호는 감지되지 않았습니다.</li>";
+
+    if (data.redflags && data.redflags.length > 0) {
         document.getElementById("rf-note").innerText =
-            "※ 위 증상 발생 시 즉시 119 또는 응급실 방문 필요";
+            "※ 위 증상이 나타나면 즉시 119 또는 가까운 응급실 방문이 필요합니다.";
     }
 
-    /* ✅ 선택한 항목 */
+
+    /* ✅ 5) 선택한 항목 목록 */
     document.getElementById("selected").innerHTML =
         data.checks.map(c => `<span class="pill">${c}</span>`).join(" ");
 
