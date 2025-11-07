@@ -1,200 +1,289 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>노을빛하루 무료 건강 체크</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노을빛하루 무료 건강 체크</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Pretendard", sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
 
-  <style>
-    body { font-family: 'Pretendard', sans-serif; background:#f3f4f6; }
-    .bubble { border-radius:1rem; padding:.8rem 1rem; box-shadow:0 4px 16px rgba(0,0,0,0.06); }
-    .bot { background:#fff; }
-    .user { background:#e0f2fe; }
-    .chip { border:1px solid #e5e7eb; border-radius:999px; padding:.6rem 1rem; cursor:pointer; text-align:center; }
-    .chip:hover { background:#f1f5f9; }
-    .btn { background:#0284c7; color:white; font-weight:700; border-radius:.75rem; padding:.8rem 1rem; }
-  </style>
+        .container {
+            max-width: 720px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .sub {
+            color: #777;
+            margin-bottom: 25px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .topic-btn, .opt-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            background: #eef2ff;
+            border-radius: 10px;
+            border: 1px solid #e0e6ff;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.25s;
+        }
+
+        .topic-btn:hover, .opt-btn:hover {
+            background: #dce5ff;
+        }
+
+        .q-title {
+            font-size: 19px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .loading-box {
+            padding: 25px;
+            background: #f5f5f7;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 17px;
+        }
+
+        .result-box {
+            background: #f8f9fc;
+            padding: 22px;
+            border-radius: 12px;
+            margin-top: 18px;
+            white-space: pre-line;
+            line-height: 1.5;
+            border: 1px solid #e7e9f3;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 12px 18px;
+            background: #e9e9e9;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #d7d7d7;
+        }
+    </style>
 </head>
 
 <body>
 
-<main class="mx-auto max-w-2xl p-6">
+<div class="container">
 
-  <!-- Header -->
-  <header class="mb-5">
-    <h1 class="text-2xl font-bold text-slate-800">노을빛하루 무료 건강 체크</h1>
-    <p class="text-slate-500 text-sm mt-1">
-      아래 질문들을 선택하면, AI가 무료로 건강 상태를 체크하고 필요한 정보를 안내드립니다.
-    </p>
-  </header>
-
-  <!-- 전체 1컬럼 챗봇 -->
-  <section class="bg-white p-5 rounded-xl shadow">
-
-    <!-- Chat -->
-    <div id="chat" class="space-y-3 max-h-[70vh] overflow-auto pr-1">
-      <div class="bubble bot">
-        확인하고 싶은 항목을 선택해 주세요 😊
-      </div>
-
-      <div id="topicChips" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+    <h2>🔹 노을빛하루 무료 건강 체크</h2>
+    <div class="sub">
+        아래 질문을 선택하면, AI가 무료로 건강 상태를 체크하고 필요한 정보를 안내드립니다.
     </div>
 
-    <!-- Input -->
-    <form id="userForm" class="mt-4 flex gap-2" onsubmit="return false;">
-      <input id="userInput"
-        class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300"
-        placeholder="메시지를 입력하거나 선택지를 눌러주세요" />
-      <button id="sendBtn" class="btn" disabled>보내기</button>
-    </form>
+    <div id="app"></div>
 
-  </section>
-
-  <footer class="text-center text-xs text-slate-400 mt-6">
-    © 노을빛하루 — Senior-friendly Advisor
-  </footer>
-
-</main>
+</div>
 
 <script>
-/* ✅ 1) 주제 목록 */
+/* ✅ 1) 전체 주제 */
 const TOPICS = [
-  { id:"joint", label:"무릎·관절" },
-  { id:"bp", label:"혈압" },
-  { id:"sugar", label:"혈당·당뇨" },
-  { id:"sleep", label:"불면증·수면" },
+    { id:"joint", label:"무릎·관절" },
+    { id:"bp", label:"혈압" },
+    { id:"sugar", label:"혈당·당뇨" },
+    { id:"sleep", label:"불면증·수면" },
     { id:"scam", label:"보이스피싱" },
-  { id:"welfare", label:"복지·지원금" },
-  { id:"phone", label:"스마트폰 문제" },
-  { id:"senior_ins", label:"시니어 보험·건강보험" }
+    { id:"welfare", label:"복지·지원금" },
+    { id:"phone", label:"스마트폰 문제" },
+    { id:"insurance", label:"시니어 보험·건강보험" }
 ];
 
-/* ✅ 2) 주제별 세부 설문 */
-const CHECKS = {
 
-  /* (예: 기존 joint/bp/sugar 등은 그대로 넣으면 됨) */
+/* ✅ 2) 주제별 질문 세트 */
+const QUESTIONS = {
+    joint: [
+        { q: "어떤 불편이 있나요?", opts: ["계단 통증","걷기/앉았다 일어설 때 통증","쑤심/뻐근함","운동 후 통증","기타/모름"] },
+        { q: "통증 기간은 어느 정도인가요?", opts: ["1주 미만","1~4주","1~3개월","3개월 이상","잘 모르겠음"] },
+        { q: "통증 강도는 어느 정도인가요?", opts: ["약함","중간","심함","매우 심함"] },
+        { q: "어떤 상황에서 악화되나요?", opts: ["걷기","계단","쪼그려 앉기","장시간 서 있기","특별히 없음"] }
+    ],
 
-  sleep: [
-    { q:"평균 수면 시간은?", opts:["4시간 이하","4~6시간","6~7시간","7시간 이상"] },
-    { q:"잠드는 데 어려움이 있나요?", opts:["예","아니오"] },
-    { q:"새벽에 자주 깨나요?", opts:["예","아니오"] },
-    { q:"아침에 상쾌한가요?", opts:["예","아니오","보통"] },
-    { q:"낮 피로감이 있나요?", opts:["자주 있음","가끔 있음","거의 없음"] }
-  ],
+    bp: [
+        { q:"최근 혈압 측정 시기", opts:["1주 이내","1개월 이내","3개월 이내","기억 안남"] },
+        { q:"고혈압 약 복용 여부", opts:["복용 중","처방받았으나 중단","복용 안 함"] },
+        { q:"평소 혈압 수치", opts:["정상","경계","높음","잘 모르겠음"] },
+        { q:"어떤 증상이 있나요?", opts:["어지럼증","두통","얼굴 붉어짐","특별한 증상 없음","가슴 두근거림"] }
+    ],
 
-  senior_ins: [
-    { q:"현재 가입된 보험이 있나요?", opts:["있음","없음","모름"] },
-    { q:"월 보험료는 어떤가요?", opts:["부담됨","적당함","전혀 부담 없음"] },
-    { q:"최근 병원 진료 경험이 있나요?", opts:["예","아니오"] },
-    { q:"보험 상담을 받아본 적 있나요?", opts:["있음","없음"] },
-    { q:"가장 걱정되는 부분은?", opts:["의료비 증가","보장 부족","보험 갱신·해지","상담 필요"] }
-  ]
+    sugar: [
+        { q:"최근 공복 혈당은?", opts:["70~99","100~125","126 이상","기억 안남"] },
+        { q:"당뇨약 복용 여부", opts:["복용 중","처방받았으나 중단","복용 안 함"] },
+        { q:"식후 2시간 혈당은?", opts:["140 미만","140~179","180 이상","기억 안남"] },
+        { q:"증상 여부", opts:["잦은 갈증","소변 증가","체중 변화","피로감","특별한 증상 없음"] }
+    ],
+
+    sleep: [
+        { q:"잠들기까지 걸리는 시간", opts:["30분 이하","30~60분","60분 이상","기억 안남"] },
+        { q:"수면 중 깨는 횟수", opts:["0~1회","2~3회","4회 이상"] },
+        { q:"아침 기분은 어떤가요?", opts:["개운함","피곤함","두통","집중력 저하"] },
+        { q:"수면 방해 요인", opts:["스트레스","통증","걱정/생각","소음","특별한 요인 없음"] }
+    ],
+
+    scam: [
+        { q:"어떤 상황이 의심되나요?", opts:["은행/정부기관","대출 권유","가족 사칭","납치/위협","기타"] },
+        { q:"금전 요구 여부", opts:["요구함","요구 안 함"] },
+        { q:"개인정보 입력 여부", opts:["입력함","입력 안 함"] },
+        { q:"피해 가능성", opts:["매우 의심됨","약간 의심됨","괜찮은 듯","모르겠음"] }
+    ],
+
+    welfare: [
+        { q:"현재 상황", opts:["만 65세 이상","기초연금 대상","차상위/한부모","해당 없음"] },
+        { q:"건강보험 등급", opts:["지역가입자","직장가입자","차상위/의료급여","잘 모르겠음"] },
+        { q:"필요한 지원 분야", opts:["의료비","주거","생계","돌봄","기타"] },
+        { q:"현재 고민", opts:["의료비 증가","월세/주거비","생활비 부족","보장/보험 부족","상담 필요"] }
+    ],
+
+    phone: [
+        { q:"어떤 문제가 있나요?", opts:["속도 느림","사진/영상 문제","문자 오류","전화 문제","기타"] },
+        { q:"사용 기종", opts:["아이폰","갤럭시","기타"] },
+        { q:"증상 기간", opts:["1주 미만","1주~1개월","1개월 이상"] },
+        { q:"어떤 현상이 나타나나요?", opts:["앱 종료","화면 멈춤","데이터 소진","저장공간 부족","잘 모르겠음"] }
+    ],
+
+    insurance: [
+        { q:"현재 보험 상태", opts:["여러 개 있음","1개 있음","거의 없음","모르겠음"] },
+        { q:"현재 고민", opts:["보장 부족","보험 갱신/해지","보험료 부담","상담 필요"] },
+        { q:"최근 건강 진단 여부", opts:["최근 진단 받음","1년 내 받음","받은 적 없음"] },
+        { q:"관심 항목", opts:["실비보험","암보험","치매보험","건강보험","모르겠음"] }
+    ]
 };
 
-let currentTopic = null;
-let currentStep = 0;
-let answers = [];
 
-const chat = document.getElementById("chat");
-const chips = document.getElementById("topicChips");
+/* ✅ 3) 화면 상태 */
+let state = {
+    topic: null,
+    step: 0,
+    answers: []
+};
 
-/* ✅ 3) 주제 선택 버튼 생성 */
-TOPICS.forEach(t=>{
-  const c = document.createElement("div");
-  c.className="chip";
-  c.innerText=t.label;
-  c.onclick=()=> startSurvey(t.id, t.label);
-  chips.appendChild(c);
-});
 
-/* ✅ 챗봇 말풍선 표시 */
-function bot(msg){
-  const b=document.createElement("div");
-  b.className="bubble bot";
-  b.innerText=msg;
-  chat.appendChild(b);
-  chat.scrollTop=chat.scrollHeight;
-}
-function user(msg){
-  const u=document.createElement("div");
-  u.className="bubble user ml-auto max-w-[85%]";
-  u.innerText=msg;
-  chat.appendChild(u);
-  chat.scrollTop=chat.scrollHeight;
+/* ✅ 화면 렌더링 */
+const app = document.getElementById("app");
+
+
+/* ✅ 첫 화면 – 주제 선택 */
+function renderTopics() {
+    state = { topic:null, step:0, answers:[] };
+
+    app.innerHTML = `
+        <div class="q-title">확인하고 싶은 항목을 선택해 주세요 😊</div>
+        <div class="topic-grid">
+            ${TOPICS.map(t => `
+                <button class="topic-btn" onclick="selectTopic('${t.id}')">${t.label}</button>
+            `).join("")}
+        </div>
+    `;
 }
 
-/* ✅ 설문 시작 */
-function startSurvey(id, label){
-  currentTopic = id;
-  currentStep = 0;
-  answers = [];
 
-  user(label);
-  bot(`"${label}" 관련 상태를 확인해볼게요.`);
-
-  setTimeout(()=> renderStep(), 500);
+/* ✅ 주제 선택 처리 */
+function selectTopic(id) {
+    state.topic = id;
+    state.step = 0;
+    state.answers = [];
+    renderQuestion();
 }
 
-/* ✅ 단계별 질문 렌더링 */
-function renderStep(){
-  const step = CHECKS[currentTopic][currentStep];
 
-  const q = document.createElement("div");
-  q.className="bubble bot";
-  q.innerText=step.q;
-  chat.appendChild(q);
+/* ✅ 질문 렌더링 */
+function renderQuestion() {
+    const qSet = QUESTIONS[state.topic];
+    const curr = qSet[state.step];
 
-  step.opts.forEach(opt=>{
-    const btn=document.createElement("div");
-    btn.className="chip mt-1";
-    btn.innerText=opt;
+    app.innerHTML = `
+        <div class="q-title">Q${state.step + 1}. ${curr.q}</div>
+        ${curr.opts.map(op => `
+            <button class="opt-btn" onclick="selectAnswer('${op}')">${op}</button>
+        `).join("")}
 
-    btn.onclick=()=>{
-      user(opt);
-      answers.push(opt);
-      currentStep++;
+        <div class="back-btn" onclick="renderTopics()">← 처음으로</div>
+    `;
+}
 
-      if(currentStep < CHECKS[currentTopic].length){
-        setTimeout(()=> renderStep(), 400);
-      } else {
+
+/* ✅ 답변 선택 후 다음 단계 */
+function selectAnswer(ans) {
+    state.answers.push(ans);
+    state.step++;
+
+    if (state.step >= QUESTIONS[state.topic].length) {
         sendToAI();
-      }
-    };
-
-    chat.appendChild(btn);
-  });
-
-  chat.scrollTop=chat.scrollHeight;
+    } else {
+        renderQuestion();
+    }
 }
 
-/* ✅ AI에게 분석 요청 */
-async function sendToAI(){
-  bot("AI가 분석 중입니다… ⏳");
 
-  try{
-    const res = await fetch("/analyze",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        topic: currentTopic,
-        answers: answers
-      })
-    });
+/* ✅ AI 서버에 분석 요청 */
+async function sendToAI() {
+    app.innerHTML = `<div class="loading-box">AI가 분석 중입니다… 잠시만 기다려주세요 ⏳</div>`;
 
-    const data = await res.json();
+    try {
+        const res = await fetch("/ai-analyze", {
+            method: "POST",
+            headers: { "Content-Type":"application/json" },
+            body: JSON.stringify({
+                topic: state.topic,
+                answers: state.answers
+            })
+        });
 
-    bot("✅ 분석 결과");
-    bot(data.result);
+        const data = await res.json();
 
-  } catch(e){
-    bot("❌ 분석 중 오류가 발생했습니다.");
-  }
+        app.innerHTML = `
+            <h3>✅ AI 분석 결과</h3>
+            <div class="result-box">${data.result}</div>
+            <div class="back-btn" onclick="renderTopics()">← 다시 시작</div>
+        `;
+
+    } catch (err) {
+        app.innerHTML = `
+            <div class="result-box">❌ 분석 중 오류가 발생했습니다.<br>잠시 후 다시 시도해주세요.</div>
+            <div class="back-btn" onclick="renderTopics()">← 처음으로</div>
+        `;
+    }
 }
+
+
+/* ✅ 초기 실행 */
+renderTopics();
 </script>
 
 </body>
 </html>
-
