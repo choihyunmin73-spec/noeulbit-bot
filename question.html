@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>증상 체크 | 노을빛하루 AI 건강 분석</title>
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; background:#f7f9fc; margin:0; }
+    .header { background:#0f68ff; color:white; padding:20px; font-size:22px; text-align:center; }
+    .wrapper { max-width:700px; margin:30px auto; background:white; padding:30px; border-radius:14px;
+               box-shadow:0 5px 15px rgba(0,0,0,0.1); }
+    h2 { margin:0 0 20px; color:#0f4fff; }
+    .checklist label { display:block; margin:12px 0; padding:10px;
+                       background:#eef4ff; border-radius:8px; cursor:pointer; }
+    button { margin-top:20px; width:100%; background:#0f4fff; color:white; 
+             border:none; padding:14px; font-size:18px; border-radius:10px; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="header">증상 체크</div>
+
+  <div class="wrapper">
+    <h2 id="topic-title"></h2>
+
+    <div class="checklist">
+      <label><input type="checkbox" value="통증이 1주 미만 지속됨"> 통증이 1주 미만 지속됨</label>
+      <label><input type="checkbox" value="통증이 1주 이상 지속됨"> 통증이 1주 이상 지속됨</label>
+      <label><input type="checkbox" value="증상이 악화됨"> 증상이 악화됨</label>
+      <label><input type="checkbox" value="중등도 이상의 불편감"> 중등도 이상의 불편감</label>
+      <label><input type="checkbox" value="밤에 더 심해짐"> 밤에 더 심해짐</label>
+      <label><input type="checkbox" value="걷거나 움직일 때 통증"> 걷거나 움직일 때 통증</label>
+      <label><input type="checkbox" value="열감 또는 붓기 동반"> 열감 또는 붓기 동반</label>
+      <label><input type="checkbox" value="일상생활 지장 있음"> 일상생활 지장 있음</label>
+    </div>
+
+    <button onclick="submitCheck()">AI 분석하기</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const topic = params.get("topic");
+    document.getElementById("topic-title").innerText = `선택한 항목: ${topic}`;
+
+    function submitCheck() {
+      const checks = [];
+      document.querySelectorAll("input[type=checkbox]").forEach(c => {
+        if (c.checked) checks.push(c.value);
+      });
+
+      fetch("/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, checks })
+      })
+      .then(res => res.json())
+      .then(data => {
+        window.location.href = `/result?text=${encodeURIComponent(data.result)}`;
+      });
+    }
+  </script>
+
+</body>
+</html>
