@@ -272,8 +272,9 @@ function submitAnswers() {
     })
     .then(res => res.json())
     .then(data => {
-        window.location.href =
-            `/result?text=${encodeURIComponent(data.result)}`;
+window.location.href =
+    `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
+
     });
 }
 
