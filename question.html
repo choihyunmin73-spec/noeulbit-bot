@@ -59,6 +59,154 @@
         color:#555;
         font-size:16px;
     }
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>증상 체크</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        font-family: "Noto Sans KR", sans-serif;
+        background:#f3f6fb;
+        margin:0;
+        padding:0;
+    }
+
+    .header {
+        text-align:center;
+        background:#0f4fff;
+        padding:22px;
+        font-size:22px;
+        color:white;
+        font-weight:700;
+    }
+
+    .wrapper {
+        max-width:650px;
+        margin:35px auto;
+        background:white;
+        padding:28px;
+        border-radius:15px;
+        box-shadow:0 5px 18px rgba(0,0,0,0.12);
+    }
+
+    .question-title {
+        font-size:22px;
+        font-weight:700;
+        margin-bottom:25px;
+        line-height:1.5;
+    }
+
+    .option {
+        padding:16px;
+        background:#eef3ff;
+        margin:12px 0;
+        border-radius:10px;
+        cursor:pointer;
+        font-size:18px;
+        transition:0.25s;
+    }
+
+    .option:hover {
+        background:#dce7ff;
+    }
+
+    .progress {
+        margin-top:25px;
+        text-align:center;
+        font-size:15px;
+        color:#5b6472;
+    }
+
+    /* ✅ 모바일 최적화 */
+    @media (max-width:480px) {
+        .header { font-size:20px; padding:18px; }
+        .wrapper { margin:15px; padding:20px; }
+        .question-title { font-size:19px; }
+        .option { font-size:17px; padding:18px; }
+        .progress { font-size:14px; }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="header">증상 체크</div>
+
+<div class="wrapper">
+    <div id="question-text" class="question-title"></div>
+    <div id="options"></div>
+    <div class="progress">
+        <span id="progress-text">문항 1 / 8</span>
+    </div>
+</div>
+
+<script>
+/* ✅ topic 가져오기 */
+const params = new URLSearchParams(location.search);
+const topic = params.get("topic");
+
+/* ✅ 문항 데이터는 이전에 제공된 survey 전체 구조 그대로 사용 (생략) */
+<!-- *** 여기에는 이전에 제공한 survey 전체 데이터 그대로 들어갑니다. *** -->
+
+/* ✅ 이하 동일 기능 */
+let index = 0;
+let selectedAnswers = [];
+let questions = survey[topic];
+
+function loadQuestion(){
+    const q = questions[index];
+    document.getElementById("question-text").innerText = q.q;
+
+    const optDiv = document.getElementById("options");
+    optDiv.innerHTML = "";
+
+    q.opt.forEach(option => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.innerText = option;
+
+        div.onclick = () => {
+            selectedAnswers.push(option);
+            index++;
+
+            if(index < questions.length){
+                loadQuestion();
+            } else {
+                submitAnswers();
+            }
+        };
+
+        optDiv.appendChild(div);
+    });
+
+    document.getElementById("progress-text").innerText =
+        `문항 ${index+1} / ${questions.length}`;
+}
+
+function submitAnswers(){
+    fetch("/analyze", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ topic, checks: selectedAnswers })
+    })
+    .then(res => res.json())
+    .then(data => {
+        window.location.href =
+          `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
+    });
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
+
+    
 </style>
 </head>
 
