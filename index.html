@@ -28,43 +28,51 @@
         }
 
         .container {
-            max-width: 980px;
+            max-width: 960px;
             margin: 35px auto;
             padding: 0 22px;
         }
 
-        /* ✅ 병원 문진 카드 */
+        /* ✅ 병원 카드 */
         .medical-card {
             background: white;
             padding: 32px;
             border-radius: 16px;
             box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
             border: 1px solid #E2E5EB;
+            margin-bottom: 30px;
         }
 
         .medical-title {
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 700;
-            color: #1A2A43;
             margin-bottom: 18px;
+            border-left: 6px solid #3C6FF3;
+            padding-left: 12px;
         }
 
+        /* ✅ 체크박스 정갈한 병원 스타일 */
         .checkbox-list label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 0;
-            font-size: 16px;
+            display: block;
+            font-size: 15px;
+            padding: 6px 0;
             cursor: pointer;
         }
 
         .checkbox-list input[type=checkbox] {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             accent-color: #3C6FF3;
+            margin-right: 6px;
         }
 
+        hr {
+            border: 0;
+            border-top: 1px solid #E2E5EB;
+            margin: 20px 0;
+        }
+
+        /* ✅ 버튼 */
         .btn-primary {
             width: 100%;
             padding: 16px 0;
@@ -79,9 +87,10 @@
             transition: 0.25s;
         }
         .btn-primary:hover {
-            background: #305CE0;
+            background: #2f5cd6;
         }
 
+        /* ✅ 결과 박스 */
         .result-box {
             background: #EEF2FF;
             padding: 32px;
@@ -89,17 +98,11 @@
             border-radius: 14px;
             display: none;
             white-space: pre-wrap;
-            line-height: 1.75;
-            font-size: 17px;
+            line-height: 1.65;
+            font-size: 16px;
             color: #1A2A43;
             box-shadow: 0 4px 14px rgba(0,0,0,0.07);
             border: 1px solid #DFE4EF;
-        }
-
-        hr {
-            border: 0;
-            border-top: 1px solid #E2E5EB;
-            margin: 22px 0;
         }
 
         .btn-restart {
@@ -127,14 +130,14 @@
 
 <body>
 
-    <!-- ✅ 대학병원 상단 헤더 (문구 변경됨) -->
+    <!-- ✅ 상단 병원 헤더 -->
     <div class="header">
         🏥 노을빛하루 AI 건강 분석 서비스
     </div>
 
     <div class="container">
 
-        <!-- ✅ 1단계: 분야 선택 -->
+        <!-- ✅ 1단계 -->
         <div class="medical-card">
             <div class="medical-title">1️⃣ 분석 분야 선택</div>
 
@@ -146,7 +149,7 @@
             </select>
         </div>
 
-        <!-- ✅ 2단계: 증상 체크 -->
+        <!-- ✅ 2단계 -->
         <div class="medical-card">
             <div class="medical-title">2️⃣ 현재 증상을 선택해주세요</div>
 
