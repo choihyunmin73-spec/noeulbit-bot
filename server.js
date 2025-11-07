@@ -7,17 +7,26 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
+app.get("/question", (req, res) => {
+  res.sendFile(__dirname + "/question.html");
+});
+
 app.get("/result", (req, res) => {
   res.sendFile(__dirname + "/result.html");
 });
 
-// ✅ AI 분석 결과(임시) — 나중에 GPT API로 교체 가능
+// ✅ AI 분석
 app.post("/analyze", (req, res) => {
-  const topic = req.body.topic;
+  const { topic, checks } = req.body;
 
-  const fakeResponse = `[AI 건강 분석 결과]\n선택 항목: ${topic}\n\n초기 증상 체크가 필요합니다.\n간단한 생활 조절 및 추가 점검을 권장드립니다.\n\n※ 본 결과는 참고용이며, 정확한 진단은 의료진 상담이 필요합니다.`;
+  const resultText =
+    `[AI 건강 분석 결과]\n` +
+    `주제: ${topic}\n` +
+    `체크한 항목: ${checks.join(", ")}\n\n` +
+    `※ 선택하신 증상을 기반으로 초기 건강 상태를 분석했습니다.\n` +
+    `증상이 지속되거나 악화되면 진료가 필요할 수 있습니다.`;
 
-  res.json({ result: fakeResponse });
+  res.json({ result: resultText });
 });
 
-app.listen(3000, () => console.log("✅ 노을빛하루 AI 서버 작동 중 (3000번 포트)"));
+app.listen(3000, () => console.log("✅ 서버 작동 중 (3000번 포트)"));
