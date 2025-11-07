@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노을빛하루 메가 챗봇</title>
+
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: #f6f7fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            background: #eef3ff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.25s;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: #d9e5ff;
+        }
+
+        .loading {
+            padding: 20px;
+            background: #f3f3f3;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h2>🔒 노을빛하루 메가 챗봇</h2>
+    <p>타이핑 없이 버튼만 선택하면 분석·추천이 자동으로 나옵니다.</p>
+
+    <div id="chat-area"></div>
+
+</div>
+
+<script>
+    let currentStep = 0;
+    let answers = [];
+
+    const steps = [
+        {
+            question: "어떤 불편이 있나요?",
+            options: ["계단 통증", "걷기·앉았다 일어설 때 통증", "쑤심/뻐근함", "운동 후 통증", "기타/모름"]
+        },
+        {
+            question: "증상이 얼마나 지속되었나요?",
+            options: ["1주 미만", "1~4주", "1~3개월", "3개월 이상", "잘 모르겠음"]
+        },
+        {
+            question: "통증 강도는 어느 정도인가요?",
+            options: ["약함", "중간", "심함", "매우 심함"]
+        },
+        {
+            question: "어떤 상황에서 더 아픈가요?",
+            options: ["걷기", "계단", "쪼그려앉기", "장시간 서있기", "아무 때나"]
+        }
+    ];
+
+    function renderStep() {
+        const area = document.getElementById("chat-area");
+        area.innerHTML = "";
+
+        const step = steps[currentStep];
+
+        const q = document.createElement("div");
+        q.className = "step-title";
+        q.innerText = `질문 ${currentStep + 1} / ${steps.length}\n${step.question}`;
+        area.appendChild(q);
+
+        step.options.forEach(option => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = option;
+
+            btn.onclick = () => {
+                answers.push(option);
+                currentStep++;
+
+                if (currentStep < steps.length) {
+                    renderStep();  // ✅ 자동 다음 질문
+                } else {
+                    sendToServer(); // ✅ 마지막 질문 후 자동 분석
+                }
+            };
+
+            area.appendChild(btn);
+        });
+    }
+
+    async function sendToServer() {
+        const area = document.getElementById("chat-area");
+        area.innerHTML = `<div class="loading">분석 중입니다… 잠시만 기다려주세요.</div>`;
+
+        try {
+            const res = await fetch("/analyze", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ answers })
+            });
+
+            const data = await res.json();
+
+            area.innerHTML = `
+                <h3>분석 결과</h3>
+                <div class="result-box">${data.result}</div>
+            `;
+        } catch (err) {
+            area.innerHTML = `<div class="result-box">❌ 서버 오류가 발생했습니다.</div>`;
+        }
+    }
+
+    window.onload = renderStep;
+</script>
+</body>
+</html>
