@@ -1,63 +1,76 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>노을빛하루 AI 종합 진단 결과</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  :root{
-    --bg:#f5f7fb; --card:#fff; --shadow:0 6px 18px rgba(0,0,0,.07);
-    --text:#111827; --muted:#6b7280; --brand:#2f6efc;
-    --border:#c9d2f0;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);font-family:'Noto Sans KR',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text)}
-  .container{max-width:1320px;margin:28px auto;display:flex;gap:20px;padding:0 14px;flex-wrap:nowrap;}
-  .left{flex:2;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:28px;}
-  .right{flex:1;background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:24px;}
-  .title{font-weight:800;font-size:24px;margin:0 0 8px;}
-  .sub{color:var(--muted);font-size:15px;margin:0 0 20px;}
-  .result-box{border:2px solid var(--border);border-radius:12px;padding:24px;display:flex;align-items:flex-start;justify-content:flex-start;gap:24px;margin-bottom:24px;flex-wrap:nowrap;}
-  .result-chart{width:240px!important;height:240px!important;flex-shrink:0;}
-  .result-detail{flex:1;word-break:keep-all;white-space:normal;line-height:1.7;font-size:15.5px;color:#333;}
-  .section{margin-top:26px;}
-  .section h3{font-size:18px;margin:0 0 12px;border-left:6px solid var(--brand);padding-left:10px;}
-  ul.clean{list-style:none;margin:0;padding-left:10px;}
-  ul.clean li{margin:6px 0;line-height:1.6;}
-  .btn{margin-top:18px;background:var(--brand);color:#fff;border:none;border-radius:12px;padding:16px 18px;font-size:17px;cursor:pointer;width:100%;}
-  .aff-title{color:#1e40af;font-size:18px;margin:0 0 12px;}
-  .card{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:14px;transition:.2s;}
-  .card:hover{background:#f0f4ff;border-color:#9db0ff;}
-  .card img{width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:10px;background:#eef1f9;}
-  .card a{color:#1e3a8a;text-decoration:none;font-weight:700;}
-  .card .desc{font-size:14px;color:#4b5563;margin-top:4px;}
-  .ins{margin-top:22px;padding-top:16px;border-top:1px solid #e5e7eb;}
-  .ins h3{border-left:5px solid #10b981;padding-left:10px;color:#065f46;font-size:17px;margin:0 0 10px;}
-  .ins .card{background:#ecfdf5;border-color:#cfe8e1;}
-  .ins .card a{color:#047857;}
+:root {
+  --bg:#f5f7fb; --card:#fff; --shadow:0 6px 18px rgba(0,0,0,.07);
+  --text:#111827; --muted:#6b7280; --brand:#2563eb; --border:#c9d2f0;
+}
+* {box-sizing:border-box;}
+body {
+  margin:0; background:var(--bg);
+  font-family:'Noto Sans KR',sans-serif; color:var(--text);
+}
+.container {
+  max-width:1320px; margin:28px auto; display:flex; gap:20px;
+  padding:0 14px; flex-wrap:nowrap;
+}
+.left {flex:2; background:var(--card); border-radius:16px; box-shadow:var(--shadow); padding:28px;}
+.right {flex:1; background:var(--card); border-radius:16px; box-shadow:var(--shadow); padding:24px;}
+.title {font-weight:800; font-size:24px; margin:0 0 8px;}
+.sub {color:var(--muted); font-size:15px; margin:0 0 20px;}
+.result-box {
+  border:2px solid var(--border); border-radius:12px; padding:24px;
+  display:flex; align-items:flex-start; justify-content:flex-start; gap:24px;
+  margin-bottom:24px; flex-wrap:nowrap;
+}
+.result-chart {width:240px!important; height:240px!important; flex-shrink:0;}
+.result-detail {flex:1; word-break:keep-all; line-height:1.7; font-size:15.5px; color:#333;}
+.result-detail strong {color:var(--brand);}
+.section {margin-top:26px;}
+.section h3 {font-size:18px; margin:0 0 12px; border-left:6px solid var(--brand); padding-left:10px;}
+ul.clean {list-style:none; margin:0; padding-left:10px;}
+ul.clean li {margin:6px 0; line-height:1.6;}
+.btn {
+  margin-top:18px; background:var(--brand); color:#fff; border:none;
+  border-radius:12px; padding:16px 18px; font-size:17px; cursor:pointer; width:100%;
+}
+.aff-title {color:#1e40af; font-size:18px; margin:0 0 12px;}
+.card {
+  border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:14px;
+  transition:.2s; cursor:pointer; overflow:hidden;
+}
+.card:hover {background:#f0f4ff; border-color:#9db0ff; transform:translateY(-3px);}
+.card img {
+  width:100%; height:160px; object-fit:cover; border-radius:10px;
+  margin-bottom:10px; background:#eef1f9;
+}
+.card-title {color:#1e3a8a; text-decoration:none; font-weight:700; font-size:15px;}
+.card .desc {font-size:14px; color:#4b5563; margin-top:4px;}
+.ins {margin-top:22px; padding-top:16px; border-top:1px solid #e5e7eb;}
+.ins h3 {border-left:5px solid #10b981; padding-left:10px; color:#065f46; font-size:17px; margin:0 0 10px;}
+.ins .card {background:#ecfdf5; border-color:#cfe8e1;}
+.ins .card:hover {background:#d1fae5;}
+.ins .card-title {color:#047857;}
 
-  /* ✅ 반응형 (핸드폰 최적화) */
-  @media (max-width:1000px){
-    .container{flex-direction:column;}
-    .result-box{flex-direction:column;align-items:center;}
-    .result-chart{width:200px!important;height:200px!important;}
-    .result-detail{width:100%;text-align:left;font-size:15px;}
-    .right{width:100%;margin-top:20px;}
-  }
-
-  @media (max-width:600px){
-    body{font-size:14px;}
-    .result-detail{font-size:14.5px;line-height:1.6;}
-    .card img{height:140px;}
-    /* ✅ 제휴상품 2열 그리드 */
-    #affList, #insList{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-    }
-    .card{margin-bottom:0;padding:10px;}
-  }
+@media(max-width:1000px){
+  .container{flex-direction:column;}
+  .result-box{flex-direction:column; align-items:center;}
+  .result-chart{width:200px!important; height:200px!important;}
+  .result-detail{width:100%; text-align:left; font-size:15px;}
+  .right{width:100%; margin-top:20px;}
+}
+@media(max-width:600px){
+  body{font-size:14px;}
+  .result-detail{font-size:14.5px; line-height:1.6;}
+  .card img{height:120px;}
+  #affList, #insList {display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+  .card{margin-bottom:0; padding:10px;}
+}
 </style>
 </head>
 <body>
@@ -69,7 +82,7 @@
     <p class="sub">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</p>
 
     <div class="result-box">
-      <canvas id="riskChart" class="result-chart" aria-label="위험도 그래프"></canvas>
+      <canvas id="riskChart" class="result-chart"></canvas>
       <div id="detail" class="result-detail"></div>
     </div>
 
@@ -103,121 +116,77 @@ const qs = new URLSearchParams(location.search);
 const payloadStr = qs.get("payload");
 let topicParam = qs.get("topic");
 let payload = null;
-if (payloadStr) {
-  try { payload = JSON.parse(decodeURIComponent(payloadStr)); } catch {}
-}
-const TOPIC = (payload && payload.topic) || topicParam || "관절 통증";
+if (payloadStr) { try { payload = JSON.parse(decodeURIComponent(payloadStr)); } catch {} }
+const TOPIC = (payload && payload.topic) || topicParam || "어깨·목 통증";
 
-/* 위험도 설정 */
-const riskConfig = {
-  "관절 통증": { percent:86,color:"#f97316" },
-  "혈압 관리": { percent:78,color:"#ef4444" },
-  "혈당·당뇨": { percent:74,color:"#dc2626" },
-  "불면증·수면장애": { percent:62,color:"#eab308" },
-  "어깨·목 통증": { percent:69,color:"#fb923c" },
-  "심장·호흡·가슴통증": { percent:88,color:"#b91c1c" },
-  "노안·시력저하": { percent:55,color:"#06b6d4" },
-  "치매·기억력 문제": { percent:72,color:"#9333ea" },
-  "전립선·배뇨 문제": { percent:67,color:"#2563eb" },
-  "종합 건강 체크": { percent:58,color:"#14b8a6" },
-  "보이스피싱 예방": { percent:83,color:"#0ea5e9" },
-  "복지·생활지원금": { percent:64,color:"#10b981" }
+/* 위험도 및 설명 */
+const riskData = {
+  "어깨·목 통증": {percent:74,color:"#fb923c",desc:"근육 긴장 및 어깨 결림이 누적된 상태입니다. 스트레칭 및 온찜질로 개선 가능성이 높습니다."},
+  "혈압 관리": {percent:78,color:"#ef4444",desc:"혈압 변동성이 높아 생활 관리가 필요합니다. 규칙적 운동과 염분 제한이 필수입니다."},
+  "관절 통증": {percent:86,color:"#f97316",desc:"초기 관절염 의심 단계로 평가됩니다. 활동 후 통증·붓기 주의가 필요합니다."}
 };
 
-/* 상세 설명 샘플 */
-const detailTemplates={
-  "관절 통증":[
-    "초기 관절염 의심 단계로 평가됩니다.",
-    "계단 오르내리기·장시간 보행에서 통증이 악화될 수 있습니다.",
-    "아침 뻣뻣함과 국소 압통이 반복될 가능성이 높습니다.",
-    "연골 마모 진행이 예측되어 체중 관리가 중요합니다.",
-    "허벅지·엉덩이 근육 강화가 통증 감소에 핵심입니다.",
-    "운동 직후 10분 냉찜질, 평소 15분 온찜질을 권장합니다.",
-    "30~40분마다 2~3분 가볍게 걷기(장시간 앉아있기 금지).",
-    "쿠션이 좋은 운동화 + 내측지지 깔창을 추천합니다.",
-    "보조적으로 MSM·오메가3·비타민 D/K2 섭취가 도움됩니다.",
-    "증상 증가 시 영상검사(X-ray/초음파) 및 전문치료가 필요합니다."
+/* 진단 요약 예시 */
+const summaryText = {
+  "어깨·목 통증": [
+    "장시간 스마트폰·컴퓨터 사용에 의한 근육 피로 누적.",
+    "온찜질과 가벼운 스트레칭으로 완화 가능.",
+    "자세 교정 밴드 및 근육 이완 보조기구 추천."
   ],
-  "혈압 관리":[
-    "혈압 변동성이 커 관리가 필요한 단계로 판단됩니다.",
-    "두통·어지러움·가슴 답답함 동반 시 즉시 진료가 필요합니다.",
-    "염분·야식·가공식품을 줄이고 수분 섭취를 규칙적으로 유지하세요.",
-    "하루 30분 걷기·근력운동 병행이 혈압 안정에 효과적입니다.",
-    "수면 부족과 스트레스가 혈압 상승에 큰 영향을 줍니다.",
-    "자기 전 스마트폰·카페인을 줄이고 일정한 수면시간을 유지하세요.",
-    "약 복용 중이라면 시간·용량을 늘 동일하게 지키는 것이 중요합니다.",
-    "집에서는 아침/저녁 2회, 1주 기록을 유지해 의사와 상의하세요.",
-    "오메가3·코큐텐 등은 보조적으로 도움될 수 있습니다.",
-    "갑작스러운 흉통·호흡곤란 시 119/응급실을 권장합니다."
+  "혈압 관리": [
+    "수축기 혈압 상승 경향 확인됨.",
+    "염분 섭취 줄이고 규칙적 수면 필요.",
+    "꾸준한 유산소 운동으로 혈압 안정화 기대."
   ]
 };
 
-/* 보험 제휴 샘플 */
-const insuranceByTopic={
-  "혈압 관리":[
-    {title:"심뇌혈관 집중 보장",link:"#",desc:"뇌출혈·급성심근경색 특약 비교"},
-    {title:"만성질환 실손 업그레이드",link:"#",desc:"고혈압 동반자용 특약 구조"}
-  ],
-  "관절 통증":[
-    {title:"정형외 실손/입원 특화 비교",link:"#",desc:"관절·물리치료 보장 항목 중점 비교"},
-    {title:"노후 실손 플랜",link:"#",desc:"자부담 최소화형 선택지 안내"}
-  ]
-};
+/* 보험 제휴서비스 */
+const insuranceList = [
+  {title:"실손보험 비교", link:"#", desc:"병원비·약값 부담 줄이는 최신 실손 플랜 비교"},
+  {title:"질병 보장형 플랜", link:"#", desc:"만성질환·입원 대비 종합보장형 설계 추천"}
+];
 
-(async function render(){
-  let summary=[],opinion="";
-  try{
-    const analysis=await fetch("analysis.json").then(r=>r.json());
-    const a=analysis[TOPIC];if(a){summary=a.summary||[];opinion=a.opinion||"";}
-  }catch(e){}
-  const detailLines=detailTemplates[TOPIC]||["현재 상태 해석 데이터가 부족합니다.","추가 점검이 필요합니다."];
-  document.getElementById("detail").innerHTML=detailLines.join("<br>");
-  document.getElementById("summary").innerHTML=(summary.length?summary:[
-    "현재 상태에 대한 기본 가이드를 표시합니다.",
-    "추가 검진 및 생활 관리 계획을 수립하세요."
-  ]).map(s=>`<li>${s}</li>`).join("");
-  document.getElementById("opinion").textContent=opinion||"개인 상황에 맞는 세부 계획은 전문의 상담 후 결정하는 것을 권장합니다.";
-  let {percent,color}=riskConfig[TOPIC]||{percent:60,color:"#2f6efc"};
-  if(payload&&payload.severity){
-    const sev=String(payload.severity);
-    if(sev.includes("높"))percent=Math.max(percent,80);
-    else if(sev.includes("중"))percent=Math.max(percent,65);
-    else percent=Math.min(percent,55);
-  }
+/* 제휴상품 예시 */
+const affList = [
+  {title:"온열 어깨찜질기",desc:"혈류 개선 및 근육 이완",img:"https://via.placeholder.com/600x400.png?text=온열+찜질기",link:"#"},
+  {title:"자세 교정 밴드",desc:"거북목·어깨 긴장 완화",img:"https://via.placeholder.com/600x400.png?text=자세+밴드",link:"#"},
+  {title:"마그네슘 영양제",desc:"근육 피로 회복 지원",img:"https://via.placeholder.com/600x400.png?text=마그네슘",link:"#"}
+];
+
+/* 실행 */
+(function render(){
+  const risk = riskData[TOPIC] || {percent:60,color:"#2f6efc",desc:"상세 분석 데이터가 부족합니다."};
   const ctx=document.getElementById("riskChart");
   new Chart(ctx,{
     type:"doughnut",
-    data:{datasets:[{data:[percent,100-percent],backgroundColor:[color,"#e5e7eb"],borderWidth:0}]},
-    options:{
-      cutout:"75%",
-      plugins:{
-        legend:{display:false},
-        tooltip:{enabled:false},
-        title:{display:true,text:`위험도 ${percent}%`,color:"#1e3a8a",font:{size:18,weight:"bold"},position:"center"}
-      }
-    }
+    data:{datasets:[{data:[risk.percent,100-risk.percent],backgroundColor:[risk.color,"#e5e7eb"],borderWidth:0}]},
+    options:{cutout:"75%",plugins:{legend:{display:false},tooltip:{enabled:false}}}
   });
 
-  try{
-    const aff=await fetch("affiliate.json").then(r=>r.json());
-    const list=aff[TOPIC]||[];
-    const wrap=document.getElementById("affList");
-    wrap.innerHTML=list.map(item=>{
-      const img=item.img||`https://via.placeholder.com/600x380.png?text=${encodeURIComponent(item.title)}`;
-      return `<div class="card">
-        <img src="${img}" alt="${item.title}">
-        <a href="${item.link}" target="_blank">${item.title}</a>
-        <div class="desc">${item.desc||""}</div>
-      </div>`;
-    }).join("")||`<div class="card"><div class="desc">준비된 제휴상품이 없습니다.</div></div>`;
-  }catch(e){
-    document.getElementById("affList").innerHTML=`<div class="card"><div class="desc">affiliate.json 불러오기 실패</div></div>`;
-  }
+  document.getElementById("detail").innerHTML = `
+    <strong>AI 분석결과:</strong> 위험도 ${risk.percent}% 단계입니다.<br>
+    ${risk.desc}<br>
+    생활습관 조정 및 전문가 상담을 권장합니다.
+  `;
 
-  const ins=insuranceByTopic[TOPIC]||[];
-  document.getElementById("insList").innerHTML=ins.map(x=>`
-    <div class="card"><a href="${x.link}" target="_blank">${x.title}</a><div class="desc">${x.desc||""}</div></div>
-  `).join("")||`<div class="card"><div class="desc">보험 제휴 정보가 없습니다.</div></div>`;
+  const sum = summaryText[TOPIC] || ["현재 상태에 대한 데이터가 부족합니다.","추가 점검이 필요합니다."];
+  document.getElementById("summary").innerHTML = sum.map(s=>`<li>${s}</li>`).join("");
+  document.getElementById("opinion").textContent = "지속적 스트레칭, 규칙적 수면, 근육이완 관리가 핵심입니다.";
+
+  document.getElementById("affList").innerHTML = affList.map(a=>`
+    <div class="card" onclick="window.open('${a.link}','_blank')">
+      <img src="${a.img}" alt="${a.title}">
+      <div class="card-title">${a.title}</div>
+      <div class="desc">${a.desc}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("insList").innerHTML = insuranceList.map(i=>`
+    <div class="card" onclick="window.open('${i.link}','_blank')">
+      <div class="card-title">${i.title}</div>
+      <div class="desc">${i.desc}</div>
+    </div>
+  `).join("");
 })();
 </script>
 
