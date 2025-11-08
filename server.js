@@ -1,83 +1,85 @@
-//-------------------------------------------------------------
-// 🌇 Noeulbit Haru AI 종합진단 서버 (완전 교체본)
-//-------------------------------------------------------------
+// ==========================================
+// 🌇 노을빛하루 AI 종합 진단 서버 (완전 교체본)
+// ==========================================
+
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+
 const app = express();
-
-// ✅ JSON 본문 처리
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname)); // 정적 파일 (HTML/CSS/JS)
 
-// ✅ 정적 리소스 제공 (이미지, CSS, JS, HTML 포함)
-app.use(express.static(__dirname, { extensions: ["html"] }));
-
-// ✅ 기본 라우팅
+// ----------------------------------------------------
+// ✅ 기본 라우트: index, question, result
+// ----------------------------------------------------
 app.get("/", (req, res) => {
-  console.log("✅ [접속] index.html 로드됨");
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.get("/question", (req, res) => {
-  console.log("✅ [접속] question.html 로드됨");
+app.get("/question.html", (req, res) => {
   res.sendFile(path.join(__dirname, "question.html"));
 });
 
-app.get("/result", (req, res) => {
-  console.log("✅ [접속] result.html 로드됨");
+app.get("/result.html", (req, res) => {
   res.sendFile(path.join(__dirname, "result.html"));
 });
 
-// ✅ JSON 데이터 로드 API (필요 시 fetch용)
-app.get("/data/analysis", (req, res) => {
-  const filePath = path.join(__dirname, "analysis.json");
+// ----------------------------------------------------
+// ✅ 분석 요청 처리 (결과 전송)
+// ----------------------------------------------------
+app.post("/api/analyze", (req, res) => {
   try {
-    const data = fs.readFileSync(filePath, "utf8");
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.send(data);
-    console.log("📊 [데이터] analysis.json 전송 완료");
-  } catch (err) {
-    console.error("❌ analysis.json 로드 오류:", err);
-    res.status(500).json({ error: "analysis.json 파일을 읽을 수 없습니다." });
+    const { topic, answers } = req.body;
+
+    if (!topic || !answers) {
+      return res.status(400).json({
+        success: false,
+        message: "입력 데이터가 누락되었습니다."
+      });
+    }
+
+    console.log("📩 [AI 요청 수신]", topic, answers.length + "개 문항");
+
+    // 📂 analysis.json 로드
+    const analysisPath = path.join(__dirname, "analysis.json");
+    const analysisData = JSON.parse(fs.readFileSync(analysisPath, "utf8"));
+
+    // ✅ 주제 기반 분석 데이터 가져오기
+    const category = analysisData[topic];
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: `해당 주제(${topic})에 대한 분석 데이터가 없습니다.`
+      });
+    }
+
+    // ✅ 예시로 첫 번째 섹션을 반환
+    const result = category.mild || category.moderate || category.severe;
+
+    // ✅ 반환 데이터
+    return res.json({
+      success: true,
+      topic,
+      risk: result.risk,
+      detail: result.detail,
+      summary: result.summary,
+      opinion: result.opinion
+    });
+  } catch (error) {
+    console.error("❌ 분석 처리 중 오류:", error);
+    return res.status(500).json({
+      success: false,
+      message: "서버 내부 오류가 발생했습니다."
+    });
   }
 });
 
-app.get("/data/affiliate", (req, res) => {
-  const filePath = path.join(__dirname, "affiliate.json");
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.send(data);
-    console.log("📦 [데이터] affiliate.json 전송 완료");
-  } catch (err) {
-    console.error("❌ affiliate.json 로드 오류:", err);
-    res.status(500).json({ error: "affiliate.json 파일을 읽을 수 없습니다." });
-  }
-});
-
-app.get("/data/survey", (req, res) => {
-  const filePath = path.join(__dirname, "survey.json");
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.send(data);
-    console.log("🧠 [데이터] survey.json 전송 완료");
-  } catch (err) {
-    console.error("❌ survey.json 로드 오류:", err);
-    res.status(500).json({ error: "survey.json 파일을 읽을 수 없습니다." });
-  }
-});
-
-// ✅ 헬스체크 (Render 빌드 확인용)
-app.get("/health", (req, res) => {
-  res.status(200).send("OK - Noeulbit Haru AI Server is running ✅");
-});
-
-// ✅ 서버 실행 (Render/Vercel 호환)
+// ----------------------------------------------------
+// ✅ 서버 구동
+// ----------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("🚀 [SERVER STARTED]");
-  console.log(`🌇 Noeulbit Haru AI Diagnostic Server running on port ${PORT}`);
-  console.log("📂 Serving static files from:", __dirname);
+  console.log(`🚀 [SERVER STARTED] 노을빛하루 서버 실행 중 (포트: ${PORT})`);
+  console.log(`📂 정적 파일 경로: ${__dirname}`);
 });
