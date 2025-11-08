@@ -1,113 +1,78 @@
-// ==========================
-// 노을빛하루 AI 진단 시스템 서버
-// ==========================
+// ✅ Noeulbit Haru AI Diagnosis Server (stable full set)
 const express = require("express");
 const path = require("path");
 const app = express();
 
 app.use(express.json());
-app.use(express.static(__dirname)); // ✅ 정적 파일(index, css, 이미지 등) 직접 서빙
+app.use(express.static(__dirname));
 
-// ==========================
-// 기본 라우팅
-// ==========================
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+/* Routes */
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/question.html", (req, res) => res.sendFile(path.join(__dirname, "question.html")));
+app.get("/result.html", (req, res) => res.sendFile(path.join(__dirname, "result.html")));
 
-app.get("/question.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "question.html"));
-});
-
-app.get("/result.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "result.html"));
-});
-
-// ==========================
-// AI 분석 로직 (간단 진단형)
-// ==========================
-function analyzeTopic(topic, answers) {
-  // 위험 단어 패턴 (문항 분석용)
-  const riskWords = ["심함", "악화", "어려움", "위험", "높음", "갑자기", "통증", "저림"];
+/* Simple analyzer matching result.html fields */
+function analyzeTopic(topic, checks = []) {
+  const riskWords = ["심함","악화","어려움","위험","높음","즉시","갑자기","숨","호흡","가슴","저림","통증"];
   let score = 0;
+  checks.forEach(c => riskWords.forEach(w => { if (c && c.includes(w)) score++; }));
 
-  answers.forEach((a) => {
-    riskWords.forEach((r) => {
-      if (a.includes(r)) score++;
-    });
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const percent = clamp(Math.round(12 + score * 12), 5, 95);
+
+  let severity = "낮음";
+  if (score >= 5) severity = "높음";
+  else if (score >= 2) severity = "중간";
+
+  const actionMap = { "낮음":"생활 관리가 필요합니다.", "중간":"조기 관리 및 관찰이 필요합니다.", "높음":"전문의 상담을 권장합니다." };
+  const action = actionMap[severity];
+
+  const deptMap = {
+    "관절 통증":"정형외과",
+    "혈압 관리":"순환기내과",
+    "혈당·당뇨":"내분비내과",
+    "불면증·수면장애":"신경과 / 정신건강의학과",
+    "어깨·목 통증":"정형외과 / 재활의학과",
+    "심장·호흡·가슴통증":"순환기내과 / 호흡기내과",
+    "노안·시력저하":"안과",
+    "치매·기억력 문제":"신경과",
+    "전립선·배뇨 문제":"비뇨의학과",
+    "종합 건강 체크":"가정의학과",
+    "보이스피싱 예방":"해당 없음",
+    "복지·생활지원금":"해당 없음"
+  };
+  const dept = deptMap[topic] || "상담 필요";
+
+  const tipsCommon = [
+    "충분한 수분 섭취","가벼운 스트레칭","규칙적 수면 유지",
+    "짧은 산책으로 활동량 증가","과로 피하고 휴식"
+  ];
+
+  const redflags = [];
+  checks.forEach(c => {
+    if (!c) return;
+    if (c.includes("가슴") || c.includes("숨")) redflags.push("가슴 통증·호흡곤란 시 즉시 진료");
+    if (c.includes("갑자기")) redflags.push("갑작스런 증상 변화는 응급 신호일 수 있음");
+    if (c.includes("심함")) redflags.push("일상에 지장을 주는 심한 통증은 진료 필요");
   });
 
-  // 결과 텍스트 생성
-  let resultText = "";
-  if (score >= 4) {
-    resultText = "위험도 높음";
-  } else if (score >= 2) {
-    resultText = "주의 필요";
-  } else {
-    resultText = "양호";
-  }
+  const aiSummary =
+    `현재 응답을 바탕으로 '${topic}' 관련 상태는 '${severity}' 수준으로 추정됩니다. ` +
+    (severity === "높음"
+      ? "증상이 악화하거나 지속되면 지체 없이 전문의 상담을 권장합니다. "
+      : severity === "중간"
+      ? "생활·약물 순응도를 점검하고, 증상 변화에 유의하세요. "
+      : "기본 생활 관리와 주기적 점검으로 유지가 가능해 보입니다. ") +
+    `권장 진료과는 '${dept}'이며, 아래 셀프 케어 가이드를 우선 적용해 보세요.`;
 
-  // 맞춤 메시지
-  let message = "";
-  if (topic.includes("관절")) {
-    message =
-      "관절의 염증 가능성이 높습니다. 통증 부위의 온찜질과 충분한 휴식을 취하세요. 지속 시 정형외과 진료를 권장합니다.";
-  } else if (topic.includes("혈압")) {
-    message =
-      "혈압 변동이 잦다면 생활습관 조절이 필요합니다. 나트륨 섭취를 줄이고 가벼운 유산소 운동을 병행하세요.";
-  } else if (topic.includes("혈당")) {
-    message =
-      "혈당이 불안정할 수 있습니다. 식사 후 가벼운 걷기와 함께 당분 섭취량을 점검해보세요.";
-  } else if (topic.includes("불면")) {
-    message =
-      "수면 패턴 불균형이 의심됩니다. 취침 전 스마트폰 사용을 줄이고 일정한 시간에 잠자리에 드는 습관을 들이세요.";
-  } else if (topic.includes("어깨") || topic.includes("목")) {
-    message =
-      "장시간 같은 자세로 인한 근육 긴장일 수 있습니다. 1시간마다 스트레칭을 하여 긴장을 풀어주세요.";
-  } else if (topic.includes("심장")) {
-    message =
-      "가슴 답답함이나 통증이 자주 발생한다면 심장 기능 검사가 필요할 수 있습니다. 전문의 상담을 권장합니다.";
-  } else if (topic.includes("치매") || topic.includes("기억")) {
-    message =
-      "최근 기억력 저하가 있다면 뇌 건강 관리가 중요합니다. 충분한 수면과 규칙적인 두뇌 활동을 병행하세요.";
-  } else if (topic.includes("시력") || topic.includes("노안")) {
-    message =
-      "눈의 피로 누적이 원인일 수 있습니다. 1시간마다 눈을 쉬게 하고, 40cm 이상 거리에서 화면을 보세요.";
-  } else if (topic.includes("전립선")) {
-    message =
-      "배뇨 불편감이 지속된다면 비뇨기과 검진을 권장합니다. 수분은 충분히 섭취하되, 자기 전 음료는 줄이세요.";
-  } else if (topic.includes("보이스피싱")) {
-    message =
-      "최근 문자·전화로 개인정보를 요구하는 사례가 많습니다. 절대 응답하지 말고 신고하세요.";
-  } else if (topic.includes("복지") || topic.includes("지원금")) {
-    message =
-      "정부 및 지자체의 다양한 지원금이 있습니다. 복지로(www.bokjiro.go.kr)에서 내게 맞는 혜택을 확인해보세요.";
-  } else {
-    message =
-      "전반적인 건강 상태는 안정적입니다. 다만 불편함이 지속된다면 전문의 상담을 권장합니다.";
-  }
-
-  return { resultText, message };
+  return { topic, checks, severity, action, dept, tips: tipsCommon, redflags, percent, aiSummary };
 }
 
-// ==========================
-// API: 분석 요청 처리
-// ==========================
-app.post("/api/analyze", (req, res) => {
-  const { topic, answers } = req.body;
-
-  if (!topic || !answers) {
-    return res.status(400).json({ error: "Invalid request data" });
-  }
-
-  const { resultText, message } = analyzeTopic(topic, answers);
-  res.json({ topic, resultText, message });
+app.post("/analyze", (req, res) => {
+  const { topic, checks } = req.body || {};
+  if (!topic || !Array.isArray(checks)) return res.status(400).json({ error: "invalid request" });
+  res.json(analyzeTopic(topic, checks));
 });
 
-// ==========================
-// 서버 실행
-// ==========================
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () =>
-  console.log(`✅ Noeulbit Haru AI Diagnosis Server running on port ${PORT}`)
-);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
