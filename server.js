@@ -1,13 +1,17 @@
 // ===============================
-// ✅ Basic Express Server (Updated)
+// ✅ Basic Express Server (AI 확장 버전)
 // ===============================
-const express = require("express");
-const path = require("path");
-const fetch = require("node-fetch");
-const app = express();
+import express from "express";
+import path from "path";
+import fetch from "node-fetch";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname)); // HTML, CSS, JS, JSON 파일 서빙
 
 // ===============================
 // ✅ 기본 페이지 라우팅
@@ -33,7 +37,6 @@ function analyzeTopic(topic, checks) {
 
   const percent = Math.min(100, Math.round((riskScore / 8) * 100));
 
-  // ✅ 공통 팁
   const tipsCommon = [
     "충분한 수분 섭취",
     "가벼운 스트레칭",
@@ -42,7 +45,6 @@ function analyzeTopic(topic, checks) {
     "과로 피하고 충분한 휴식"
   ];
 
-  // ✅ 위험 신호 감지
   const redFlags = [];
   checks.forEach(c => {
     if (c.includes("숨") || c.includes("가슴"))
@@ -53,7 +55,6 @@ function analyzeTopic(topic, checks) {
       redFlags.push("일상생활 지장·심한 통증은 진료 필요");
   });
 
-  // ✅ 진료과 매핑
   const deptMap = {
     "관절 통증": "정형외과",
     "혈압 관리": "순환기내과",
@@ -69,12 +70,10 @@ function analyzeTopic(topic, checks) {
     "복지·생활지원금": "해당 없음"
   };
 
-  // ✅ 조치 문장
   let action = "생활 관리가 필요합니다.";
   if (severity === "높음") action = "전문의 상담이 권장됩니다.";
   else if (severity === "중간") action = "조기 관리 및 관찰이 필요합니다.";
 
-  // ✅ AI 요약 (주제별 자동 생성)
   let aiSummary = "";
   if (healthTopics.includes(topic)) {
     aiSummary =
@@ -109,47 +108,17 @@ function analyzeTopic(topic, checks) {
 }
 
 // ===============================
-// ✅ /analyze API (AI 확장 버전)
+// ✅ /analyze API
 // ===============================
 app.post("/analyze", (req, res) => {
   const { topic, checks } = req.body;
   if (!topic || !checks) return res.json({ error: "invalid request" });
-
   const result = analyzeTopic(topic, checks);
   res.json(result);
 });
 
 // ===============================
-// ✅ GPT API (유지)
-// ===============================
-app.post("/api/chat", async (req, res) => {
-  try {
-    const userMessage = req.body.message;
-    if (!userMessage) return res.status(400).json({ error: "Message required" });
-
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "OPENAI_API_KEY missing" });
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: userMessage }]
-      })
-    });
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "(no response)";
-    res.json({ reply });
-  } catch (err) {
-    console.error("GPT API Error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// ===============================
-// ✅ Render 포트
+// ✅ 서버 실행
 // ===============================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("✅ Server running on port", PORT));
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
