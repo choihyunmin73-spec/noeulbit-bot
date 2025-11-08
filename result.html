@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>노을빛하루 AI 종합 진단 결과</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body {
   margin: 0;
@@ -26,16 +26,41 @@ body {
 }
 .left { flex: 2; }
 .right { flex: 1; }
+
 .title {
   font-size: 24px;
   font-weight: 800;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .sub {
   color: #6b7280;
   font-size: 15px;
   margin-bottom: 20px;
 }
+
+/* 🔹 결과요약 */
+.result-box {
+  border: 2px solid #c9d2f0;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+.result-text {
+  flex: 1;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: #333;
+}
+.result-chart {
+  width: 220px;
+  height: 220px;
+  flex-shrink: 0;
+}
+
+/* 🔹 섹션 타이틀 */
 .section-title {
   font-size: 19px;
   font-weight: 700;
@@ -52,6 +77,8 @@ li {
   line-height: 1.6;
   font-size: 15.5px;
 }
+
+/* 🔹 제휴상품 카드 */
 .affiliate-card {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -80,6 +107,8 @@ li {
 }
 @media(max-width:900px){
   .wrap { flex-direction: column; }
+  .result-box { flex-direction: column; align-items: flex-start; }
+  .result-chart { width: 180px; height: 180px; }
 }
 </style>
 </head>
@@ -93,52 +122,6 @@ li {
     <div class="title">💠 노을빛하루 AI 종합 진단 결과</div>
     <div class="sub">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</div>
 
-    <div class="section-title">AI 종합 진단 요약</div>
-    <ul id="summary"></ul>
-
-    <div class="section-title">종합 의견</div>
-    <p id="opinion"></p>
-
-    <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
-  </div>
-
-  <!-- 우측: 제휴상품 -->
-  <div class="right">
-    <div class="section-title">추천 제휴상품</div>
-    <div id="affiliate-list"></div>
-  </div>
-
-</div>
-
-<script>
-(async function() {
-  const params = new URLSearchParams(location.search);
-  const topic = params.get("topic") || "관절 통증";
-
-  try {
-    // ✅ AI 분석 내용 불러오기
-    const analysis = await fetch("analysis.json").then(r => r.json());
-    const data = analysis[topic];
-
-    const summaryList = document.getElementById("summary");
-    summaryList.innerHTML = data.summary.map(s => `<li>${s}</li>`).join("");
-    document.getElementById("opinion").innerText = data.opinion;
-
-    // ✅ 제휴상품 불러오기
-    const affiliates = await fetch("affiliate.json").then(r => r.json());
-    const list = affiliates[topic] || [];
-    const affiliateList = document.getElementById("affiliate-list");
-    affiliateList.innerHTML = list.map(a => `
-      <div class="affiliate-card">
-        <a href="${a.link}" target="_blank">${a.title}</a>
-        ${a.desc ? `<div style="font-size:14px;color:#555;">${a.desc}</div>` : ""}
-      </div>
-    `).join("");
-  } catch (err) {
-    console.error("데이터 로드 실패:", err);
-  }
-})();
-</script>
-
-</body>
-</html>
+    <!-- 🔹 진단결과 그래프 + 상세 -->
+    <div class="result-box">
+      <canvas id="riskChart" class="result-chart"></canvas>
