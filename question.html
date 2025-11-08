@@ -7,173 +7,174 @@
 
 <style>
 body {
-    margin:0;
-    background:#f5f7fb;
-    font-family:'Noto Sans KR',sans-serif;
+  margin:0;
+  background:#f5f7fb;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.header {
+  text-align:center;
+  background:#2f6efc;
+  color:white;
+  padding:22px;
+  font-size:22px;
+  font-weight:700;
 }
 .wrap {
-    max-width:900px;
-    margin:25px auto;
+  max-width:650px;
+  margin:35px auto;
+  background:white;
+  padding:28px;
+  border-radius:15px;
+  box-shadow:0 5px 18px rgba(0,0,0,0.12);
 }
-.card {
-    background:white;
-    padding:24px;
-    border-radius:16px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.06);
-    margin-bottom:20px;
-}
-h2 {
-    font-size:22px;
-    font-weight:700;
-    margin-bottom:10px;
-}
-p {
-    color:#555;
-    font-size:15px;
-}
-.btn {
-    display:inline-block;
-    background:#2f6efc;
-    color:white;
-    padding:14px 24px;
-    border-radius:8px;
-    font-size:17px;
-    text-decoration:none;
-    cursor:pointer;
-    margin-top:10px;
+.question-title {
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:25px;
+  line-height:1.5;
+  color:#2f6efc;
 }
 .option {
-    display:block;
-    padding:10px 14px;
-    border:1px solid #d1d5db;
-    border-radius:8px;
-    margin-bottom:8px;
-    cursor:pointer;
-    font-size:15px;
+  padding:16px;
+  background:#eef3ff;
+  margin:12px 0;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:18px;
+  transition:0.25s;
+  border:2px solid transparent;
 }
 .option:hover {
-    background:#eff6ff;
-    border-color:#3b82f6;
+  background:#dce7ff;
+  border-color:#2f6efc;
 }
-.option.selected {
-    background:#3b82f6;
-    color:white;
-    border-color:#2563eb;
+.progress {
+  margin-top:25px;
+  text-align:center;
+  font-size:15px;
+  color:#5b6472;
 }
-@media(max-width:480px){
-    .wrap{margin:15px;}
-    h2{font-size:20px;}
+
+/* 모바일 최적화 */
+@media (max-width:480px) {
+  .header { font-size:20px; padding:18px; }
+  .wrap { margin:15px; padding:20px; }
+  .question-title { font-size:19px; }
+  .option { font-size:17px; padding:18px; }
+  .progress { font-size:14px; }
 }
 </style>
 </head>
+
 <body>
 
+<div class="header">노을빛하루 AI 건강·생활 진단</div>
+
 <div class="wrap">
-    <div class="card">
-        <h2>💠 노을빛하루 AI 건강·생활 진단</h2>
-        <p>아래 주제 중 하나를 선택해주세요.</p>
-        <select id="topic" style="width:100%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #ccc;">
-            <option value="">-- 주제 선택 --</option>
-            <option>관절 통증</option>
-            <option>혈압 관리</option>
-            <option>혈당·당뇨</option>
-            <option>불면증·수면장애</option>
-            <option>어깨·목 통증</option>
-            <option>심장·호흡·가슴통증</option>
-            <option>노안·시력저하</option>
-            <option>치매·기억력 문제</option>
-            <option>전립선·배뇨 문제</option>
-            <option>종합 건강 체크</option>
-            <option>보이스피싱 예방</option>
-            <option>복지·생활지원금</option>
-        </select>
+  <div id="intro">
+    <div class="question-title">아래 주제 중 하나를 선택하세요.</div>
+    <select id="topicSelect" style="width:100%;padding:14px;font-size:16px;border-radius:10px;border:1px solid #ccc;">
+      <option value="">-- 주제 선택 --</option>
+      <option>관절 통증</option>
+      <option>혈압 관리</option>
+      <option>혈당·당뇨</option>
+      <option>불면증·수면장애</option>
+      <option>어깨·목 통증</option>
+      <option>심장·호흡·가슴통증</option>
+      <option>노안·시력저하</option>
+      <option>치매·기억력 문제</option>
+      <option>전립선·배뇨 문제</option>
+      <option>종합 건강 체크</option>
+      <option>보이스피싱 예방</option>
+      <option>복지·생활지원금</option>
+    </select>
+    <div style="text-align:center;margin-top:25px;">
+      <div class="option" id="startBtn" style="background:#2f6efc;color:white;">시작하기</div>
     </div>
+  </div>
 
-    <div id="surveyArea"></div>
-
-    <div id="submitBtn" class="btn" style="display:none;">결과 보기 →</div>
+  <div id="questionBox" style="display:none;">
+    <div id="question-text" class="question-title"></div>
+    <div id="options"></div>
+    <div class="progress"><span id="progress-text"></span></div>
+  </div>
 </div>
 
 <script>
-let surveyData = {};
+let survey = {};
+let questions = [];
+let index = 0;
 let selectedAnswers = [];
 let currentTopic = "";
 
-// ✅ survey.json 불러오기
+// ✅ 설문 데이터 불러오기
 fetch("survey.json")
-    .then(res => res.json())
-    .then(data => {
-        surveyData = data;
-    })
-    .catch(err => console.error("❌ 설문 로드 오류", err));
+  .then(res => res.json())
+  .then(data => { survey = data; })
+  .catch(err => console.error("❌ survey.json 로드 오류:", err));
 
-// ✅ 주제 선택 시 문항 표시
-document.getElementById("topic").addEventListener("change", e => {
-    const topic = e.target.value;
-    currentTopic = topic;
-    const container = document.getElementById("surveyArea");
-    container.innerHTML = "";
-    selectedAnswers = [];
+// ✅ 시작 버튼 클릭
+document.getElementById("startBtn").onclick = () => {
+  const topic = document.getElementById("topicSelect").value;
+  if (!topic) return alert("주제를 선택하세요.");
+  currentTopic = topic;
+  questions = survey[topic] || [];
+  if (!questions.length) {
+    alert("이 주제에 대한 설문이 준비되지 않았습니다.");
+    return;
+  }
+  document.getElementById("intro").style.display = "none";
+  document.getElementById("questionBox").style.display = "block";
+  index = 0;
+  selectedAnswers = [];
+  loadQuestion();
+};
 
-    if (!topic) return;
-    const questions = surveyData[topic];
-    if (!questions) {
-        container.innerHTML = "<p>⚠️ 이 주제에 대한 설문이 준비되지 않았습니다.</p>";
-        return;
-    }
+// ✅ 문항 표시
+function loadQuestion() {
+  const q = questions[index];
+  if (!q) {
+    submitAnswers();
+    return;
+  }
+  document.getElementById("question-text").innerText = q.q;
 
-    questions.forEach((q, qi) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        const title = document.createElement("h3");
-        title.textContent = `${qi + 1}. ${q.q}`;
-        card.appendChild(title);
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
 
-        q.opt.forEach(opt => {
-            const btn = document.createElement("div");
-            btn.className = "option";
-            btn.textContent = opt;
-            btn.onclick = () => {
-                // 선택 처리
-                const prev = card.querySelector(".selected");
-                if (prev) prev.classList.remove("selected");
-                btn.classList.add("selected");
-                selectedAnswers[qi] = opt;
-                checkAllAnswered();
-            };
-            card.appendChild(btn);
-        });
-        container.appendChild(card);
-    });
-});
+  q.opt.forEach(option => {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerText = option;
+    div.onclick = () => {
+      selectedAnswers.push(option);
+      index++;
+      if (index < questions.length) {
+        loadQuestion();
+      } else {
+        submitAnswers();
+      }
+    };
+    optionsDiv.appendChild(div);
+  });
 
-// ✅ 모든 문항 응답 완료 시 버튼 표시
-function checkAllAnswered() {
-    const qCount = surveyData[currentTopic]?.length || 0;
-    const answered = selectedAnswers.filter(Boolean).length;
-    document.getElementById("submitBtn").style.display =
-        answered === qCount ? "block" : "none";
+  document.getElementById("progress-text").innerText = `문항 ${index + 1} / ${questions.length}`;
 }
 
-// ✅ 결과 보기 클릭 시
-document.getElementById("submitBtn").onclick = async () => {
-    const payload = { topic: currentTopic, checks: selectedAnswers };
-
-    try {
-        const res = await fetch("/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-        const encoded = encodeURIComponent(JSON.stringify(result));
-        location.href = `/result?payload=${encoded}`;
-    } catch (e) {
-        alert("⚠️ 결과 전송 오류가 발생했습니다.");
-        console.error(e);
-    }
-};
+// ✅ 결과 전송
+function submitAnswers() {
+  fetch("/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic: currentTopic, checks: selectedAnswers })
+  })
+  .then(res => res.json())
+  .then(data => {
+    window.location.href = `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
+  })
+  .catch(() => alert("결과 전송에 실패했습니다."));
+}
 </script>
+
 </body>
 </html>
