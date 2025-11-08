@@ -2,183 +2,178 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>AI 맞춤 진단 | 노을빛하루</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노을빛하루 AI 건강·생활 진단</title>
 
 <style>
-  body {
-    font-family: "Noto Sans KR", sans-serif;
-    background:#f3f6fb;
+body {
     margin:0;
-    padding:0;
-  }
-  .header {
-    text-align:center;
-    background:#0f4fff;
-    padding:22px;
-    font-size:22px;
-    color:white;
-    font-weight:700;
-  }
-  .wrapper {
-    max-width:650px;
-    margin:35px auto;
+    background:#f5f7fb;
+    font-family:'Noto Sans KR',sans-serif;
+}
+.wrap {
+    max-width:900px;
+    margin:25px auto;
+}
+.card {
     background:white;
-    padding:28px;
-    border-radius:15px;
-    box-shadow:0 5px 18px rgba(0,0,0,0.12);
-    transition: all 0.4s ease;
-  }
-  .question-title {
+    padding:24px;
+    border-radius:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.06);
+    margin-bottom:20px;
+}
+h2 {
     font-size:22px;
     font-weight:700;
-    margin-bottom:25px;
-    line-height:1.5;
-    color:#0f4fff;
-    text-align:center;
-  }
-  .option {
-    padding:16px;
-    background:#eef3ff;
-    margin:12px 0;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:18px;
-    transition:0.25s;
-    border:2px solid transparent;
-  }
-  .option:hover {
-    background:#dce7ff;
-    border-color:#0f4fff;
-  }
-  .option:active {
-    background:#cbd9ff;
-    transform:scale(0.98);
-  }
-  .progress {
-    margin-top:25px;
-    text-align:center;
+    margin-bottom:10px;
+}
+p {
+    color:#555;
     font-size:15px;
-    color:#5b6472;
-  }
-  .loading-box {
-    display:none;
-    text-align:center;
-    color:#444;
+}
+.btn {
+    display:inline-block;
+    background:#2f6efc;
+    color:white;
+    padding:14px 24px;
+    border-radius:8px;
     font-size:17px;
-    font-weight:500;
-    padding:40px 10px;
-    line-height:1.6;
-  }
-  @media (max-width:480px) {
-    .header { font-size:20px; padding:18px; }
-    .wrapper { margin:15px; padding:20px; }
-    .question-title { font-size:19px; }
-    .option { font-size:17px; padding:18px; }
-    .progress { font-size:14px; }
-  }
+    text-decoration:none;
+    cursor:pointer;
+    margin-top:10px;
+}
+.option {
+    display:block;
+    padding:10px 14px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-size:15px;
+}
+.option:hover {
+    background:#eff6ff;
+    border-color:#3b82f6;
+}
+.option.selected {
+    background:#3b82f6;
+    color:white;
+    border-color:#2563eb;
+}
+@media(max-width:480px){
+    .wrap{margin:15px;}
+    h2{font-size:20px;}
+}
 </style>
 </head>
-
 <body>
 
-<div class="header">AI 맞춤 진단</div>
+<div class="wrap">
+    <div class="card">
+        <h2>💠 노을빛하루 AI 건강·생활 진단</h2>
+        <p>아래 주제 중 하나를 선택해주세요.</p>
+        <select id="topic" style="width:100%;padding:10px;font-size:16px;border-radius:8px;border:1px solid #ccc;">
+            <option value="">-- 주제 선택 --</option>
+            <option>관절 통증</option>
+            <option>혈압 관리</option>
+            <option>혈당·당뇨</option>
+            <option>불면증·수면장애</option>
+            <option>어깨·목 통증</option>
+            <option>심장·호흡·가슴통증</option>
+            <option>노안·시력저하</option>
+            <option>치매·기억력 문제</option>
+            <option>전립선·배뇨 문제</option>
+            <option>종합 건강 체크</option>
+            <option>보이스피싱 예방</option>
+            <option>복지·생활지원금</option>
+        </select>
+    </div>
 
-<div class="wrapper" id="quiz-box">
-  <div id="question-text" class="question-title">문항을 불러오는 중입니다...</div>
-  <div id="options"></div>
-  <div class="progress">
-    <span id="progress-text"></span>
-  </div>
-</div>
+    <div id="surveyArea"></div>
 
-<div class="loading-box" id="loading-box">
-  🤖 AI가 입력하신 응답을 분석 중입니다.<br>
-  잠시만 기다려 주세요...
+    <div id="submitBtn" class="btn" style="display:none;">결과 보기 →</div>
 </div>
 
 <script>
-/* ✅ 1. URL로 전달된 topic 가져오기 */
-const params = new URLSearchParams(window.location.search);
-const topic = params.get("topic");
-
-/* ✅ 2. 변수 초기화 */
-let survey = {};
-let index = 0;
+let surveyData = {};
 let selectedAnswers = [];
-let questions = [];
+let currentTopic = "";
 
-/* ✅ 3. survey.json 불러오기 */
+// ✅ survey.json 불러오기
 fetch("survey.json")
-  .then(res => res.json())
-  .then(data => {
-    survey = data;
-    if (!survey[topic]) {
-      document.getElementById("question-text").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
-      return;
+    .then(res => res.json())
+    .then(data => {
+        surveyData = data;
+    })
+    .catch(err => console.error("❌ 설문 로드 오류", err));
+
+// ✅ 주제 선택 시 문항 표시
+document.getElementById("topic").addEventListener("change", e => {
+    const topic = e.target.value;
+    currentTopic = topic;
+    const container = document.getElementById("surveyArea");
+    container.innerHTML = "";
+    selectedAnswers = [];
+
+    if (!topic) return;
+    const questions = surveyData[topic];
+    if (!questions) {
+        container.innerHTML = "<p>⚠️ 이 주제에 대한 설문이 준비되지 않았습니다.</p>";
+        return;
     }
-    questions = survey[topic];
-    loadQuestion();
-  })
-  .catch(() => {
-    document.getElementById("question-text").innerText = "데이터를 불러오지 못했습니다.";
-  });
 
-/* ✅ 4. 문항 로딩 함수 */
-function loadQuestion() {
-  const q = questions[index];
-  document.getElementById("question-text").innerText = q.q;
+    questions.forEach((q, qi) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const title = document.createElement("h3");
+        title.textContent = `${qi + 1}. ${q.q}`;
+        card.appendChild(title);
 
-  const optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
+        q.opt.forEach(opt => {
+            const btn = document.createElement("div");
+            btn.className = "option";
+            btn.textContent = opt;
+            btn.onclick = () => {
+                // 선택 처리
+                const prev = card.querySelector(".selected");
+                if (prev) prev.classList.remove("selected");
+                btn.classList.add("selected");
+                selectedAnswers[qi] = opt;
+                checkAllAnswered();
+            };
+            card.appendChild(btn);
+        });
+        container.appendChild(card);
+    });
+});
 
-  q.opt.forEach(option => {
-    const div = document.createElement("div");
-    div.className = "option";
-    div.innerText = option;
-
-    div.onclick = () => {
-      selectedAnswers.push(option);
-      index++;
-
-      if (index < questions.length) {
-        document.querySelector(".wrapper").style.opacity = "0";
-        setTimeout(() => {
-          document.querySelector(".wrapper").style.opacity = "1";
-          loadQuestion();
-        }, 250);
-      } else {
-        submitAnswers();
-      }
-    };
-
-    optionsDiv.appendChild(div);
-  });
-
-  document.getElementById("progress-text").innerText =
-    `문항 ${index + 1} / ${questions.length}`;
+// ✅ 모든 문항 응답 완료 시 버튼 표시
+function checkAllAnswered() {
+    const qCount = surveyData[currentTopic]?.length || 0;
+    const answered = selectedAnswers.filter(Boolean).length;
+    document.getElementById("submitBtn").style.display =
+        answered === qCount ? "block" : "none";
 }
 
-/* ✅ 5. 분석 전송 함수 */
-function submitAnswers() {
-  document.getElementById("quiz-box").style.display = "none";
-  document.getElementById("loading-box").style.display = "block";
+// ✅ 결과 보기 클릭 시
+document.getElementById("submitBtn").onclick = async () => {
+    const payload = { topic: currentTopic, checks: selectedAnswers };
 
-  fetch("/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic, checks: selectedAnswers })
-  })
-  .then(res => res.json())
-  .then(data => {
-    window.location.href = `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
-  })
-  .catch(() => {
-    alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-    window.location.href = "/";
-  });
-}
+    try {
+        const res = await fetch("/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        const encoded = encodeURIComponent(JSON.stringify(result));
+        location.href = `/result?payload=${encoded}`;
+    } catch (e) {
+        alert("⚠️ 결과 전송 오류가 발생했습니다.");
+        console.error(e);
+    }
+};
 </script>
-
 </body>
 </html>
