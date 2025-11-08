@@ -2,142 +2,114 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>노을빛하루 AI 맞춤 진단 서비스</title>
+<title>노을빛하루 AI 무료 분석 서비스</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #f4f6fb;
-        font-family: 'Noto Sans KR', sans-serif;
-    }
+body {
+    margin:0;
+    padding:0;
+    background:#f3f6fb;
+    font-family:'Noto Sans KR', sans-serif;
+}
+.header {
+    width:100%;
+    background:#2f6efc;
+    color:white;
+    padding:22px;
+    font-size:22px;
+    font-weight:700;
+    text-align:center;
+    box-sizing:border-box;
+}
+.container {
+    max-width:900px;
+    margin:30px auto;
+    padding:20px;
+    box-sizing:border-box;
+}
+.intro-box {
+    background:white;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.07);
+    margin-bottom:20px;
+    text-align:center;
+}
+.intro-title {
+    font-size:19px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+.grid {
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:15px;
+    margin-top:20px;
+}
+.btn-topic {
+    background:white;
+    padding:15px 10px;
+    border-radius:12px;
+    border:1px solid #cdd5ff;
+    text-align:center;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.25s;
+}
+.btn-topic:hover {
+    background:#e8edff;
+    border-color:#6a7cff;
+}
 
-    .header {
-        width: 100%;
-        background: linear-gradient(90deg, #0f4fff, #5280ff);
-        color: white;
-        padding: 22px;
-        font-size: 22px;
-        font-weight: 700;
-        text-align: center;
-        box-sizing: border-box;
-    }
-
-    .container {
-        max-width: 900px;
-        margin: 30px auto;
-        padding: 20px;
-        box-sizing: border-box;
-    }
-
-    .intro-box {
-        background: white;
-        padding: 25px;
-        border-radius: 14px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.07);
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .intro-title {
-        font-size: 19px;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-top: 20px;
-    }
-
-    .btn-topic {
-        background: white;
-        padding: 18px 10px;
-        border-radius: 12px;
-        border: 1px solid #cdd5ff;
-        text-align: center;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        transition: 0.25s;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.03);
-    }
-
-    .btn-topic:hover {
-        background: #e9edff;
-        border-color: #6680ff;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.06);
-        transform: translateY(-2px);
-    }
-
-    .btn-topic span {
-        display: block;
-        font-size: 28px;
-        margin-bottom: 6px;
-    }
-
-    @media(max-width:600px){
-        .grid { grid-template-columns: repeat(2, 1fr); }
-        .btn-topic { font-size:15px; padding:15px 8px; }
-        .intro-title { font-size:17px; }
-    }
-
-    @media(max-width:400px){
-        .grid { grid-template-columns: repeat(1, 1fr); }
-    }
-
-    .loading {
-        text-align:center;
-        margin-top:20px;
-        font-size:16px;
-        color:#555;
-        display:none;
-    }
+/* ✅ 모바일 최적화 */
+@media(max-width:600px){
+    .grid { grid-template-columns:repeat(2, 1fr); }
+    .btn-topic { font-size:15px; padding:15px 8px; }
+    .intro-title { font-size:17px; }
+}
+@media(max-width:400px){
+    .grid { grid-template-columns:repeat(1, 1fr); }
+}
 </style>
 </head>
+
 <body>
 
-<div class="header">노을빛하루 AI 맞춤 진단 서비스</div>
+<div class="header">노을빛하루 AI 무료 분석 서비스</div>
 
 <div class="container">
 
     <div class="intro-box">
-        <div class="intro-title">필요한 건강·생활 주제를 선택하세요.</div>
+        <div class="intro-title">아래에서 필요한 건강·생활 주제를 선택해 주세요.</div>
         <div style="color:#667085; font-size:15px;">
-            총 8가지 질문을 통해 AI가 개인별 맞춤 결과를 생성합니다.
+            총 8가지 문항에 답하면 AI가 맞춤 분석 결과를 생성합니다.
         </div>
     </div>
 
     <div class="grid">
-        <div class="btn-topic" onclick="go('관절 통증')"><span>🦵</span>관절 통증</div>
-        <div class="btn-topic" onclick="go('혈압 관리')"><span>💓</span>혈압 관리</div>
-        <div class="btn-topic" onclick="go('혈당·당뇨')"><span>🩸</span>혈당·당뇨</div>
+        <div class="btn-topic" onclick="go('관절 통증')">관절 통증</div>
+        <div class="btn-topic" onclick="go('혈압 관리')">혈압 관리</div>
+        <div class="btn-topic" onclick="go('혈당·당뇨')">혈당·당뇨</div>
 
-        <div class="btn-topic" onclick="go('불면증·수면장애')"><span>🌙</span>불면증·수면장애</div>
-        <div class="btn-topic" onclick="go('어깨·목 통증')"><span>💪</span>어깨·목 통증</div>
-        <div class="btn-topic" onclick="go('심장·호흡·가슴통증')"><span>❤️‍🔥</span>심장·호흡·가슴통증</div>
+        <div class="btn-topic" onclick="go('불면증·수면장애')">불면증·수면장애</div>
+        <div class="btn-topic" onclick="go('어깨·목 통증')">어깨·목 통증</div>
+        <div class="btn-topic" onclick="go('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
 
-        <div class="btn-topic" onclick="go('노안·시력저하')"><span>👁️</span>노안·시력저하</div>
-        <div class="btn-topic" onclick="go('치매·기억력 문제')"><span>🧠</span>치매·기억력 문제</div>
-        <div class="btn-topic" onclick="go('전립선·배뇨 문제')"><span>🚻</span>전립선·배뇨 문제</div>
+        <div class="btn-topic" onclick="go('노안·시력저하')">노안·시력저하</div>
+        <div class="btn-topic" onclick="go('치매·기억력 문제')">치매·기억력 문제</div>
+        <div class="btn-topic" onclick="go('전립선·배뇨 문제')">전립선·배뇨 문제</div>
 
-        <div class="btn-topic" onclick="go('종합 건강 체크')"><span>💊</span>종합 건강 체크</div>
-        <div class="btn-topic" onclick="go('보이스피싱 예방')"><span>📵</span>보이스피싱 예방</div>
-        <div class="btn-topic" onclick="go('복지·생활지원금')"><span>💰</span>복지·생활지원금</div>
+        <div class="btn-topic" onclick="go('종합 건강 체크')">종합 건강 체크</div>
+        <div class="btn-topic" onclick="go('보이스피싱 예방')">보이스피싱 예방</div>
+        <div class="btn-topic" onclick="go('복지·생활지원금')">복지·생활지원금</div>
     </div>
-
-    <div id="loading" class="loading">AI 분석 준비 중입니다...</div>
 
 </div>
 
 <script>
 function go(topic){
-    document.getElementById("loading").style.display = "block";
-    setTimeout(() => {
-        location.href = `/question.html?topic=${encodeURIComponent(topic)}`;
-    }, 600);
+    location.href = `/question.html?topic=${encodeURIComponent(topic)}`;
 }
 </script>
 
