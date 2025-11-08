@@ -6,180 +6,226 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    body {
-        margin:0;
-        background:#f5f7fb;
-        font-family:'Noto Sans KR',sans-serif;
-    }
+body {
+  margin:0;
+  background:#f5f7fb;
+  font-family:'Noto Sans KR',sans-serif;
+}
+.wrap {
+  max-width:920px;
+  margin:25px auto;
+}
+.card {
+  background:white;
+  padding:28px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+  margin-bottom:20px;
+}
+.title {
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+.sub {
+  color:#6b7280;
+  font-size:15px;
+  margin-bottom:20px;
+}
+h3 {
+  font-size:19px;
+  margin-top:15px;
+  margin-bottom:12px;
+}
+li {
+  margin-bottom:8px;
+  font-size:16px;
+  line-height:1.45;
+}
+.btn {
+  background:#2f6efc;
+  color:white;
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+  font-size:18px;
+  cursor:pointer;
+  margin-top:18px;
+}
+.pill {
+  display:inline-block;
+  background:#eef2ff;
+  padding:7px 12px;
+  border-radius:999px;
+  margin:4px 6px 4px 0;
+  font-size:13px;
+  color:#3742b1;
+}
+.pill.red { background:#ffe7e7; color:#b91c1c; }
+.pill.amber { background:#fff3cd; color:#b54706; }
 
-    .wrap {
-        max-width:920px;
-        margin:25px auto;
-    }
+/* 🔷 AI 요약 테두리 박스 */
+.ai-summary {
+  border:2px solid #c7d2fe;
+  background:#f9faff;
+  border-radius:12px;
+  padding:18px 20px;
+  margin-bottom:20px;
+}
+.ai-summary h3 {
+  color:#0f4fff;
+  font-size:20px;
+  margin-bottom:10px;
+}
+.ai-gauge {
+  height:12px;
+  border-radius:6px;
+  background:#e4e7eb;
+  overflow:hidden;
+  margin:10px 0 6px;
+}
+.ai-gauge-fill {
+  height:100%;
+  background:#ff6961;
+  width:0;
+  transition:width 1s ease;
+}
 
-    .card {
-        background:white;
-        padding:28px;
-        border-radius:16px;
-        box-shadow:0 6px 20px rgba(0,0,0,0.08);
-        margin-bottom:20px;
-    }
-
-    .title {
-        font-size:24px;
-        font-weight:800;
-        margin-bottom:8px;
-    }
-
-    .sub {
-        color:#6b7280;
-        font-size:15px;
-        margin-bottom:20px;
-    }
-
-    /* ✅ 파란/노란/빨간 PILLS */
-    .pill {
-        display:inline-block;
-        background:#eef2ff;
-        padding:7px 12px;
-        border-radius:999px;
-        margin-right:8px;
-        margin-bottom:6px;
-        font-size:13px;
-        color:#3742b1;
-    }
-    .pill.red { background:#ffe7e7; color:#b91c1c; }
-    .pill.amber { background:#fff3cd; color:#b54706; }
-
-    h3 {
-        font-size:19px;
-        margin-top:15px;
-        margin-bottom:12px;
-    }
-
-    li {
-        margin-bottom:8px;
-        font-size:16px;
-        line-height:1.45;
-    }
-
-    .btn {
-        background:#2f6efc;
-        color:white;
-        padding:18px;
-        border-radius:12px;
-        text-align:center;
-        font-size:18px;
-        cursor:pointer;
-        margin-top:18px;
-    }
-
-    /* ✅ 모바일 최적화 */
-    @media(max-width:480px){
-        .wrap { margin:15px; }
-        .card { padding:20px; }
-        .title { font-size:22px; }
-        h3 { font-size:18px; }
-        li { font-size:15px; }
-        .btn { font-size:17px; padding:16px; }
-    }
+/* 모바일 */
+@media(max-width:480px){
+  .wrap { margin:15px; }
+  .card { padding:20px; }
+  .title { font-size:22px; }
+  h3 { font-size:18px; }
+  li { font-size:15px; }
+  .btn { font-size:17px; padding:16px; }
+}
 </style>
 </head>
-
 <body>
 
 <div class="wrap">
 
-    <!-- ✅ 결과 헤더 -->
-    <div class="card">
-        <div class="title">💠 노을빛하루 종합 진단 결과</div>
-        <div class="sub">선택한 문항 기반으로 초기 건강 상태를 안내합니다.</div>
+  <!-- ✅ 결과 헤더 -->
+  <div class="card">
+    <div class="title">💠 노을빛하루 종합 진단 결과</div>
+    <div class="sub">선택한 문항 기반으로 맞춤 AI 예측 결과를 제공합니다.</div>
 
-        <div id="pills"></div>
-        <div id="summary" style="margin-top:15px;"></div>
+    <div id="pills"></div>
+    <div class="ai-summary" id="ai-summary">
+      <h3>AI 종합 진단 요약</h3>
+      <div id="ai-text"></div>
+      <div class="ai-gauge">
+        <div class="ai-gauge-fill" id="ai-gauge-fill"></div>
+      </div>
+      <div style="font-size:14px;color:#555;" id="ai-percent"></div>
     </div>
 
-    <!-- ✅ 셀프 케어 -->
-    <div class="card">
-        <h3>✅ 셀프 케어 가이드</h3>
-        <ul id="tips"></ul>
-    </div>
+    <div id="summary"></div>
+  </div>
 
-    <!-- ✅ 위험 신호 -->
-    <div class="card">
-        <h3>⚠️ 이런 증상이면 즉시 조치</h3>
-        <ul id="redflags"></ul>
-        <div id="rf-note" style="color:#d62828;font-size:14px;margin-top:8px;"></div>
-    </div>
+  <!-- ✅ 셀프 케어 -->
+  <div class="card">
+    <h3>✅ 셀프 케어 가이드</h3>
+    <ul id="tips"></ul>
+  </div>
 
-    <!-- ✅ 선택한 항목 -->
-    <div class="card">
-        <h3>🧾 선택한 항목</h3>
-        <div id="selected"></div>
-    </div>
+  <!-- ✅ 위험 신호 -->
+  <div class="card">
+    <h3>⚠️ 이런 증상이면 즉시 조치</h3>
+    <ul id="redflags"></ul>
+    <div id="rf-note" style="color:#d62828;font-size:14px;margin-top:8px;"></div>
+  </div>
 
-    <!-- ✅ 다시하기 버튼 -->
-    <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
+  <!-- ✅ 영양제 / 보험 서비스 -->
+  <div class="card" id="extra-card" style="display:none;">
+    <h3 id="extra-title"></h3>
+    <ul id="extra-list"></ul>
+  </div>
 
+  <!-- ✅ 선택한 항목 -->
+  <div class="card">
+    <h3>🧾 선택한 항목</h3>
+    <div id="selected"></div>
+  </div>
+
+  <!-- ✅ 다시하기 버튼 -->
+  <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
 </div>
 
 <script>
 (function(){
+  const params = new URLSearchParams(location.search);
+  const raw = params.get("payload");
+  let data = {};
+  try { data = JSON.parse(decodeURIComponent(raw)); } catch(e){}
 
-    /* ✅ 전달된 payload 파싱 */
-    const params = new URLSearchParams(location.search);
-    const raw = params.get("payload");
+  /* ✅ 기본정보 표시 */
+  const pills = [];
+  pills.push(`<span class="pill">주제: ${data.topic}</span>`);
+  const sevClass =
+      data.severity === "높음" ? "red" :
+      data.severity === "중간" ? "amber" : "";
+  pills.push(`<span class="pill ${sevClass}">위험도: ${data.severity}</span>`);
+  document.getElementById("pills").innerHTML = pills.join(" ");
 
-    let data = {};
-    try {
-        data = JSON.parse(decodeURIComponent(raw));
-    } catch(e) {
-        console.error("❌ 데이터 파싱 오류", e);
-    }
+  /* ✅ AI 종합 진단 요약 */
+  const aiText = document.getElementById("ai-text");
+  const aiPercent = document.getElementById("ai-percent");
+  const aiGauge = document.getElementById("ai-gauge-fill");
 
-    /* ✅ 1) 제목 아래 파란 정보칩 */
-    const pills = [];
-    pills.push(`<span class="pill">주제: ${data.topic}</span>`);
+  const percent = data.percent || 0;
+  aiText.innerHTML = data.aiSummary || "AI 예측 데이터를 불러오는 중입니다...";
+  aiPercent.innerText = `예측 위험도: ${percent}%`;
+  setTimeout(()=>{ aiGauge.style.width = percent + "%"; }, 300);
 
-    const sevClass =
-        data.severity === "높음" ? "red" :
-        data.severity === "중간" ? "amber" :
-        "";
+  /* ✅ 요약 */
+  document.getElementById("summary").innerHTML =
+    `<div style="margin-top:10px;"><b>권장 조치:</b> ${data.action || "데이터 분석 중"}</div>
+     <div style="margin-top:6px;"><b>권장 진료과:</b> ${data.dept || "-"}</div>`;
 
-    pills.push(`<span class="pill ${sevClass}">위험도: ${data.severity}</span>`);
+  /* ✅ 셀프 케어 */
+  document.getElementById("tips").innerHTML =
+    (data.tips||[]).map(t=>`<li>${t}</li>`).join("");
 
-    document.getElementById("pills").innerHTML = pills.join(" ");
+  /* ✅ 위험 신호 */
+  const rf = data.redflags || [];
+  document.getElementById("redflags").innerHTML =
+    rf.length ? rf.map(r=>`<li>${r}</li>`).join("") :
+    "<li>특별한 응급 신호는 감지되지 않았습니다.</li>";
+  if(rf.length){ document.getElementById("rf-note").innerText = "※ 위 증상이 나타나면 즉시 119 또는 응급실을 방문하세요."; }
 
+  /* ✅ 선택한 항목 */
+  document.getElementById("selected").innerHTML =
+    (data.checks||[]).map(c=>`<span class="pill">${c}</span>`).join(" ");
 
-    /* ✅ 2) 주요 요약 정보 */
-    document.getElementById("summary").innerHTML =
-        `<div><b>권장 조치:</b> ${data.action}</div>
-         <div style="margin-top:6px;"><b>권장 진료과:</b> ${data.dept}</div>`;
+  /* ✅ 주제별 맞춤 블록 (건강/비건강 구분) */
+  const extraCard = document.getElementById("extra-card");
+  const extraTitle = document.getElementById("extra-title");
+  const extraList = document.getElementById("extra-list");
 
-
-    /* ✅ 3) 셀프 케어 */
-    document.getElementById("tips").innerHTML =
-        data.tips.map(t => `<li>${t}</li>`).join("");
-
-
-    /* ✅ 4) 위험 신호(redflags) */
-    document.getElementById("redflags").innerHTML =
-        (data.redflags && data.redflags.length > 0)
-            ? data.redflags.map(r => `<li>${r}</li>`).join("")
-            : "<li>특별한 응급 신호는 감지되지 않았습니다.</li>";
-
-    if (data.redflags && data.redflags.length > 0) {
-        document.getElementById("rf-note").innerText =
-            "※ 위 증상이 나타나면 즉시 119 또는 가까운 응급실 방문이 필요합니다.";
-    }
-
-
-    /* ✅ 5) 선택한 항목 목록 */
-    document.getElementById("selected").innerHTML =
-        data.checks.map(c => `<span class="pill">${c}</span>`).join(" ");
+  if(["관절 통증","혈압 관리","혈당·당뇨","어깨·목 통증","심장·호흡·가슴통증","노안·시력저하","전립선·배뇨 문제"].includes(data.topic)){
+    extraCard.style.display = "block";
+    extraTitle.innerText = "💊 추천 영양제 / 보험 서비스";
+    extraList.innerHTML = `
+      <li>✔ MSM + 글루코사민 복합제</li>
+      <li>✔ 오메가3 (EPA 70% 이상)</li>
+      <li>✔ 비타민 D + K2 복합제</li>
+      <li>💡 무릎·관절 치료비 보장형 보험 확인</li>
+      <li>💡 AI 분석 기반 맞춤 보장 진단 서비스</li>`;
+  } else if(["보이스피싱 예방","복지·생활지원금"].includes(data.topic)){
+    extraCard.style.display = "block";
+    extraTitle.innerText = "📘 AI 실행 가이드";
+    extraList.innerHTML = data.topic === "보이스피싱 예방" ?
+      `<li>📱 스미싱 차단 앱 설치 및 알 수 없는 링크 금지</li>
+       <li>🏦 금융기관 사칭 전화 즉시 차단 및 신고</li>
+       <li>💬 최근 보이스피싱 유형: 지원금·택배 사칭 메시지</li>` :
+      `<li>💰 복지로 / 정부24에서 본인 자격 즉시 조회</li>
+       <li>🏢 주민센터 방문 시 신분증 필수</li>
+       <li>📅 신청 마감일 확인 후 제출 필요</li>`;
+  }
 
 })();
 </script>
-
 </body>
 </html>
