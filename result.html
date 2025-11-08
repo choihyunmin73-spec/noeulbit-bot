@@ -11,17 +11,28 @@
         margin:0;
         color:#222;
     }
-    .wrap {
-        max-width:900px;
+    .container {
+        display:flex;
+        justify-content:space-between;
+        max-width:1200px;
         margin:30px auto;
+        gap:20px;
         padding:0 15px;
     }
-    .card {
+    .left, .right {
         background:#fff;
         border-radius:14px;
         box-shadow:0 3px 10px rgba(0,0,0,0.05);
         padding:25px;
-        margin-bottom:18px;
+    }
+    .left {
+        flex:2;
+    }
+    .right {
+        flex:1;
+        position:sticky;
+        top:20px;
+        height:fit-content;
     }
     .title {
         font-size:22px;
@@ -32,7 +43,7 @@
     .subtitle {
         font-size:15px;
         color:#555;
-        margin-bottom:12px;
+        margin-bottom:15px;
     }
     .pill {
         display:inline-block;
@@ -81,6 +92,27 @@
         margin:4px 5px;
     }
 
+    .affiliate-card {
+        border:1px solid #e0e4f2;
+        border-radius:12px;
+        padding:14px;
+        margin-bottom:14px;
+        background:#fafbff;
+    }
+    .affiliate-card h4 {
+        margin:0 0 8px;
+        font-size:15px;
+        color:#0f4fff;
+    }
+    .affiliate-card a {
+        color:#333;
+        text-decoration:none;
+        font-size:14px;
+    }
+    .affiliate-card a:hover {
+        text-decoration:underline;
+    }
+
     .btn {
         background:#0f4fff;
         color:white;
@@ -93,111 +125,86 @@
         box-shadow:0 3px 10px rgba(15,79,255,0.25);
     }
     .btn:hover { background:#285eff; }
+
+    @media(max-width:900px){
+        .container { flex-direction:column; }
+        .right { position:relative; top:0; }
+    }
 </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="container">
 
-    <!-- HEADER -->
-    <div class="card">
+    <!-- LEFT: 분석 결과 -->
+    <div class="left">
         <div class="title">💠 노을빛하루 AI 종합 진단 결과</div>
         <div class="subtitle">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</div>
 
-        <div id="header-info"></div>
-    </div>
+        <div class="pill">주제: 관절 통증</div>
+        <div class="pill amber">위험도: 중간</div>
 
-    <!-- AI SUMMARY -->
-    <div class="card">
+        <div style="margin-top:10px;line-height:1.6;">
+            <b>권장 조치:</b> 생활 관리 및 꾸준한 스트레칭이 필요합니다.<br>
+            <b>권장 진료과:</b> 정형외과
+        </div>
+
+        <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+
         <div class="section-title">🩺 AI 종합 진단 요약</div>
-        <div id="summary" class="ai-summary"></div>
+        <div class="ai-summary">
+            관절 통증 관련 주요 부위의 이상이 감지되었습니다. 현재 상태에 따라 꾸준한 관리와 스트레칭이 필요하며, 통증이 지속될 경우 정형외과 진료를 권장드립니다.
+        </div>
+
+        <div class="section-title" style="margin-top:25px;">✅ 셀프 케어 가이드</div>
+        <div class="advice">
+            <ul>
+                <li>가벼운 스트레칭으로 근육과 관절을 풀어주세요.</li>
+                <li>무리한 운동이나 장시간 서있는 자세는 피하세요.</li>
+                <li>통증이 심하면 전문의 상담을 받으세요.</li>
+            </ul>
+        </div>
+
+        <div class="section-title" style="margin-top:25px;">⚠️ 위험 신호</div>
+        <div class="alert">주의가 필요합니다. 증상이 악화되면 즉시 병원 방문이 필요합니다.</div>
+
+        <div class="section-title" style="margin-top:25px;">🧩 선택한 항목</div>
+        <div class="tag-list">
+            <span class="tag">가벼운 통증</span>
+            <span class="tag">1주 미만</span>
+            <span class="tag">약한 통증</span>
+            <span class="tag">무릎 부위</span>
+        </div>
+
+        <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
     </div>
 
-    <!-- SELF CARE -->
-    <div class="card">
-        <div class="section-title">✅ 셀프 케어 가이드</div>
-        <div id="advice" class="advice"></div>
+    <!-- RIGHT: 제휴상품/보험 영역 -->
+    <div class="right">
+        <div class="section-title">🤝 제휴 상품 추천</div>
+
+        <div class="affiliate-card">
+            <h4>💊 글루코사민 관절 케어 영양제</h4>
+            <a href="https://www.coupang.com/vp/products/6714055083" target="_blank">
+                쿠팡 바로가기 →
+            </a>
+        </div>
+
+        <div class="affiliate-card">
+            <h4>🏥 실손보험 관절 치료 특약</h4>
+            <a href="https://www.samsunglife.com" target="_blank">
+                삼성생명 보험 상담 →
+            </a>
+        </div>
+
+        <div class="affiliate-card">
+            <h4>🦵 무릎 보호대 · 관절 서포터</h4>
+            <a href="https://www.coupang.com/np/search?q=%EB%AC%B4%EB%A6%8E%EB%B3%B4%ED%98%B8%EB%8C%80" target="_blank">
+                쇼핑몰 바로가기 →
+            </a>
+        </div>
     </div>
-
-    <!-- ALERT -->
-    <div class="card">
-        <div class="section-title">⚠️ 위험 신호</div>
-        <div id="alert" class="alert"></div>
-    </div>
-
-    <!-- SELECTED TAGS -->
-    <div class="card">
-        <div class="section-title">🧩 선택한 항목</div>
-        <div id="tags" class="tag-list"></div>
-    </div>
-
-    <!-- BUTTON -->
-    <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
-
 </div>
-
-<script>
-(function(){
-    const params = new URLSearchParams(window.location.search);
-    const payload = params.get("payload");
-
-    if(!payload){
-        document.body.innerHTML = "<h2 style='text-align:center;margin-top:60px;'>⚠️ 분석 데이터가 없습니다.</h2>";
-        return;
-    }
-
-    let data;
-    try {
-        data = JSON.parse(decodeURIComponent(payload));
-    } catch(e){
-        document.body.innerHTML = "<h2 style='text-align:center;margin-top:60px;'>⚠️ 데이터 파싱 오류</h2>";
-        return;
-    }
-
-    // HEADER INFO
-    const sevClass = data.severity === "높음" ? "red" : data.severity === "중간" ? "amber" : "";
-    document.getElementById("header-info").innerHTML = `
-        <div>
-            <span class="pill">주제: ${data.topic}</span>
-            <span class="pill ${sevClass}">위험도: ${data.severity}</span>
-        </div>
-        <div style="margin-top:10px;">
-            <b>권장 조치:</b> ${data.summary}<br>
-            <b>권장 진료과:</b> ${data.dept}
-        </div>
-    `;
-
-    // SUMMARY
-    document.getElementById("summary").textContent =
-        `${data.topic} 관련 주요 부위의 상태 이상이 감지되었습니다. 현재 상태에 따라 ${data.summary} 이 필요하며, ${data.dept} 방문을 권장드립니다.`;
-
-    // ADVICE
-    if(data.advice && data.advice.length){
-        document.getElementById("advice").innerHTML =
-            "<ul>" + data.advice.map(v => `<li>${v}</li>`).join("") + "</ul>";
-    } else {
-        document.getElementById("advice").innerHTML = "별도의 셀프 케어 항목이 없습니다.";
-    }
-
-    // ALERT
-    const alertEl = document.getElementById("alert");
-    if(data.severity === "높음"){
-        alertEl.innerHTML = "⚠️ 현재 응급 수준의 위험 신호가 감지되었습니다. 즉시 의료기관 방문이 필요합니다.";
-    } else if(data.severity === "중간"){
-        alertEl.innerHTML = "주의가 필요합니다. 증상 변화를 꾸준히 관찰하세요.";
-    } else {
-        alertEl.innerHTML = "특별한 응급 신호는 감지되지 않았습니다.";
-    }
-
-    // SELECTED TAGS (선택 항목)
-    const tagContainer = document.getElementById("tags");
-    if(data.checks && data.checks.length){
-        tagContainer.innerHTML = data.checks.map(c => `<span class='tag'>${c}</span>`).join("");
-    } else {
-        tagContainer.innerHTML = "<span class='tag'>선택 항목 없음</span>";
-    }
-})();
-</script>
 
 </body>
 </html>
