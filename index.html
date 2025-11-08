@@ -6,44 +6,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{margin:0;background:#f3f6fb;font-family:'Noto Sans KR',sans-serif}
-.header{background:linear-gradient(90deg,#2f6efc,#4f8bff);color:#fff;padding:22px;font-size:22px;font-weight:700;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.header{background:#2f6efc;color:#fff;text-align:center;padding:22px;font-size:22px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.1)}
 .container{max-width:900px;margin:40px auto;padding:20px}
-.intro{background:#fff;padding:30px;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.07);text-align:center}
-.intro h1{margin:0 0 10px;color:#2f6efc;font-size:20px}
-.intro p{margin:0;color:#667085}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:25px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:25px}
 .btn-topic{background:#fff;padding:18px 12px;border-radius:14px;border:1.5px solid #cfd8ff;text-align:center;cursor:pointer;font-size:16px;font-weight:500;transition:all .3s;box-shadow:0 4px 8px rgba(0,0,0,.05)}
-.btn-topic:hover{background:#2f6efc;color:#fff;border-color:#2f6efc;box-shadow:0 6px 15px rgba(47,110,252,.25);transform:translateY(-2px)}
-@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){.grid{grid-template-columns:1fr}.intro{padding:22px}.btn-topic{font-size:15px}}
+.btn-topic:hover{background:#2f6efc;color:#fff;transform:translateY(-2px);box-shadow:0 6px 15px rgba(47,110,252,.25)}
 .footer{text-align:center;margin-top:30px;color:#8a8fa3;font-size:13px}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="header">노을빛하루 AI 무료 분석 서비스</div>
 <div class="container">
-  <div class="intro">
-    <h1>필요한 건강·생활 주제를 선택하세요</h1>
-    <p>총 8문항에 답하면 맞춤 분석 결과가 자동 생성됩니다.</p>
-    <div class="grid">
-      <div class="btn-topic" onclick="go('관절 통증')">🦵 관절 통증</div>
-      <div class="btn-topic" onclick="go('혈압 관리')">💓 혈압 관리</div>
-      <div class="btn-topic" onclick="go('혈당·당뇨')">🍬 혈당·당뇨</div>
-      <div class="btn-topic" onclick="go('불면증·수면장애')">😴 불면증·수면장애</div>
-      <div class="btn-topic" onclick="go('어깨·목 통증')">💪 어깨·목 통증</div>
-      <div class="btn-topic" onclick="go('심장·호흡·가슴통증')">❤️‍🔥 심장·호흡·가슴통증</div>
-      <div class="btn-topic" onclick="go('노안·시력저하')">👁️ 노안·시력저하</div>
-      <div class="btn-topic" onclick="go('치매·기억력 문제')">🧠 치매·기억력 문제</div>
-      <div class="btn-topic" onclick="go('전립선·배뇨 문제')">🚻 전립선·배뇨 문제</div>
-      <div class="btn-topic" onclick="go('종합 건강 체크')">⚕️ 종합 건강 체크</div>
-      <div class="btn-topic" onclick="go('보이스피싱 예방')">📵 보이스피싱 예방</div>
-      <div class="btn-topic" onclick="go('복지·생활지원금')">💰 복지·생활지원금</div>
-    </div>
-  </div>
+  <h2>필요한 건강·생활 주제를 선택하세요</h2>
+  <p>8문항에 답하면 맞춤 분석 결과가 자동 생성됩니다.</p>
+  <div class="grid" id="topics"></div>
   <div class="footer">© 2025 노을빛하루 AI 진단 시스템</div>
 </div>
+
 <script>
-function go(topic){ location.href = `/question.html?topic=${encodeURIComponent(topic)}`; }
+const topics = [
+  "관절 통증","혈압 관리","혈당·당뇨","불면증·수면장애",
+  "어깨·목 통증","심장·호흡·가슴통증","노안·시력저하","치매·기억력 문제",
+  "전립선·배뇨 문제","종합 건강 체크","보이스피싱 예방","복지·생활지원금"
+];
+document.getElementById("topics").innerHTML =
+  topics.map(t=>`<div class="btn-topic" onclick="go('${t}')">${t}</div>`).join("");
+function go(t){location.href=`/question.html?topic=${encodeURIComponent(t)}`;}
 </script>
 </body>
 </html>
