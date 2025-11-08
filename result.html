@@ -1,194 +1,571 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>노을빛하루 AI 종합 진단 결과</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root {
-  --bg:#f5f7fb; --card:#fff; --shadow:0 6px 18px rgba(0,0,0,.07);
-  --text:#111827; --muted:#6b7280; --brand:#2563eb; --border:#c9d2f0;
-}
-* {box-sizing:border-box;}
-body {
-  margin:0; background:var(--bg);
-  font-family:'Noto Sans KR',sans-serif; color:var(--text);
-}
-.container {
-  max-width:1320px; margin:28px auto; display:flex; gap:20px;
-  padding:0 14px; flex-wrap:nowrap;
-}
-.left {flex:2; background:var(--card); border-radius:16px; box-shadow:var(--shadow); padding:28px;}
-.right {flex:1; background:var(--card); border-radius:16px; box-shadow:var(--shadow); padding:24px;}
-.title {font-weight:800; font-size:24px; margin:0 0 8px;}
-.sub {color:var(--muted); font-size:15px; margin:0 0 20px;}
-.result-box {
-  border:2px solid var(--border); border-radius:12px; padding:24px;
-  display:flex; align-items:flex-start; justify-content:flex-start; gap:24px;
-  margin-bottom:24px; flex-wrap:nowrap;
-}
-.result-chart {width:240px!important; height:240px!important; flex-shrink:0;}
-.result-detail {flex:1; word-break:keep-all; line-height:1.7; font-size:15.5px; color:#333;}
-.result-detail strong {color:var(--brand);}
-.section {margin-top:26px;}
-.section h3 {font-size:18px; margin:0 0 12px; border-left:6px solid var(--brand); padding-left:10px;}
-ul.clean {list-style:none; margin:0; padding-left:10px;}
-ul.clean li {margin:6px 0; line-height:1.6;}
-.btn {
-  margin-top:18px; background:var(--brand); color:#fff; border:none;
-  border-radius:12px; padding:16px 18px; font-size:17px; cursor:pointer; width:100%;
-}
-.aff-title {color:#1e40af; font-size:18px; margin:0 0 12px;}
-.card {
-  border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:14px;
-  transition:.2s; cursor:pointer; overflow:hidden;
-}
-.card:hover {background:#f0f4ff; border-color:#9db0ff; transform:translateY(-3px);}
-.card img {
-  width:100%; height:160px; object-fit:cover; border-radius:10px;
-  margin-bottom:10px; background:#eef1f9;
-}
-.card-title {color:#1e3a8a; text-decoration:none; font-weight:700; font-size:15px;}
-.card .desc {font-size:14px; color:#4b5563; margin-top:4px;}
-.ins {margin-top:22px; padding-top:16px; border-top:1px solid #e5e7eb;}
-.ins h3 {border-left:5px solid #10b981; padding-left:10px; color:#065f46; font-size:17px; margin:0 0 10px;}
-.ins .card {background:#ecfdf5; border-color:#cfe8e1;}
-.ins .card:hover {background:#d1fae5;}
-.ins .card-title {color:#047857;}
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 
-@media(max-width:1000px){
-  .container{flex-direction:column;}
-  .result-box{flex-direction:column; align-items:center;}
-  .result-chart{width:200px!important; height:200px!important;}
-  .result-detail{width:100%; text-align:left; font-size:15px;}
-  .right{width:100%; margin-top:20px;}
-}
-@media(max-width:600px){
-  body{font-size:14px;}
-  .result-detail{font-size:14.5px; line-height:1.6;}
-  .card img{height:120px;}
-  #affList, #insList {display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
-  .card{margin-bottom:0; padding:10px;}
-}
+<style>
+  :root{
+    --brand:#2A7FFF;
+    --brand-weak:#E9F1FF;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --bg:#F5F8FF;
+    --danger:#dc2626;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Pretendard,'Noto Sans KR',system-ui,AppleSDGothicNeo,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:inherit}
+
+  .wrap{max-width:1180px;margin:24px auto;padding:0 16px}
+  .header{
+    background:var(--brand);
+    color:#fff;
+    font-weight:800;
+    padding:18px 16px;
+    text-align:center;
+    border-radius:14px;
+    box-shadow:0 8px 24px rgba(42,127,255,.25);
+  }
+  .sub{color:#eef;opacity:.95;font-weight:500}
+
+  .grid{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap:18px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+    padding:22px;
+  }
+
+  .title{font-size:22px;font-weight:800;margin:0 0 8px}
+  .kicker{font-size:13px;color:var(--muted);margin-bottom:10px}
+
+  .pill{
+    display:inline-block;background:var(--brand-weak);color:var(--brand);
+    border:1px solid #cfe2ff;padding:6px 10px;border-radius:999px;margin:4px 6px 0 0;
+    font-size:12px;font-weight:600
+  }
+  .pill.red{background:#ffe8e8;color:#b91c1c;border-color:#ffbcbc}
+  .pill.amber{background:#fff4d8;color:#b45309;border-color:#ffe3a7}
+
+  /* left column */
+  .gbox{display:grid;grid-template-columns: 240px 1fr;gap:18px;align-items:center}
+  .gcanvas{
+    width:240px;height:240px;display:block;margin:auto;background:#fff;border-radius:50%;
+  }
+  .gnum{font-size:28px;font-weight:900;margin-top:8px;text-align:center}
+  .gsev{font-size:13px;text-align:center;color:var(--muted)}
+
+  .dl{
+    margin:0;padding-left:16px
+  }
+  .dl li{
+    margin:6px 0;line-height:1.5
+  }
+
+  .sec-title{font-weight:800;margin:4px 0 10px}
+  .list{margin:0;padding-left:18px}
+  .list li{margin:6px 0;line-height:1.55}
+
+  /* right column (affiliates) */
+  .aff-sec + .aff-sec{margin-top:16px}
+  .aff-title{font-weight:800;margin-bottom:10px}
+  .aff-grid{
+    display:grid;gap:12px;
+    grid-template-columns: 1fr;
+  }
+  /* 모바일 2열 그리드 */
+  @media (max-width: 640px){
+    .grid{grid-template-columns: 1fr} /* stack columns */
+    .gbox{grid-template-columns: 1fr}
+    .aff-grid{grid-template-columns: repeat(2,1fr)}
+  }
+
+  .aff-card{
+    display:block;
+    text-decoration:none;
+    border:2px solid var(--brand);
+    border-radius:14px;
+    padding:12px;
+    background:#ffffff;
+    box-shadow:0 6px 14px rgba(42,127,255,.08);
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    cursor:pointer;
+    height:100%;
+  }
+  .aff-card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(42,127,255,.15);background:#f9fbff}
+
+  .aff-flex{display:flex;gap:12px;align-items:center}
+  .thumb{
+    flex:0 0 72px;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid #e8efff;background:#f0f6ff;
+  }
+  .thumb img{
+    width:100%;height:100%;object-fit:cover;display:block;
+  }
+  .atxt .aname{font-weight:800;font-size:14px;line-height:1.35;margin-bottom:4px}
+  .atxt .atag{font-size:12px;color:var(--muted)}
+  .atag .dot{margin:0 6px;color:#cbd5e1}
+
+  .warn{
+    color:#b91c1c;background:#ffecec;border:1px solid #ffc4c4;
+    padding:10px 12px;border-radius:10px;font-size:13px;margin-top:8px
+  }
+
+  .footnote{font-size:12px;color:#94a3b8;margin-top:8px}
+
+  /* helper */
+  .sp8{height:8px}
+  .sp12{height:12px}
+  .sp16{height:16px}
+  .hr{height:1px;background:#eef2ff;margin:14px 0}
 </style>
 </head>
+
 <body>
-
-<div class="container">
-  <!-- LEFT -->
-  <div class="left">
-    <h1 class="title">💠 노을빛하루 AI 종합 진단 결과</h1>
-    <p class="sub">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</p>
-
-    <div class="result-box">
-      <canvas id="riskChart" class="result-chart"></canvas>
-      <div id="detail" class="result-detail"></div>
+  <div class="wrap">
+    <div class="header">
+      <div style="font-size:18px;font-weight:900">노을빛하루 AI 종합 진단 결과</div>
+      <div class="sub">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</div>
     </div>
 
-    <section class="section">
-      <h3>AI 종합 진단 요약</h3>
-      <ul id="summary" class="clean"></ul>
-    </section>
+    <div class="sp12"></div>
 
-    <section class="section">
-      <h3>종합 의견</h3>
-      <p id="opinion" style="margin:0"></p>
-    </section>
+    <div class="grid">
+      <!-- LEFT: Graph + details + summaries -->
+      <section class="card" id="left">
+        <div class="kicker" id="topicKicker">주제: -</div>
+        <h2 class="title" id="titleMain">AI 위험도 분석</h2>
+        <div id="pillRow"></div>
 
-    <button class="btn" onclick="location.href='/'">← 다시 진단하기</button>
+        <div class="sp12"></div>
+
+        <div class="gbox">
+          <div>
+            <canvas id="gauge" class="gcanvas" width="240" height="240" aria-label="위험도 게이지"></canvas>
+            <div class="gnum" id="gnum">0%</div>
+            <div class="gsev" id="gsev">위험도</div>
+          </div>
+
+          <div>
+            <div class="sec-title">그래프 해석</div>
+            <ul class="dl" id="detailList">
+              <!-- 10줄 이상 채워짐 -->
+            </ul>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div>
+          <div class="sec-title">AI 종합 진단 요약</div>
+          <ul class="list" id="summaryList"></ul>
+        </div>
+
+        <div class="hr"></div>
+
+        <div>
+          <div class="sec-title">종합 의견</div>
+          <ul class="list" id="opinionList"></ul>
+        </div>
+
+        <div id="redFlagWrap" style="display:none">
+          <div class="sp12"></div>
+          <div class="warn" id="rfText">※ 즉시 조치가 필요한 증상 감지</div>
+        </div>
+
+        <div class="footnote">※ 본 서비스는 교육/정보 제공용으로, 의학적 진단/치료를 대체하지 않습니다. 증상이 심하거나 지속되면 반드시 전문의와 상담하세요.</div>
+      </section>
+
+      <!-- RIGHT: Affiliates -->
+      <aside class="card" id="right">
+        <div class="aff-sec">
+          <div class="aff-title">추천 제휴상품</div>
+          <div class="aff-grid" id="affProducts">
+            <!-- 카드 전체 클릭 가능 -->
+          </div>
+        </div>
+
+        <div class="aff-sec">
+          <div class="aff-title">추천 보험/제휴 서비스</div>
+          <div class="aff-grid" id="affInsurance">
+            <!-- 최소 2개 노출 -->
+          </div>
+        </div>
+      </aside>
+    </div>
   </div>
 
-  <!-- RIGHT -->
-  <aside class="right">
-    <h3 class="aff-title">추천 제휴상품</h3>
-    <div id="affList"></div>
-
-    <div class="ins">
-      <h3>추천 보험 제휴 서비스</h3>
-      <div id="insList"></div>
-    </div>
-  </aside>
-</div>
-
 <script>
-const qs = new URLSearchParams(location.search);
-const payloadStr = qs.get("payload");
-let topicParam = qs.get("topic");
-let payload = null;
-if (payloadStr) { try { payload = JSON.parse(decodeURIComponent(payloadStr)); } catch {} }
-const TOPIC = (payload && payload.topic) || topicParam || "어깨·목 통증";
+/* -----------------------------
+   1) 유틸: 안전한 데이터 로드
+-------------------------------- */
+function safeJSON(str){
+  try{ return JSON.parse(str) }catch(e){ return null }
+}
+function qs(key){
+  const p=new URLSearchParams(location.search);
+  return p.get(key);
+}
 
-/* 위험도 및 설명 */
-const riskData = {
-  "어깨·목 통증": {percent:74,color:"#fb923c",desc:"근육 긴장 및 어깨 결림이 누적된 상태입니다. 스트레칭 및 온찜질로 개선 가능성이 높습니다."},
-  "혈압 관리": {percent:78,color:"#ef4444",desc:"혈압 변동성이 높아 생활 관리가 필요합니다. 규칙적 운동과 염분 제한이 필수입니다."},
-  "관절 통증": {percent:86,color:"#f97316",desc:"초기 관절염 의심 단계로 평가됩니다. 활동 후 통증·붓기 주의가 필요합니다."}
+/* -----------------------------
+   2) 입력: topic & checks 확보
+   - 우선순위: payload(query) > localStorage > query(topic)
+-------------------------------- */
+let topic = null;
+let checks = [];
+
+const payload = qs('payload') ? safeJSON(decodeURIComponent(qs('payload'))) : null;
+if (payload && payload.topic){
+  topic = payload.topic;
+  if (Array.isArray(payload.checks)) checks = payload.checks;
+}
+// localStorage 백업 경로
+if (!topic){
+  try{
+    const t = localStorage.getItem('nh_topic');
+    const c = localStorage.getItem('nh_checks');
+    if (t){ topic = t }
+    if (c){ const arr = safeJSON(c); if (Array.isArray(arr)) checks = arr }
+  }catch(e){}
+}
+// query ?topic=
+if (!topic){
+  const t2 = qs('topic');
+  if (t2) topic = t2;
+}
+
+// 비상 처리
+if (!topic){ topic = '혈압 관리' } // 디폴트
+if (!Array.isArray(checks)) checks = [];
+
+/* -----------------------------
+   3) 위험도 판정 (응답 기반)
+-------------------------------- */
+const riskWords = ["심함","악화","어려움","높음","위험","즉시","갑자기","숨","통증","가슴","저림","혈압","어지러움","두통","붓기","열감","야간","흉통"];
+let riskScore = 0;
+checks.forEach(c=>{
+  riskWords.forEach(r=>{ if (c && c.indexOf(r) >= 0) riskScore++ })
+});
+let severityKey = 'mild'; // 기본
+if (riskScore >= 6) severityKey = 'severe';
+else if (riskScore >= 3) severityKey = 'moderate';
+
+/* -----------------------------
+   4) 제휴 데이터 (주제별)
+   - 이미지 깨짐 방지: onerror로 플레이스홀더
+-------------------------------- */
+const PLACEHOLDER = 'https://via.placeholder.com/300x300.png?text=Noeulbit+Haru';
+
+const affiliates = {
+  "혈압 관리":{
+    products:[
+      {name:"오메가3 고함량 EPA", tag:"혈관 · 염증 · 순환", img:"https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=600&auto=format&fit=crop", url:"https://www.coupang.com/"},
+      {name:"저염 가정간편식 세트", tag:"저염식 · 체중관리", img:"https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=600&auto=format&fit=crop", url:"https://www.coupang.com/"},
+      {name:"혈압측정기(상완식)", tag:"자가측정 · 기록", img:"https://images.unsplash.com/photo-1582719478250-41797ba1b1b1?q=80&w=600&auto=format&fit=crop", url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"고혈압 특화 실손 가이드", tag:"진료비 · 약제비", img:"https://images.unsplash.com/photo-1584982916648-7f0f4f5f9f7f?q=80&w=600&auto=format&fit=crop", url:"#"},
+      {name:"만성질환 관리형 보장", tag:"만성 · 정기관리", img:"https://images.unsplash.com/photo-1584467735871-8d1473a1a996?q=80&w=600&auto=format&fit=crop", url:"#"}
+    ]
+  },
+  "관절 통증":{
+    products:[
+      {name:"MSM+글루코사민", tag:"연골 · 염증완화", img:"https://images.unsplash.com/photo-1580281780460-82d277b0a2a9?q=80&w=600&auto=format&fit=crop", url:"https://www.coupang.com/"},
+      {name:"무릎 보호대(스테이)", tag:"안정 · 보행", img:"https://images.unsplash.com/photo-1599050751792-d5b1d7a9b1db?q=80&w=600&auto=format&fit=crop", url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"정형외과 치료 실손", tag:"물리치료 · 주사", img:PLACEHOLDER, url:"#"},
+      {name:"골절/연골 손상 특약", tag:"무릎 · 고관절", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "혈당·당뇨":{
+    products:[
+      {name:"당 지수 낮은 곡물세트", tag:"식단 · 포만감", img:"https://images.unsplash.com/photo-1543357480-c60d40007a3a?q=80&w=600&auto=format&fit=crop", url:"https://www.coupang.com/"},
+      {name:"오메가3 + 크롬", tag:"대사 · 염증", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"당뇨 통원/약제 실손", tag:"내분비내과", img:PLACEHOLDER, url:"#"},
+      {name:"합병증 케어 특약", tag:"망막 · 신장", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "불면증·수면장애":{
+    products:[
+      {name:"마그네슘 글리시네이트", tag:"긴장완화 · 수면", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"화이트노이즈 기기", tag:"수면환경", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"정신건강 상담형 보장", tag:"상담 · 약제", img:PLACEHOLDER, url:"#"},
+      {name:"수면검사 보장", tag:"수면다원검사", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "어깨·목 통증":{
+    products:[
+      {name:"저·중강도 마사지건", tag:"근막 · 회복", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"높이조절 기능성 베개", tag:"자세교정", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"근골격계 물리치료", tag:"자세 · 재활", img:PLACEHOLDER, url:"#"},
+      {name:"MRI/도수치료 특약", tag:"정형 · 재활", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "심장·호흡·가슴통증":{
+    products:[
+      {name:"저염 식단 패키지", tag:"염분관리", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"활동량 측정 스마트밴드", tag:"심박 · 수면", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"심혈관 집중 보장", tag:"협심증 · 부정맥", img:PLACEHOLDER, url:"#"},
+      {name:"응급실 내원 보장", tag:"급성 흉통", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "노안·시력저하":{
+    products:[
+      {name:"루테인+오메가3", tag:"망막 · 건조", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"가습기(저소음)", tag:"습도관리", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"안과 실손/검사", tag:"각막 · 망막", img:PLACEHOLDER, url:"#"},
+      {name:"백내장 수술 특약", tag:"수술 · 렌즈", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "치매·기억력 문제":{
+    products:[
+      {name:"오메가3+DHA 강화", tag:"인지 · 혈류", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"두뇌퍼즐/퍼포먼스북", tag:"인지훈련", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"치매 간병형 보장", tag:"중증 · 간병", img:PLACEHOLDER, url:"#"},
+      {name:"신경과 통원 실손", tag:"약제 · 검사", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "전립선·배뇨 문제":{
+    products:[
+      {name:"쏘팔메토 복합", tag:"배뇨 · 순환", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"따뜻한 안심 방석", tag:"체열 · 순환", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"비뇨기과 실손", tag:"약제 · 검사", img:PLACEHOLDER, url:"#"},
+      {name:"남성 건강 특약", tag:"호르몬 · 배뇨", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "종합 건강 체크":{
+    products:[
+      {name:"종합비타민(시니어)", tag:"기초 · 활력", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"스트레칭 보조밴드", tag:"순환 · 유연", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"가정의학과 실손", tag:"통합진료", img:PLACEHOLDER, url:"#"},
+      {name:"검진형 특약", tag:"정기 · 스크리닝", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "보이스피싱 예방":{
+    products:[
+      {name:"보안 백신 앱(유료)", tag:"악성링크 차단", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"가짜문자 탐지 앱", tag:"스미싱 차단", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"금융사기 피해지원 안내", tag:"계좌정지 · 신고", img:PLACEHOLDER, url:"#"},
+      {name:"개인정보 모니터링", tag:"신용 · 유출감시", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "복지·생활지원금":{
+    products:[
+      {name:"공공요금 감면 안내서", tag:"전기 · 가스", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"서류 스캔 앱", tag:"신청 · 제출", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"복지상담 연결", tag:"주민센터 · 복지로", img:PLACEHOLDER, url:"#"},
+      {name:"서민금융 안내", tag:"햇살론 · 특례", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "건강 습관":{
+    products:[
+      {name:"만보기/스마트밴드", tag:"걷기 · 수면", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"저당 식단키트", tag:"식사 루틴", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"헬스케어 코칭", tag:"식단 · 운동", img:PLACEHOLDER, url:"#"},
+      {name:"검진 패키지", tag:"기초 · 정밀", img:PLACEHOLDER, url:"#"}
+    ]
+  },
+  "기기 보안":{
+    products:[
+      {name:"패스워드 관리자", tag:"2단계 인증", img:PLACEHOLDER, url:"https://www.coupang.com/"},
+      {name:"광고 차단/보안 브라우저", tag:"링크 보호", img:PLACEHOLDER, url:"https://www.coupang.com/"}
+    ],
+    insurance:[
+      {name:"신용 모니터링", tag:"이상징후 알림", img:PLACEHOLDER, url:"#"},
+      {name:"사이버 보험 가이드", tag:"해킹 · 유출", img:PLACEHOLDER, url:"#"}
+    ]
+  }
 };
 
-/* 진단 요약 예시 */
-const summaryText = {
-  "어깨·목 통증": [
-    "장시간 스마트폰·컴퓨터 사용에 의한 근육 피로 누적.",
-    "온찜질과 가벼운 스트레칭으로 완화 가능.",
-    "자세 교정 밴드 및 근육 이완 보조기구 추천."
-  ],
-  "혈압 관리": [
-    "수축기 혈압 상승 경향 확인됨.",
-    "염분 섭취 줄이고 규칙적 수면 필요.",
-    "꾸준한 유산소 운동으로 혈압 안정화 기대."
-  ]
-};
+/* -----------------------------
+   5) analysis.json 로드 & 렌더
+-------------------------------- */
+async function loadAnalysis(){
+  const res = await fetch('analysis.json',{cache:'no-store'});
+  if(!res.ok){ throw new Error('analysis.json 로드 실패') }
+  return await res.json();
+}
 
-/* 보험 제휴서비스 */
-const insuranceList = [
-  {title:"실손보험 비교", link:"#", desc:"병원비·약값 부담 줄이는 최신 실손 플랜 비교"},
-  {title:"질병 보장형 플랜", link:"#", desc:"만성질환·입원 대비 종합보장형 설계 추천"}
-];
+function chooseSeverityBlock(analysisTopic, key){
+  // 이미 mild/moderate/severe 중 하나가 정해진 상태
+  return analysisTopic && analysisTopic[key] ? analysisTopic[key] : null;
+}
 
-/* 제휴상품 예시 */
-const affList = [
-  {title:"온열 어깨찜질기",desc:"혈류 개선 및 근육 이완",img:"https://via.placeholder.com/600x400.png?text=온열+찜질기",link:"#"},
-  {title:"자세 교정 밴드",desc:"거북목·어깨 긴장 완화",img:"https://via.placeholder.com/600x400.png?text=자세+밴드",link:"#"},
-  {title:"마그네슘 영양제",desc:"근육 피로 회복 지원",img:"https://via.placeholder.com/600x400.png?text=마그네슘",link:"#"}
-];
+function sevLabel(key){
+  if (key==='severe') return '높음';
+  if (key==='moderate') return '중간';
+  return '낮음';
+}
 
-/* 실행 */
-(function render(){
-  const risk = riskData[TOPIC] || {percent:60,color:"#2f6efc",desc:"상세 분석 데이터가 부족합니다."};
-  const ctx=document.getElementById("riskChart");
-  new Chart(ctx,{
-    type:"doughnut",
-    data:{datasets:[{data:[risk.percent,100-risk.percent],backgroundColor:[risk.color,"#e5e7eb"],borderWidth:0}]},
-    options:{cutout:"75%",plugins:{legend:{display:false},tooltip:{enabled:false}}}
+function sevClass(key){
+  if (key==='severe') return 'red';
+  if (key==='moderate') return 'amber';
+  return '';
+}
+
+// Canvas 게이지
+function drawGauge(canvas, percent, color='#2A7FFF'){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const cx=W/2, cy=H/2, r=90;
+  // 바탕 링
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,Math.PI*0.85,Math.PI*0.15,false);
+  ctx.strokeStyle = '#e5edff';
+  ctx.lineWidth = 18;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // 값 링
+  const start = Math.PI*0.85;
+  const end = start + (Math.PI*1.3) * (percent/100);
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,start,end,false);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 18;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
+function colorByRisk(p){
+  if (p>=85) return '#dc2626';
+  if (p>=70) return '#f59e0b';
+  return '#2A7FFF';
+}
+
+// 이미지 onerror 대체
+function safeImg(el){
+  el.onerror = ()=>{ el.src = PLACEHOLDER; }
+}
+
+function renderAff(container, items){
+  container.innerHTML = '';
+  items.forEach(it=>{
+    const a = document.createElement('a');
+    a.className = 'aff-card';
+    a.href = it.url || '#';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+
+    a.innerHTML = `
+      <div class="aff-flex">
+        <div class="thumb"><img alt="" src="${it.img || PLACEHOLDER}"></div>
+        <div class="atxt">
+          <div class="aname">${it.name || '상품'}</div>
+          <div class="atag">${it.tag || ''}</div>
+        </div>
+      </div>
+    `;
+    const img = a.querySelector('img');
+    safeImg(img);
+
+    container.appendChild(a);
   });
+}
 
-  document.getElementById("detail").innerHTML = `
-    <strong>AI 분석결과:</strong> 위험도 ${risk.percent}% 단계입니다.<br>
-    ${risk.desc}<br>
-    생활습관 조정 및 전문가 상담을 권장합니다.
-  `;
+(async()=>{
+  try{
+    const analysis = await loadAnalysis();
+    const topicBlock = analysis[topic];
+    // topic 맵핑 호환 (분류명이 다를 수 있어 보정)
+    let tKey = topicBlock ? topic : null;
+    if(!tKey){
+      // 일부 다른 표기 대응
+      const aliases = Object.keys(analysis);
+      tKey = aliases.find(k => k.replace(/\s/g,'')===topic.replace(/\s/g,''));
+    }
+    if(!tKey){ tKey = Object.keys(analysis)[0] }
 
-  const sum = summaryText[TOPIC] || ["현재 상태에 대한 데이터가 부족합니다.","추가 점검이 필요합니다."];
-  document.getElementById("summary").innerHTML = sum.map(s=>`<li>${s}</li>`).join("");
-  document.getElementById("opinion").textContent = "지속적 스트레칭, 규칙적 수면, 근육이완 관리가 핵심입니다.";
+    const chosen = chooseSeverityBlock(analysis[tKey], severityKey);
+    const percent = chosen?.risk ?? 0;
 
-  document.getElementById("affList").innerHTML = affList.map(a=>`
-    <div class="card" onclick="window.open('${a.link}','_blank')">
-      <img src="${a.img}" alt="${a.title}">
-      <div class="card-title">${a.title}</div>
-      <div class="desc">${a.desc}</div>
-    </div>
-  `).join("");
+    // 상단 메타
+    document.getElementById('topicKicker').textContent = `주제: ${topic}`;
+    document.getElementById('titleMain').textContent = 'AI 위험도 분석';
+    const pills = [];
+    pills.push(`<span class="pill">선택 항목: ${checks.length || 0}개</span>`);
+    pills.push(`<span class="pill ${sevClass(severityKey)}">위험도: ${sevLabel(severityKey)}</span>`);
+    document.getElementById('pillRow').innerHTML = pills.join(' ');
 
-  document.getElementById("insList").innerHTML = insuranceList.map(i=>`
-    <div class="card" onclick="window.open('${i.link}','_blank')">
-      <div class="card-title">${i.title}</div>
-      <div class="desc">${i.desc}</div>
-    </div>
-  `).join("");
+    // 게이지
+    const g = document.getElementById('gauge');
+    const col = colorByRisk(percent);
+    drawGauge(g, percent, col);
+    document.getElementById('gnum').textContent = `${percent}%`;
+    document.getElementById('gsev').textContent = `위험도 · ${sevLabel(severityKey)}`;
+
+    // 그래프 해석(= detail 10줄 이상)
+    const detail = (chosen?.detail || []).slice(0, 12);
+    document.getElementById('detailList').innerHTML =
+      detail.map(x=>`<li>${x}</li>`).join('');
+
+    // 요약(10줄)
+    const summary = (chosen?.summary || []).slice(0, 10);
+    document.getElementById('summaryList').innerHTML =
+      summary.map(x=>`<li>${x}</li>`).join('');
+
+    // 종합 의견(5줄 이상)
+    const opinion = (chosen?.opinion || []);
+    const min5 = opinion.length<5 ? opinion.concat(Array(5-opinion.length).fill('추가 의견 준비 중')) : opinion;
+    document.getElementById('opinionList').innerHTML =
+      min5.map(x=>`<li>${x}</li>`).join('');
+
+    // 위험 신호 표시 (간단 규칙)
+    const rf = checks.some(c=>/가슴|숨|즉시|갑자기|심함|야간/.test(c));
+    if (rf){
+      const wrap = document.getElementById('redFlagWrap');
+      wrap.style.display='block';
+      document.getElementById('rfText').textContent =
+        '※ 가슴 통증·호흡곤란·야간 악화 등은 즉시 119 또는 가까운 응급실 방문이 필요할 수 있습니다.';
+    }
+
+    // 제휴 섹션 렌더
+    const aff = affiliates[topic] || affiliates[tKey] || affiliates['종합 건강 체크'];
+    renderAff(document.getElementById('affProducts'), (aff.products||[]).slice(0,4));
+    // 보험은 최소 2개 보장
+    const insureList = (aff.insurance||[]);
+    renderAff(document.getElementById('affInsurance'), insureList.slice(0, Math.max(2, insureList.length)));
+
+  }catch(err){
+    console.error(err);
+    alert('분석 데이터를 불러오지 못했습니다. analysis.json을 확인하세요.');
+  }
 })();
 </script>
-
 </body>
 </html>
