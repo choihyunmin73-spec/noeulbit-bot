@@ -2,165 +2,200 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>노을빛하루 종합 진단 결과</title>
+<title>노을빛하루 AI 종합 진단 결과</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
     body {
-        margin:0;
-        background:#f4f6fa;
+        background:#f5f7fb;
         font-family:'Noto Sans KR',sans-serif;
+        margin:0;
+        color:#222;
     }
-
     .wrap {
         max-width:900px;
-        margin:25px auto;
+        margin:30px auto;
         padding:0 15px;
     }
-
     .card {
-        background:white;
-        padding:28px;
-        border-radius:16px;
-        box-shadow:0 6px 20px rgba(0,0,0,0.08);
-        margin-bottom:20px;
-    }
-
-    .title {
-        font-size:24px;
-        font-weight:800;
-        margin-bottom:8px;
-        color:#0f4fff;
-    }
-
-    .sub {
-        color:#6b7280;
-        font-size:15px;
+        background:#fff;
+        border-radius:14px;
+        box-shadow:0 3px 10px rgba(0,0,0,0.05);
+        padding:25px;
         margin-bottom:18px;
     }
-
+    .title {
+        font-size:22px;
+        font-weight:800;
+        color:#0f4fff;
+        margin-bottom:5px;
+    }
+    .subtitle {
+        font-size:15px;
+        color:#555;
+        margin-bottom:12px;
+    }
     .pill {
         display:inline-block;
-        background:#eef2ff;
         padding:7px 12px;
         border-radius:999px;
-        margin-right:8px;
-        margin-bottom:6px;
-        font-size:13px;
+        background:#eef2ff;
         color:#3742b1;
+        font-size:13px;
+        margin-right:6px;
+        margin-bottom:6px;
     }
-    .pill.red { background:#ffe7e7; color:#b91c1c; }
-    .pill.amber { background:#fff3cd; color:#b54706; }
+    .pill.red { background:#ffe5e5; color:#b91c1c; }
+    .pill.amber { background:#fff7e0; color:#b54706; }
 
-    h3 {
-        font-size:19px;
-        margin-top:20px;
-        margin-bottom:12px;
-        color:#333;
+    .section-title {
+        font-size:17px;
+        font-weight:700;
+        margin-bottom:10px;
+        display:flex;
+        align-items:center;
+        gap:6px;
     }
 
-    li {
-        margin-bottom:8px;
-        font-size:16px;
-        line-height:1.45;
+    .ai-summary { color:#333; line-height:1.6; font-size:16px; }
+    .advice ul { margin:0; padding-left:18px; line-height:1.6; font-size:16px; }
+    .advice li { margin-bottom:6px; }
+
+    .alert {
+        background:#fff9e6;
+        border-left:4px solid #ffd43b;
+        padding:12px 15px;
+        border-radius:8px;
+        color:#444;
+        font-size:15px;
+        margin-top:8px;
+    }
+
+    .tag-list { margin-top:8px; }
+    .tag {
+        display:inline-block;
+        background:#e9efff;
+        padding:7px 11px;
+        border-radius:8px;
+        font-size:13px;
+        color:#3248a8;
+        margin:4px 5px;
     }
 
     .btn {
         background:#0f4fff;
         color:white;
-        padding:18px;
-        border-radius:12px;
+        padding:16px;
+        border-radius:10px;
         text-align:center;
-        font-size:18px;
+        font-size:17px;
         cursor:pointer;
-        margin-top:18px;
-        font-weight:600;
-        box-shadow:0 4px 14px rgba(15,79,255,0.3);
-        transition:0.3s;
+        margin-top:22px;
+        box-shadow:0 3px 10px rgba(15,79,255,0.25);
     }
-    .btn:hover {
-        background:#285eff;
-    }
-
-    @media(max-width:480px){
-        .card { padding:20px; }
-        .title { font-size:22px; }
-        li { font-size:15px; }
-        .btn { font-size:17px; padding:16px; }
-    }
+    .btn:hover { background:#285eff; }
 </style>
 </head>
-
 <body>
 
 <div class="wrap">
 
-    <!-- ✅ 결과 헤더 -->
+    <!-- HEADER -->
     <div class="card">
-        <div class="title">💠 노을빛하루 종합 진단 결과</div>
-        <div class="sub">선택한 문항을 기반으로 AI가 분석한 예측 결과입니다.</div>
+        <div class="title">💠 노을빛하루 AI 종합 진단 결과</div>
+        <div class="subtitle">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</div>
 
-        <div id="pills"></div>
-        <div id="summary" style="margin-top:15px;"></div>
+        <div id="header-info"></div>
     </div>
 
-    <!-- ✅ 권장 조치 -->
+    <!-- AI SUMMARY -->
     <div class="card">
-        <h3>✅ 권장 조치</h3>
-        <div id="advice"></div>
+        <div class="section-title">🩺 AI 종합 진단 요약</div>
+        <div id="summary" class="ai-summary"></div>
     </div>
 
-    <!-- ✅ 진료과 안내 -->
+    <!-- SELF CARE -->
     <div class="card">
-        <h3>🏥 권장 진료과</h3>
-        <div id="dept"></div>
+        <div class="section-title">✅ 셀프 케어 가이드</div>
+        <div id="advice" class="advice"></div>
     </div>
 
-    <!-- ✅ 다시하기 버튼 -->
+    <!-- ALERT -->
+    <div class="card">
+        <div class="section-title">⚠️ 위험 신호</div>
+        <div id="alert" class="alert"></div>
+    </div>
+
+    <!-- SELECTED TAGS -->
+    <div class="card">
+        <div class="section-title">🧩 선택한 항목</div>
+        <div id="tags" class="tag-list"></div>
+    </div>
+
+    <!-- BUTTON -->
     <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
 
 </div>
 
 <script>
 (function(){
-    // ✅ URL 파라미터로부터 payload 파싱
     const params = new URLSearchParams(window.location.search);
     const payload = params.get("payload");
+
     if(!payload){
-        document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>⚠️ 분석 데이터가 없습니다.</h2>";
+        document.body.innerHTML = "<h2 style='text-align:center;margin-top:60px;'>⚠️ 분석 데이터가 없습니다.</h2>";
         return;
     }
 
     let data;
     try {
         data = JSON.parse(decodeURIComponent(payload));
-    } catch(e) {
-        document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>⚠️ 데이터 파싱 오류</h2>";
+    } catch(e){
+        document.body.innerHTML = "<h2 style='text-align:center;margin-top:60px;'>⚠️ 데이터 파싱 오류</h2>";
         return;
     }
 
-    // ✅ 위험도 표시
-    const pillsEl = document.getElementById("pills");
-    const sevClass =
-        data.severity === "높음" ? "red" :
-        data.severity === "중간" ? "amber" : "";
-    pillsEl.innerHTML = `
-        <span class="pill">주제: ${data.topic}</span>
-        <span class="pill ${sevClass}">위험도: ${data.severity}</span>
+    // HEADER INFO
+    const sevClass = data.severity === "높음" ? "red" : data.severity === "중간" ? "amber" : "";
+    document.getElementById("header-info").innerHTML = `
+        <div>
+            <span class="pill">주제: ${data.topic}</span>
+            <span class="pill ${sevClass}">위험도: ${data.severity}</span>
+        </div>
+        <div style="margin-top:10px;">
+            <b>권장 조치:</b> ${data.summary}<br>
+            <b>권장 진료과:</b> ${data.dept}
+        </div>
     `;
 
-    // ✅ 요약 결과 표시
-    document.getElementById("summary").innerHTML =
-        `<div style="font-size:17px;color:#333;line-height:1.6;">${data.summary}</div>`;
+    // SUMMARY
+    document.getElementById("summary").textContent =
+        `${data.topic} 관련 주요 부위의 상태 이상이 감지되었습니다. 현재 상태에 따라 ${data.summary} 이 필요하며, ${data.dept} 방문을 권장드립니다.`;
 
-    // ✅ 조치 내용
-    document.getElementById("advice").innerHTML = data.advice
-        ? "<ul>" + data.advice.map(a => `<li>${a}</li>`).join("") + "</ul>"
-        : "<p>별도의 권장 사항이 없습니다.</p>";
+    // ADVICE
+    if(data.advice && data.advice.length){
+        document.getElementById("advice").innerHTML =
+            "<ul>" + data.advice.map(v => `<li>${v}</li>`).join("") + "</ul>";
+    } else {
+        document.getElementById("advice").innerHTML = "별도의 셀프 케어 항목이 없습니다.";
+    }
 
-    // ✅ 진료과 표시
-    document.getElementById("dept").innerHTML =
-        `<div style="font-size:17px;">${data.dept}</div>`;
+    // ALERT
+    const alertEl = document.getElementById("alert");
+    if(data.severity === "높음"){
+        alertEl.innerHTML = "⚠️ 현재 응급 수준의 위험 신호가 감지되었습니다. 즉시 의료기관 방문이 필요합니다.";
+    } else if(data.severity === "중간"){
+        alertEl.innerHTML = "주의가 필요합니다. 증상 변화를 꾸준히 관찰하세요.";
+    } else {
+        alertEl.innerHTML = "특별한 응급 신호는 감지되지 않았습니다.";
+    }
+
+    // SELECTED TAGS (선택 항목)
+    const tagContainer = document.getElementById("tags");
+    if(data.checks && data.checks.length){
+        tagContainer.innerHTML = data.checks.map(c => `<span class='tag'>${c}</span>`).join("");
+    } else {
+        tagContainer.innerHTML = "<span class='tag'>선택 항목 없음</span>";
+    }
 })();
 </script>
 
