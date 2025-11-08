@@ -1,7 +1,7 @@
 {
   "name": "noeulbit-haru-ai",
   "version": "1.0.0",
-  "description": "노을빛하루 AI 건강·생활 진단 서비스",
+  "description": "노을빛하루 AI 건강·생활 진단 서비스 (Full Version)",
   "main": "server.js",
   "type": "commonjs",
   "scripts": { "start": "node server.js" },
