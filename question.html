@@ -6,71 +6,82 @@
   <title>노을빛하루 AI 종합 진단</title>
   <style>
     body {
+      background-color: #f5f7fb;
       font-family: "Noto Sans KR", sans-serif;
-      background-color: #f6f8fa;
-      color: #222;
       margin: 0;
       padding: 0;
     }
-    .container {
-      max-width: 650px;
-      margin: 80px auto;
+    .wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
       background: #fff;
       padding: 40px;
-      border-radius: 16px;
+      border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      text-align: center;
+      width: 400px;
     }
     h2 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-    .question {
+      color: #1e293b;
+      font-size: 20px;
+      font-weight: 700;
       margin-bottom: 25px;
     }
-    select, input[type="text"] {
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #475569;
+    }
+    select, input {
       width: 100%;
       padding: 10px;
-      font-size: 15px;
-      border: 1px solid #ccc;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      outline: none;
     }
     button {
       width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      background-color: #3b82f6;
+      padding: 12px;
+      background-color: #2563eb;
+      color: white;
       border: none;
-      color: #fff;
       border-radius: 8px;
+      font-size: 15px;
       cursor: pointer;
       font-weight: 600;
     }
     button:hover {
-      background-color: #2563eb;
-    }
-    .progress {
-      text-align: center;
-      margin-top: 16px;
-      color: #666;
-      font-size: 14px;
+      background-color: #1e40af;
     }
     .error {
-      background-color: #ffecec;
-      border-left: 4px solid #ff5252;
-      padding: 12px;
-      color: #c00;
-      font-weight: 500;
-      margin-top: 16px;
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+      background: #fee2e2;
       border-radius: 6px;
+      padding: 8px;
+    }
+    .progress {
+      color: #475569;
+      font-size: 13px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>노을빛하루 AI 종합 진단</h2>
+  <div class="wrapper">
+    <div class="box">
+      <h2>노을빛하루 AI 종합 진단</h2>
 
-    <div class="question">
       <label>주제 선택</label>
       <select id="topic">
         <option value="">-- 주제를 선택하세요 --</option>
@@ -85,26 +96,24 @@
         <option value="전립선·배뇨 문제">전립선·배뇨 문제</option>
         <option value="보이스피싱·복지 안전">보이스피싱·복지 안전</option>
       </select>
-    </div>
 
-    <div class="question">
       <label>응답 입력 (쉼표로 구분)</label>
       <input type="text" id="answers" placeholder="예: 피로, 두통, 어깨결림, 불면" />
+
+      <button id="submitBtn">결과 보기</button>
+      <div id="progress" class="progress"></div>
+      <div id="errorBox" class="error"></div>
     </div>
-
-    <button id="submitBtn">결과 보기</button>
-
-    <div id="progress" class="progress"></div>
-    <div id="errorBox" class="error" style="display:none;"></div>
   </div>
 
   <script>
     document.getElementById("submitBtn").addEventListener("click", async () => {
       const topic = document.getElementById("topic").value.trim();
       const answersText = document.getElementById("answers").value.trim();
-      const errorBox = document.getElementById("errorBox");
       const progress = document.getElementById("progress");
+      const errorBox = document.getElementById("errorBox");
       errorBox.style.display = "none";
+      progress.textContent = "";
 
       if (!topic || !answersText) {
         errorBox.textContent = "주제와 답변을 모두 입력해주세요.";
@@ -116,7 +125,7 @@
       progress.textContent = "문항 8 / 8 — 분석 중입니다...";
 
       try {
-        // ✅ Render용 절대경로 (필요 시 변경)
+        // ✅ Render 절대경로 (필수 수정: 실제 도메인 입력)
         const response = await fetch("https://noeulbitharu.onrender.com/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -124,7 +133,7 @@
         });
 
         if (!response.ok) {
-          throw new Error(`서버 응답 오류 (${response.status})`);
+          throw new Error("서버 응답 오류: " + response.status);
         }
 
         const data = await response.json();
@@ -132,7 +141,7 @@
           throw new Error(data.error || "결과 분석 실패");
         }
 
-        // ✅ 결과 페이지로 이동
+        // ✅ 결과 저장 후 이동
         localStorage.setItem("aiResult", JSON.stringify(data));
         window.location.href = "result.html";
       } catch (err) {
