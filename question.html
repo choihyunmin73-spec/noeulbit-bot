@@ -5,21 +5,90 @@
   <title>증상 체크 | 노을빛하루</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body{font-family:"Noto Sans KR",sans-serif;background:#f3f6fb;margin:0}
-    .header{background:#0f4fff;color:#fff;text-align:center;padding:22px;font-size:22px;font-weight:700}
-    .wrap{max-width:650px;margin:35px auto;background:#fff;padding:28px;border-radius:15px;box-shadow:0 5px 18px rgba(0,0,0,.12)}
-    .title{font-size:22px;font-weight:700;margin-bottom:10px;line-height:1.45;color:#0f4fff}
-    .desc{color:#5b6472;font-size:14px;margin-bottom:18px}
-    .option{padding:16px;background:#eef3ff;margin:12px 0;border-radius:10px;cursor:pointer;font-size:18px;transition:.25s;border:2px solid transparent}
-    .option:hover{background:#dce7ff;border-color:#0f4fff}
-    .progress{margin-top:20px;text-align:center;font-size:14px;color:#5b6472}
-    .pill{display:inline-block;background:#eef2ff;color:#3742b1;padding:5px 10px;border-radius:999px;margin:2px;font-size:12px}
-    .error{padding:16px;background:#fff1f1;color:#b40000;border-radius:10px}
-    @media (max-width:480px){
-      .header{font-size:20px;padding:18px}
-      .wrap{margin:15px;padding:20px}
-      .title{font-size:19px}
-      .option{font-size:17px;padding:16px}
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background: #f3f6fb;
+      margin: 0;
+    }
+    .header {
+      background: #0f4fff;
+      color: #fff;
+      text-align: center;
+      padding: 22px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .wrap {
+      max-width: 650px;
+      margin: 35px auto;
+      background: #fff;
+      padding: 28px;
+      border-radius: 15px;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.45;
+      color: #0f4fff;
+    }
+    .desc {
+      color: #5b6472;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+    .option {
+      padding: 16px;
+      background: #eef3ff;
+      margin: 12px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: 0.25s;
+      border: 2px solid transparent;
+    }
+    .option:hover {
+      background: #dce7ff;
+      border-color: #0f4fff;
+    }
+    .progress {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #5b6472;
+    }
+    .pill {
+      display: inline-block;
+      background: #eef2ff;
+      color: #3742b1;
+      padding: 5px 10px;
+      border-radius: 999px;
+      margin: 2px;
+      font-size: 12px;
+    }
+    .error {
+      padding: 16px;
+      background: #fff1f1;
+      color: #b40000;
+      border-radius: 10px;
+    }
+    @media (max-width: 480px) {
+      .header {
+        font-size: 20px;
+        padding: 18px;
+      }
+      .wrap {
+        margin: 15px;
+        padding: 20px;
+      }
+      .title {
+        font-size: 19px;
+      }
+      .option {
+        font-size: 17px;
+        padding: 16px;
+      }
     }
   </style>
 </head>
@@ -38,7 +107,7 @@
   </div>
 
   <script>
-    (async function(){
+    (async function() {
       const qs = new URLSearchParams(location.search);
       const topic = qs.get("topic");
       const topicPill = document.getElementById("topic-pill");
@@ -50,8 +119,7 @@
 
       topicPill.textContent = topic ? `주제: ${topic}` : "주제 미선택";
 
-      // 가드: topic 없으면 안내
-      if(!topic){
+      if (!topic) {
         qBlock.style.display = "none";
         err.style.display = "block";
         err.textContent = "주제가 선택되지 않았습니다. 첫 화면에서 다시 선택해주세요.";
@@ -59,78 +127,68 @@
       }
 
       let survey;
-      try{
-        const res = await fetch("/survey.json", {cache:"no-store"});
-        if(!res.ok) throw new Error("설문 로드 실패");
+      try {
+        const res = await fetch("/survey.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("설문 로드 실패");
         survey = await res.json();
-      }catch(e){
-        qBlock.style.display="none";
-        err.style.display="block";
-        err.textContent="설문 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.";
+      } catch (e) {
+        qBlock.style.display = "none";
+        err.style.display = "block";
+        err.textContent = "설문 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.";
         console.error(e);
         return;
       }
 
-      // 가드: 해당 주제 유무
       const questions = survey[topic];
-      if(!Array.isArray(questions) || questions.length === 0){
-        qBlock.style.display="none";
-        err.style.display="block";
-        err.textContent="이 주제에 대한 설문이 준비되지 않았습니다.";
+      if (!Array.isArray(questions) || questions.length === 0) {
+        qBlock.style.display = "none";
+        err.style.display = "block";
+        err.textContent = "이 주제에 대한 설문이 준비되지 않았습니다.";
         return;
       }
 
       let idx = 0;
       const answers = [];
 
-      function renderQuestion(){
+      function renderQuestion() {
         const item = questions[idx];
-        // 질문 스키마 호환: {q, opt} 또는 {question, options}
         const q = item.q || item.question || "";
         const options = item.opt || item.options || [];
-        qText.textContent = `${idx+1}. ${q}`;
+        qText.textContent = `${idx + 1}. ${q}`;
         optBox.innerHTML = "";
-        options.forEach((label)=>{
+        options.forEach((label) => {
           const div = document.createElement("div");
           div.className = "option";
           div.textContent = label;
-          div.onclick = ()=>{
+          div.onclick = () => {
             answers.push(label);
             idx++;
-            if(idx < questions.length){
+            if (idx < questions.length) {
               renderQuestion();
-            }else{
+            } else {
               submit();
             }
           };
           optBox.appendChild(div);
         });
-        prog.textContent = `문항 ${idx+1} / ${questions.length}`;
+        prog.textContent = `문항 ${idx + 1} / ${questions.length}`;
       }
 
-      async function submit(){
-        // 서버 분석 호출
-        try{
-          const res = await fetch("/analyze",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({ topic, checks: answers })
+      async function submit() {
+        try {
+          const res = await fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ topic, answers })
           });
           const data = await res.json();
-          // 방어적: 기본 필드 가드
-          data.topic = data.topic || topic;
-          data.checks = data.checks || answers;
-          data.severity = data.severity || "낮음";
-          data.action = data.action || "생활 관리가 필요합니다.";
-          data.dept = data.dept || "상담 필요";
-          data.tips = data.tips || [];
-          data.redflags = data.redflags || [];
-          // 결과 페이지로 이동
-          location.href = `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
-        }catch(e){
-          err.style.display="block";
-          err.textContent="결과 전송에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.";
-          console.error(e);
+          if (!data.success) throw new Error(data.error || "분석 실패");
+
+          location.href = `/result.html?payload=${encodeURIComponent(JSON.stringify(data))}`;
+        } catch (e) {
+          err.style.display = "block";
+          err.textContent = "결과 전송에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.";
+          console.error("❌ 전송 오류:", e);
         }
       }
 
