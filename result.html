@@ -2,192 +2,87 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>노을빛하루 AI 진단 결과</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body {
-    margin:0;
-    background:#f4f6fb;
-    font-family:'Noto Sans KR',sans-serif;
-}
-.wrap {
-    max-width:920px;
-    margin:25px auto;
-}
-.card {
-    background:white;
-    padding:26px;
-    border-radius:16px;
-    box-shadow:0 5px 16px rgba(0,0,0,0.08);
-    margin-bottom:20px;
-}
-.title {
-    font-size:24px;
-    font-weight:800;
-    margin-bottom:10px;
-}
-.sub {
-    color:#6b7280;
-    font-size:15px;
-    margin-bottom:15px;
-}
-.pill {
-    display:inline-block;
-    background:#eef2ff;
-    padding:7px 13px;
-    border-radius:999px;
-    margin:4px 6px 6px 0;
-    font-size:13px;
-    color:#3742b1;
-}
-.pill.red { background:#ffe7e7; color:#b91c1c; }
-.pill.amber { background:#fff3cd; color:#b54706; }
-
-.bar {
-    background:#e5e7eb;
-    border-radius:999px;
-    overflow:hidden;
-    margin-top:10px;
-    height:14px;
-}
-.bar-fill {
-    background:#2563eb;
-    height:100%;
-    transition:width 0.8s;
-}
-
-h3 {
-    font-size:19px;
-    margin:18px 0 10px;
-}
-li {
-    font-size:16px;
-    margin-bottom:6px;
-    line-height:1.45;
-}
-.btn {
-    background:#2f6efc;
-    color:white;
-    padding:18px;
-    border-radius:12px;
-    text-align:center;
-    font-size:18px;
-    cursor:pointer;
-    margin-top:18px;
-}
-@media(max-width:480px){
-    .wrap{margin:15px;}
-    .card{padding:20px;}
-    .title{font-size:22px;}
-    h3{font-size:18px;}
-    li{font-size:15px;}
-}
+body{margin:0;background:#f4f6fb;font-family:'Noto Sans KR',sans-serif}
+.wrap{max-width:920px;margin:25px auto}
+.card{background:#fff;padding:26px;border-radius:16px;box-shadow:0 5px 16px rgba(0,0,0,.08);margin-bottom:20px}
+.title{font-size:24px;font-weight:800;margin-bottom:10px}
+.sub{color:#6b7280;font-size:15px;margin-bottom:15px}
+.pill{display:inline-block;background:#eef2ff;padding:7px 13px;border-radius:999px;margin:4px 6px 6px 0;font-size:13px;color:#3742b1}
+.pill.red{background:#ffe7e7;color:#b91c1c}.pill.amber{background:#fff3cd;color:#b54706}
+.bar{background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:10px;height:14px}
+.bar-fill{background:#2563eb;height:100%;transition:width .8s}
+h3{font-size:19px;margin:18px 0 10px}
+li{font-size:16px;margin-bottom:6px;line-height:1.45}
+.btn{background:#2f6efc;color:#fff;padding:18px;border-radius:12px;text-align:center;font-size:18px;cursor:pointer;margin-top:18px}
+@media(max-width:480px){.wrap{margin:15px}.card{padding:20px}.title{font-size:22px}h3{font-size:18px}li{font-size:15px}}
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
-    <!-- ✅ 헤더 -->
-    <div class="card">
-        <div class="title">💠 노을빛하루 AI 분석 결과</div>
-        <div class="sub">입력하신 응답을 기반으로 종합 분석한 결과입니다.</div>
+  <div class="card">
+    <div class="title">💠 노을빛하루 AI 분석 결과</div>
+    <div class="sub">입력하신 응답을 기반으로 종합 분석한 결과입니다.</div>
+    <div id="pills"></div>
+    <div id="summary" style="margin-top:15px;"></div>
+    <div class="bar"><div id="barFill" class="bar-fill" style="width:0%"></div></div>
+    <div style="font-size:14px;color:#374151;margin-top:6px;">예상 위험도: <span id="percentTxt">0%</span></div>
+  </div>
 
-        <div id="pills"></div>
-        <div id="summary" style="margin-top:15px;"></div>
+  <div class="card">
+    <h3>🤖 AI 종합 분석</h3>
+    <div id="aiSummary" style="font-size:16px;line-height:1.6;color:#374151;"></div>
+  </div>
 
-        <div class="bar"><div id="barFill" class="bar-fill" style="width:0%;"></div></div>
-        <div style="font-size:14px;color:#374151;margin-top:6px;">예상 위험도: <span id="percentTxt">0%</span></div>
-    </div>
+  <div class="card">
+    <h3>✅ 셀프 케어 가이드</h3>
+    <ul id="tips"></ul>
+  </div>
 
-    <!-- ✅ AI 요약 -->
-    <div class="card">
-        <h3>🤖 AI 종합 분석</h3>
-        <div id="aiSummary" style="font-size:16px;line-height:1.6;color:#374151;"></div>
-    </div>
+  <div class="card" id="rfCard" style="border:1px solid #ffd1d1">
+    <h3>⚠️ 위험 신호</h3>
+    <ul id="redflags"></ul>
+    <div id="rfNote" style="color:#d62828;font-size:14px;margin-top:8px;"></div>
+  </div>
 
-    <!-- ✅ 셀프 케어 -->
-    <div class="card">
-        <h3>✅ 셀프 케어 가이드</h3>
-        <ul id="tips"></ul>
-    </div>
+  <div class="card">
+    <h3>🧾 선택한 항목</h3>
+    <div id="selected"></div>
+  </div>
 
-    <!-- ✅ 위험 신호 -->
-    <div class="card">
-        <h3>⚠️ 위험 신호</h3>
-        <ul id="redflags"></ul>
-        <div id="rfNote" style="color:#d62828;font-size:14px;margin-top:8px;"></div>
-    </div>
-
-    <!-- ✅ 선택 항목 -->
-    <div class="card">
-        <h3>🧾 선택한 항목</h3>
-        <div id="selected"></div>
-    </div>
-
-    <!-- ✅ 다시하기 -->
-    <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
+  <div class="btn" onclick="location.href='/'">← 다시 진단하기</div>
 </div>
 
 <script>
 (function(){
-    const params = new URLSearchParams(location.search);
-    const raw = params.get("payload");
-    let data = {};
-    try {
-        data = JSON.parse(decodeURIComponent(raw));
-    } catch(e) {
-        console.error("❌ 데이터 파싱 오류", e);
-        document.body.innerHTML = "<p style='padding:20px;'>⚠️ 결과 데이터를 불러올 수 없습니다.</p>";
-        return;
-    }
+  const raw = new URLSearchParams(location.search).get("payload");
+  let data = {};
+  try{ data = JSON.parse(decodeURIComponent(raw)); }catch(e){ document.body.innerHTML="<p style='padding:20px'>⚠️ 결과 데이터를 불러올 수 없습니다.</p>"; return; }
 
-    // ✅ 색상 클래스 설정
-    const sevClass = 
-        data.severity === "높음" ? "red" :
-        data.severity === "중간" ? "amber" : "";
+  const sevClass = data.severity==="높음"?"red":(data.severity==="중간"?"amber":"");
+  const pills = [
+    `<span class="pill">주제: ${data.topic}</span>`,
+    `<span class="pill ${sevClass}">위험도: ${data.severity}</span>`,
+    `<span class="pill">권장 진료과: ${data.dept}</span>`
+  ];
+  document.getElementById("pills").innerHTML = pills.join(" ");
+  document.getElementById("summary").innerHTML = `<b>권장 조치:</b> ${data.action}`;
+  const percent = data.percent || 0;
+  document.getElementById("barFill").style.width = percent + "%";
+  document.getElementById("percentTxt").textContent = percent + "%";
+  document.getElementById("aiSummary").textContent = data.aiSummary || "-";
 
-    // ✅ 정보칩
-    const pills = [
-        `<span class="pill">주제: ${data.topic}</span>`,
-        `<span class="pill ${sevClass}">위험도: ${data.severity}</span>`,
-        `<span class="pill">권장 진료과: ${data.dept}</span>`
-    ];
-    document.getElementById("pills").innerHTML = pills.join(" ");
+  const tips = data.tips || [];
+  document.getElementById("tips").innerHTML = tips.length ? tips.map(t=>`<li>${t}</li>`).join("") : "<li>-</li>";
 
-    // ✅ 요약
-    document.getElementById("summary").innerHTML =
-        `<b>권장 조치:</b> ${data.action}`;
+  const rf = data.redflags || [];
+  document.getElementById("redflags").innerHTML = rf.length ? rf.map(r=>`<li>${r}</li>`).join("") : "<li>특별한 응급 신호는 감지되지 않았습니다.</li>";
+  if (rf.length) document.getElementById("rfNote").textContent = "※ 위 증상이 나타나면 즉시 119 또는 가까운 응급실로 방문하세요.";
 
-    // ✅ 퍼센트바
-    const percent = data.percent || 0;
-    document.getElementById("barFill").style.width = percent + "%";
-    document.getElementById("percentTxt").textContent = percent + "%";
-
-    // ✅ AI 요약
-    document.getElementById("aiSummary").textContent = data.aiSummary || "분석 결과를 불러오지 못했습니다.";
-
-    // ✅ 셀프 케어
-    const tips = data.tips || [];
-    document.getElementById("tips").innerHTML = tips.length
-        ? tips.map(t => `<li>${t}</li>`).join("")
-        : "<li>추천 정보가 없습니다.</li>";
-
-    // ✅ 위험 신호
-    const rf = data.redflags || [];
-    document.getElementById("redflags").innerHTML = rf.length
-        ? rf.map(r => `<li>${r}</li>`).join("")
-        : "<li>특별한 응급 신호는 감지되지 않았습니다.</li>";
-
-    if (rf.length > 0)
-        document.getElementById("rfNote").textContent =
-            "※ 위 증상이 나타나면 즉시 119 또는 가까운 응급실로 방문하세요.";
-
-    // ✅ 선택 항목
-    const checks = data.checks || [];
-    document.getElementById("selected").innerHTML =
-        checks.map(c => `<span class="pill">${c}</span>`).join(" ");
+  const checks = data.checks || [];
+  document.getElementById("selected").innerHTML = checks.map(c=>`<span class="pill">${c}</span>`).join(" ");
 })();
 </script>
 </body>
