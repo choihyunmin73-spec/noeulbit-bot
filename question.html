@@ -6,79 +6,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  font-family: "Noto Sans KR", sans-serif;
-  background:#f3f6fb;
-  margin:0;
-  padding:0;
-}
-.header {
-  text-align:center;
-  background:#0f4fff;
-  padding:22px;
-  font-size:22px;
-  color:white;
-  font-weight:700;
-}
-.wrapper {
-  max-width:650px;
-  margin:35px auto;
-  background:white;
-  padding:28px;
-  border-radius:15px;
-  box-shadow:0 5px 18px rgba(0,0,0,0.12);
-  transition: all 0.4s ease;
-}
-.question-title {
-  font-size:22px;
-  font-weight:700;
-  margin-bottom:25px;
-  line-height:1.5;
-  color:#0f4fff;
-  text-align:center;
-}
-.option {
-  padding:16px;
-  background:#eef3ff;
-  margin:12px 0;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:18px;
-  transition:0.25s;
-  border:2px solid transparent;
-}
-.option:hover {
-  background:#dce7ff;
-  border-color:#0f4fff;
-}
-.option:active {
-  background:#cbd9ff;
-  transform:scale(0.98);
-}
-.progress {
-  margin-top:25px;
-  text-align:center;
-  font-size:15px;
-  color:#5b6472;
-}
-.loading-box {
-  display:none;
-  text-align:center;
-  color:#444;
-  font-size:17px;
-  font-weight:500;
-  padding:40px 10px;
-  line-height:1.6;
-}
-
-/* 모바일 최적화 */
-@media (max-width:480px) {
-  .header { font-size:20px; padding:18px; }
-  .wrapper { margin:15px; padding:20px; }
-  .question-title { font-size:19px; }
-  .option { font-size:17px; padding:18px; }
-  .progress { font-size:14px; }
-}
+  body {
+    font-family: "Noto Sans KR", sans-serif;
+    background:#f3f6fb;
+    margin:0;
+    padding:0;
+  }
+  .header {
+    text-align:center;
+    background:#0f4fff;
+    padding:22px;
+    font-size:22px;
+    color:white;
+    font-weight:700;
+  }
+  .wrapper {
+    max-width:650px;
+    margin:35px auto;
+    background:white;
+    padding:28px;
+    border-radius:15px;
+    box-shadow:0 5px 18px rgba(0,0,0,0.12);
+    transition: all 0.4s ease;
+  }
+  .question-title {
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:25px;
+    line-height:1.5;
+    color:#0f4fff;
+    text-align:center;
+  }
+  .option {
+    padding:16px;
+    background:#eef3ff;
+    margin:12px 0;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:18px;
+    transition:0.25s;
+    border:2px solid transparent;
+  }
+  .option:hover {
+    background:#dce7ff;
+    border-color:#0f4fff;
+  }
+  .option:active {
+    background:#cbd9ff;
+    transform:scale(0.98);
+  }
+  .progress {
+    margin-top:25px;
+    text-align:center;
+    font-size:15px;
+    color:#5b6472;
+  }
+  .loading-box {
+    display:none;
+    text-align:center;
+    color:#444;
+    font-size:17px;
+    font-weight:500;
+    padding:40px 10px;
+    line-height:1.6;
+  }
+  @media (max-width:480px) {
+    .header { font-size:20px; padding:18px; }
+    .wrapper { margin:15px; padding:20px; }
+    .question-title { font-size:19px; }
+    .option { font-size:17px; padding:18px; }
+    .progress { font-size:14px; }
+  }
 </style>
 </head>
 
@@ -87,10 +85,10 @@ body {
 <div class="header">AI 맞춤 진단</div>
 
 <div class="wrapper" id="quiz-box">
-  <div id="question-text" class="question-title"></div>
+  <div id="question-text" class="question-title">문항을 불러오는 중입니다...</div>
   <div id="options"></div>
   <div class="progress">
-    <span id="progress-text">문항 1 / 8</span>
+    <span id="progress-text"></span>
   </div>
 </div>
 
@@ -100,41 +98,37 @@ body {
 </div>
 
 <script>
-/* ✅ 전달된 topic 받기 */
+/* ✅ 1. URL로 전달된 topic 가져오기 */
 const params = new URLSearchParams(window.location.search);
 const topic = params.get("topic");
 
-/* ✅ 문항 데이터 로드 */
-let surveyData;
-fetch("/survey.json")
+/* ✅ 2. 변수 초기화 */
+let survey = {};
+let index = 0;
+let selectedAnswers = [];
+let questions = [];
+
+/* ✅ 3. survey.json 불러오기 */
+fetch("survey.json")
   .then(res => res.json())
   .then(data => {
-    surveyData = data;
-    startQuiz();
+    survey = data;
+    if (!survey[topic]) {
+      document.getElementById("question-text").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
+      return;
+    }
+    questions = survey[topic];
+    loadQuestion();
   })
   .catch(() => {
     document.getElementById("question-text").innerText = "데이터를 불러오지 못했습니다.";
   });
 
-/* ✅ 동작 변수 */
-let index = 0;
-let selectedAnswers = [];
-let questions = [];
-
-/* ✅ 주제별 문항 시작 */
-function startQuiz() {
-  questions = surveyData[topic] || [];
-  if (!questions.length) {
-    document.getElementById("question-text").innerText = "문항이 준비되지 않았습니다.";
-    return;
-  }
-  loadQuestion();
-}
-
-/* ✅ 문항 로딩 */
+/* ✅ 4. 문항 로딩 함수 */
 function loadQuestion() {
   const q = questions[index];
   document.getElementById("question-text").innerText = q.q;
+
   const optionsDiv = document.getElementById("options");
   optionsDiv.innerHTML = "";
 
@@ -157,13 +151,15 @@ function loadQuestion() {
         submitAnswers();
       }
     };
+
     optionsDiv.appendChild(div);
   });
+
   document.getElementById("progress-text").innerText =
     `문항 ${index + 1} / ${questions.length}`;
 }
 
-/* ✅ 결과 전송 */
+/* ✅ 5. 분석 전송 함수 */
 function submitAnswers() {
   document.getElementById("quiz-box").style.display = "none";
   document.getElementById("loading-box").style.display = "block";
@@ -178,8 +174,8 @@ function submitAnswers() {
     window.location.href = `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
   })
   .catch(() => {
-    alert("네트워크 연결이 원활하지 않습니다. 잠시 후 다시 시도해주세요.");
-    window.location.href = "/result?error=true";
+    alert("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    window.location.href = "/";
   });
 }
 </script>
