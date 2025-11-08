@@ -1,0 +1,73 @@
+{
+  "관절 통증": [
+    { "title": "MSM 관절 영양제", "link": "https://www.coupang.com/vp/products/6714055083", "desc": "연골 재생 및 관절염 통증 완화에 도움" },
+    { "title": "오메가3 + 비타민D 세트", "link": "https://www.coupang.com/vp/products/7340512322", "desc": "염증 완화 및 관절 유연성 강화" },
+    { "title": "무릎 보호대", "link": "https://www.coupang.com/vp/products/5238491012", "desc": "보행 시 무릎 통증 감소, 체중 분산 지원" }
+  ],
+
+  "혈압 관리": [
+    { "title": "혈압 측정기 (자동)", "link": "https://www.coupang.com/vp/products/5610342299", "desc": "가정용으로 손쉬운 혈압 관리" },
+    { "title": "저염 식단 도시락 세트", "link": "https://www.coupang.com/vp/products/6611149232", "desc": "나트륨 섭취를 줄여 혈압 안정화" },
+    { "title": "오메가3 EPA 고함량", "link": "https://www.coupang.com/vp/products/5123094411", "desc": "혈류 개선 및 혈압 조절 보조" }
+  ],
+
+  "혈당·당뇨": [
+    { "title": "당뇨식 식단 도시락", "link": "https://www.coupang.com/vp/products/7224123203", "desc": "탄수화물 조절로 혈당 균형 유지" },
+    { "title": "크롬 + 비타민B 복합제", "link": "https://www.coupang.com/vp/products/7214312422", "desc": "혈당 조절 및 피로 개선에 도움" },
+    { "title": "혈당 측정기 세트", "link": "https://www.coupang.com/vp/products/6124312003", "desc": "자가 모니터링으로 조기 관리" }
+  ],
+
+  "불면증·수면장애": [
+    { "title": "GABA + 마그네슘 수면영양제", "link": "https://www.coupang.com/vp/products/7214300222", "desc": "이완과 숙면 유도" },
+    { "title": "수면 안대 & 백색소음기", "link": "https://www.coupang.com/vp/products/6134209202", "desc": "편안한 환경 조성으로 숙면 도움" },
+    { "title": "트립토판 천연보조제", "link": "https://www.coupang.com/vp/products/6314240233", "desc": "멜라토닌 생성을 촉진" }
+  ],
+
+  "어깨·목 통증": [
+    { "title": "온열 어깨찜질기", "link": "https://www.coupang.com/vp/products/6210402003", "desc": "혈류 개선 및 근육 이완" },
+    { "title": "자세 교정 밴드", "link": "https://www.coupang.com/vp/products/7104322013", "desc": "거북목·어깨 긴장 완화" },
+    { "title": "마그네슘 영양제", "link": "https://www.coupang.com/vp/products/6104202201", "desc": "근육 피로 회복 지원" }
+  ],
+
+  "심장·호흡·가슴통증": [
+    { "title": "코엔자임Q10 200mg", "link": "https://www.coupang.com/vp/products/7314523201", "desc": "심근 에너지 개선 및 피로 회복" },
+    { "title": "심전도 측정 스마트워치", "link": "https://www.coupang.com/vp/products/8114002333", "desc": "실시간 심박수 및 리듬 모니터링" },
+    { "title": "오메가3 트리플세트", "link": "https://www.coupang.com/vp/products/6114103322", "desc": "혈류 개선, 심혈관 건강 유지" }
+  ],
+
+  "노안·시력저하": [
+    { "title": "루테인 + 아스타잔틴", "link": "https://www.coupang.com/vp/products/7314234102", "desc": "망막 건강 및 피로 완화" },
+    { "title": "블루라이트 차단 안경", "link": "https://www.coupang.com/vp/products/8114422102", "desc": "눈의 피로감 감소" },
+    { "title": "인공눈물 세트", "link": "https://www.coupang.com/vp/products/7314455201", "desc": "건조증 완화 및 윤활 개선" }
+  ],
+
+  "치매·기억력 문제": [
+    { "title": "포스파티딜세린 PS", "link": "https://www.coupang.com/vp/products/7124322001", "desc": "기억력 개선 기능성 원료" },
+    { "title": "오메가3 + 비타민B12", "link": "https://www.coupang.com/vp/products/7124113232", "desc": "인지기능 유지 및 신경 보호" },
+    { "title": "퍼즐 두뇌훈련 게임북", "link": "https://www.coupang.com/vp/products/8214111221", "desc": "두뇌 자극 및 인지력 강화" }
+  ],
+
+  "전립선·배뇨 문제": [
+    { "title": "쏘팔메토 영양제", "link": "https://www.coupang.com/vp/products/7314124211", "desc": "전립선 건강 유지 및 야간뇨 완화" },
+    { "title": "아연 + 비타민E 복합제", "link": "https://www.coupang.com/vp/products/7214124231", "desc": "남성 호르몬 균형 유지" },
+    { "title": "비뇨기 건강차", "link": "https://www.coupang.com/vp/products/7214011222", "desc": "소변 순환 개선에 도움" }
+  ],
+
+  "종합 건강 체크": [
+    { "title": "종합비타민 프리미엄", "link": "https://www.coupang.com/vp/products/6114112001", "desc": "기초 체력과 면역력 강화" },
+    { "title": "유산균 100억 생균제", "link": "https://www.coupang.com/vp/products/7214112202", "desc": "장 건강과 면역 균형 유지" },
+    { "title": "오메가3 밸런스", "link": "https://www.coupang.com/vp/products/6314103211", "desc": "혈류와 뇌 기능 보조" }
+  ],
+
+  "보이스피싱 예방": [
+    { "title": "스미싱 차단 보험", "link": "https://www.coupang.com/vp/products/8514011222", "desc": "보이스피싱 피해 보장 서비스" },
+    { "title": "개인정보 보호 앱", "link": "https://www.coupang.com/vp/products/8614121201", "desc": "스마트폰 해킹 및 개인정보 유출 방지" },
+    { "title": "보안 문자 차단 설정 서비스", "link": "https://www.coupang.com/vp/products/8614124102", "desc": "스미싱 문자 자동 차단 기능" }
+  ],
+
+  "복지·생활지원금": [
+    { "title": "정부지원금 상담 서비스", "link": "https://www.coupang.com/vp/products/8614000001", "desc": "지원금 대상 및 신청 절차 무료 상담" },
+    { "title": "기초연금·의료비 지원 안내서", "link": "https://www.coupang.com/vp/products/8614000101", "desc": "복지 수급 자격 및 신청법 안내" },
+    { "title": "복지 정보 알림 앱", "link": "https://www.coupang.com/vp/products/8614000202", "desc": "최신 지원금 정보 실시간 확인" }
+  ]
+}
