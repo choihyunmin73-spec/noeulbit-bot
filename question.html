@@ -2,97 +2,62 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>노을빛하루 AI 건강·생활 진단</title>
+<title>노을빛하루 AI 진단</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{margin:0;background:#f5f7fb;font-family:'Noto Sans KR',sans-serif}
-.header{background:#2563eb;color:#fff;font-size:22px;text-align:center;padding:22px;font-weight:700}
-.wrap{max-width:650px;margin:30px auto;background:#fff;padding:26px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.08)}
+body{margin:0;background:#f6f8fb;font-family:'Noto Sans KR',sans-serif}
+.header{background:#2563eb;color:#fff;font-size:22px;text-align:center;padding:20px;font-weight:700}
+.wrap{max-width:700px;margin:30px auto;background:#fff;padding:26px;border-radius:16px;box-shadow:0 5px 20px rgba(0,0,0,.08)}
 .question{font-size:20px;font-weight:700;color:#1e293b;margin-bottom:16px}
 .option{background:#eef3ff;border:1px solid #cbd5e1;border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.2s}
 .option:hover{background:#dce7ff;border-color:#2563eb}
 .progress{margin-top:16px;text-align:center;color:#6b7280}
-.badge{display:inline-block;background:#ffe5e5;color:#b91c1c;border-radius:999px;padding:6px 10px;font-size:12px;margin-bottom:10px}
-@media(max-width:480px){.wrap{margin:15px;padding:20px}.header{font-size:20px;padding:18px}.question{font-size:18px}}
+.bar{background:#e5e7eb;border-radius:999px;overflow:hidden;height:10px;margin:10px 0}
+.bar-fill{background:#2563eb;height:100%;width:0%;transition:width .3s}
+.btn{background:#2563eb;color:#fff;padding:14px 0;text-align:center;border-radius:10px;margin-top:16px;cursor:pointer;font-weight:600}
 </style>
 </head>
 <body>
-<div class="header">노을빛하루 AI 건강·생활 진단</div>
+<div class="header">노을빛하루 AI 진단</div>
 <div class="wrap">
-  <div id="topicBadge" class="badge" style="display:none"></div>
+  <div id="topic" style="font-weight:700;color:#2563eb;margin-bottom:8px"></div>
   <div id="q" class="question">문항을 불러오는 중...</div>
   <div id="opts"></div>
+  <div class="bar"><div id="barFill" class="bar-fill"></div></div>
   <div class="progress" id="pg"></div>
-  <div id="checkReport" style="margin-top:12px;color:#9ca3af;font-size:12px"></div>
 </div>
 
 <script>
 const params = new URLSearchParams(location.search);
 const topic = params.get("topic") || "";
-
-let survey = {};
-let list = [];
-let idx = 0;
-const answers = [];
-
+let survey={}, list=[], idx=0, answers=[];
 async function init(){
-  try{
-    const res = await fetch("/survey.json");
-    survey = await res.json();
-
-    // ✅ 무결성 점검
-    const topics = Object.keys(survey || {});
-    const report = [];
-    if (topics.length !== 12) report.push(`⚠️ 주제 수 ${topics.length}/12`);
-    topics.forEach(t => { if (!Array.isArray(survey[t]) || survey[t].length < 3) report.push(`⚠️ '${t}' 문항 ${survey[t]?.length||0}`); });
-    document.getElementById("checkReport").textContent = report.length ? report.join(" · ") : "✔ 모든 주제/문항 정상";
-
-    if (!survey[topic]) {
-      document.getElementById("q").textContent = "이 주제에 대한 설문이 준비되지 않았습니다.";
-      return;
-    }
-
-    document.getElementById("topicBadge").style.display = "inline-block";
-    document.getElementById("topicBadge").textContent = `주제: ${topic}`;
-
-    list = survey[topic];
-    idx = 0;
-    render();
-  }catch(e){
-    document.getElementById("q").textContent = "설문 데이터를 불러올 수 없습니다.";
-    console.error(e);
-  }
+  const res=await fetch("/survey.json"); survey=await res.json();
+  if(!survey[topic]){document.getElementById("q").textContent="해당 설문이 없습니다.";return;}
+  list=survey[topic]; idx=0;
+  document.getElementById("topic").textContent="주제: "+topic;
+  render();
 }
-
 function render(){
-  if (idx >= list.length) return submit();
-  const { question, options } = list[idx];
-  document.getElementById("q").textContent = `${idx+1}. ${question}`;
-  const c = document.getElementById("opts");
-  c.innerHTML = "";
-  options.forEach(opt => {
-    const d = document.createElement("div");
-    d.className = "option";
-    d.textContent = opt;
-    d.onclick = () => { answers[idx] = opt; idx++; render(); };
+  if(idx>=list.length){return submit();}
+  const {question,options}=list[idx];
+  document.getElementById("q").textContent=`${idx+1}. ${question}`;
+  const c=document.getElementById("opts"); c.innerHTML="";
+  options.forEach(o=>{
+    const d=document.createElement("div");
+    d.className="option"; d.textContent=o;
+    d.onclick=()=>{answers[idx]=o;idx++;render();};
     c.appendChild(d);
   });
-  document.getElementById("pg").textContent = `문항 ${idx+1} / ${list.length}`;
+  const pct=Math.round(((idx)/list.length)*100);
+  document.getElementById("barFill").style.width=pct+"%";
+  document.getElementById("pg").textContent=`${idx+1} / ${list.length} 문항`;
 }
-
 async function submit(){
-  try{
-    const res = await fetch("/analyze", {
-      method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ topic, checks: answers })
-    });
-    const data = await res.json();
-    location.href = `/result?payload=${encodeURIComponent(JSON.stringify(data))}`;
-  }catch(e){
-    alert("결과 전송 오류가 발생했습니다."); console.error(e);
-  }
+  const res=await fetch("/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic,checks:answers})});
+  const data=await res.json();
+  location.href=`/result.html?payload=${encodeURIComponent(JSON.stringify(data))}`;
 }
-
 init();
 </script>
 </body>
