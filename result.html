@@ -1,172 +1,287 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI 건강 진단 결과 | 노을빛하루</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: "Noto Sans KR", sans-serif;
-      background: #f3f6fb;
-      margin: 0;
-    }
-    .header {
-      background: #0f4fff;
-      color: #fff;
-      text-align: center;
-      padding: 22px;
-      font-size: 22px;
-      font-weight: 700;
-    }
-    .wrap {
-      max-width: 800px;
-      margin: 35px auto;
-      background: #fff;
-      padding: 28px;
-      border-radius: 15px;
-      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
-    }
-    .title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #0f4fff;
-      margin-bottom: 15px;
-    }
-    .section {
-      margin-top: 25px;
-    }
-    .sub {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: #333;
-    }
-    .list {
-      background: #f7f9ff;
-      padding: 15px;
-      border-radius: 10px;
-      line-height: 1.6;
-      color: #333;
-    }
-    .risk {
-      text-align: center;
-      font-size: 28px;
-      font-weight: 700;
-      margin: 10px 0;
-      color: #0f4fff;
-    }
-    .highlight {
-      color: #ff3b3b;
-      font-weight: 700;
-    }
-    .partner-box {
-      display: flex;
-      gap: 15px;
-      margin-top: 25px;
-    }
-    .partner {
-      flex: 1;
-      text-align: center;
-      background: #eef3ff;
-      border: 2px solid #0f4fff;
-      border-radius: 12px;
-      padding: 10px;
-      cursor: pointer;
-      transition: 0.25s;
-    }
-    .partner:hover {
-      background: #dce7ff;
-      transform: translateY(-2px);
-    }
-    .partner img {
-      width: 100%;
-      height: 180px;
-      border-radius: 10px;
-      object-fit: cover;
-      display: block;
-      margin-bottom: 10px;
-    }
-    .partner p {
-      font-weight: 600;
-      color: #0f4fff;
-      margin: 5px 0;
-    }
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      color: #666;
-      font-size: 14px;
-    }
-    @media (max-width: 480px) {
-      .partner-box { flex-direction: column; }
-      .partner img { height: 160px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>노을빛하루 AI 종합 진단 결과</title>
+<style>
+  :root{
+    --brand:#0f4fff;
+    --ink:#111827;
+    --muted:#6b7280;
+    --bg:#f3f6fb;
+    --card:#ffffff;
+    --line:#e5e7eb;
+    --good:#10b981;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Pretendard","Noto Sans KR",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  .wrap{max-width:1200px;margin:24px auto;padding:0 16px}
+  .header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+  .header .title{font-weight:800;font-size:22px}
+  .header .sub{color:var(--muted);font-size:13px}
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(15,79,255,.04);overflow:hidden}
+  .card .hd{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:700}
+  .card .bd{padding:18px}
+  .row{display:flex;gap:22px;align-items:center}
+  .row .chartBox{width:220px;min-width:220px;aspect-ratio:1/1;position:relative}
+  .row .chartBox canvas{width:100%;height:100%}
+  .kvs{display:grid;gap:6px}
+  .kvs .kv{display:flex;gap:8px;align-items:flex-start}
+  .kv b{min-width:94px;color:#374151}
+  .risk{font-weight:900;font-size:26px}
+  .risk.bad{color:var(--bad)} .risk.warn{color:var(--warn)} .risk.good{color:var(--good)}
+  ul.list{margin:0;padding-left:18px;display:grid;gap:6px}
+  ul.list li{line-height:1.6}
+  .section{margin-top:16px}
+  /* 오른쪽 사이드 */
+  .aside-group{display:grid;gap:16px}
+  .goods{padding:12px}
+  .goodsGrid{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px
+  }
+  /* 요청: 모바일에서도 2열 유지 */
+  @media (max-width:380px){ .goodsGrid{gap:10px} }
+  .gcard{position:relative;border:2px solid #b9ccff;border-radius:12px;overflow:hidden;background:#f7faff;transition:.2s}
+  .gcard:hover{border-color:var(--brand);box-shadow:0 8px 24px rgba(15,79,255,.12)}
+  .gimg{width:100%;aspect-ratio:1/1;object-fit:cover;background:#eaf0ff}
+  .gtxt{padding:10px 12px}
+  .gt1{font-weight:700;font-size:13px;color:#0b1a49;line-height:1.3}
+  .gt2{font-size:12px;color:var(--muted);margin-top:3px}
+  .glink{position:absolute;inset:0;outline:0;border:0}
+  .ins-box{padding:12px}
+  .ins-card{border:1px dashed #c7d2fe;background:#f8fbff;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+  .ins-badge{background:#e5efff;color:#1636c9;font-weight:700;border-radius:999px;padding:4px 10px;font-size:12px}
+  .ins-title{font-weight:800}
+  .ins-desc{color:var(--muted);font-size:13px;margin-top:6px}
+  .ins-link{margin-top:10px;display:inline-block;color:var(--brand);font-weight:700}
+  /* 작은 캡션 */
+  .cap{color:var(--muted);font-size:12px;margin-top:8px}
+  /* 이미지 깨짐 방지용 placeholder */
+  .hide{display:none}
+</style>
 </head>
 <body>
-  <div class="header">AI 건강 종합 진단 결과</div>
   <div class="wrap">
-    <div id="result-area">
-      <div class="title">결과를 불러오는 중입니다...</div>
+    <div class="header">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 6v6l-9 6-9-6V9l9-6z" stroke="#0f4fff" stroke-width="2" stroke-linejoin="round"/></svg>
+      <div>
+        <div class="title">노을빛하루 AI 종합 진단 결과</div>
+        <div class="sub">AI 분석 기반으로 개인 맞춤형 상태를 요약합니다.</div>
+      </div>
     </div>
-  </div>
-  <div class="footer">© 2025 노을빛하루 AI 건강진단</div>
 
-  <script>
-    (function() {
-      const container = document.getElementById("result-area");
-      const qs = new URLSearchParams(location.search);
-      const payload = qs.get("payload");
-      if (!payload) {
-        container.innerHTML = "<div style='color:#b40000'>결과 데이터가 없습니다.</div>";
-        return;
-      }
+    <div class="grid">
+      <!-- LEFT MAIN -->
+      <div class="main">
+        <!-- 분석 결과 + 차트 -->
+        <div class="card">
+          <div class="hd">AI 분석결과</div>
+          <div class="bd">
+            <div class="row">
+              <div class="chartBox">
+                <canvas id="donut"></canvas>
+                <div id="riskTxt" class="risk" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"></div>
+              </div>
+              <div class="kvs">
+                <div class="kv"><b>진단 주제</b><span id="kvTopic">-</span></div>
+                <div class="kv"><b>위험도</b><span id="kvRiskPct">-</span></div>
+                <div class="kv"><b>판정</b><span id="kvTier">-</span></div>
+                <div class="kv"><b>권장</b><span id="kvAction">-</span></div>
+              </div>
+            </div>
 
-      let data;
-      try {
-        data = JSON.parse(decodeURIComponent(payload));
-      } catch (e) {
-        container.innerHTML = "<div style='color:#b40000'>데이터 해석 오류입니다.</div>";
-        return;
-      }
-
-      const { topic, risk, detail, summary, opinion } = data;
-      const riskText = risk ? `${risk}%` : "분석 중";
-
-      container.innerHTML = `
-        <div class="title">🩺 ${topic || "AI 진단 결과"}</div>
-        <div class="risk">위험도: <span class="highlight">${riskText}</span></div>
-
-        <div class="section">
-          <div class="sub">📋 상세 진단</div>
-          <div class="list">${(detail || []).map(d => "• " + d).join("<br>")}</div>
-        </div>
-
-        <div class="section">
-          <div class="sub">💡 요약</div>
-          <div class="list">${(summary || []).map(s => "• " + s).join("<br>")}</div>
-        </div>
-
-        <div class="section">
-          <div class="sub">🔎 전문가 의견</div>
-          <div class="list">${(opinion || []).map(o => "• " + o).join("<br>")}</div>
-        </div>
-
-        <div class="section">
-          <div class="sub">🔗 추천 제휴 서비스</div>
-          <div class="partner-box">
-            <a class="partner" href="https://www.coupang.com/" target="_blank">
-              <img src="https://cdn-icons-png.flaticon.com/512/3081/3081871.png" alt="영양제 추천" />
-              <p>건강 영양제 추천 보기</p>
-            </a>
-            <a class="partner" href="https://www.boheom.go.kr/" target="_blank">
-              <img src="https://cdn-icons-png.flaticon.com/512/942/942799.png" alt="보험 상담" />
-              <p>보험/의료 상담 바로가기</p>
-            </a>
+            <div class="section">
+              <div style="font-weight:800;margin-bottom:8px">상세 진단</div>
+              <ul id="detailList" class="list"></ul>
+              <div class="cap">* 그래프는 현재 위험도 비율을 시각화한 값입니다.</div>
+            </div>
           </div>
         </div>
-      `;
-    })();
-  </script>
+
+        <!-- 요약 10줄 -->
+        <div class="card section">
+          <div class="hd">AI 종합 진단 요약</div>
+          <div class="bd">
+            <ul id="summaryList" class="list"></ul>
+          </div>
+        </div>
+
+        <!-- 의견 5줄+ -->
+        <div class="card section">
+          <div class="hd">종합 의견</div>
+          <div class="bd">
+            <ul id="opinionList" class="list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT ASIDE -->
+      <aside class="aside">
+        <!-- 추천 제휴상품 -->
+        <div class="card">
+          <div class="hd">추천 제휴상품</div>
+          <div class="bd goods">
+            <div id="goodsGrid" class="goodsGrid"></div>
+            <div class="cap">* 카드의 파란 테두리 안쪽 아무 곳이나 눌러주세요.</div>
+          </div>
+        </div>
+
+        <!-- 보험 제휴 서비스 (2가지 고정) -->
+        <div class="card section">
+          <div class="hd">추천 보험 제휴 서비스</div>
+          <div class="bd ins-box">
+            <div class="ins-card">
+              <span class="ins-badge">보험비교</span>
+              <div>
+                <div class="ins-title">실손보험 비교</div>
+                <div class="ins-desc">병원비·약값 부담 줄이는 최신 실손 플랜 비교</div>
+                <a class="ins-link" href="#" target="_blank" rel="noopener">바로 알아보기 →</a>
+              </div>
+            </div>
+            <div style="height:10px"></div>
+            <div class="ins-card">
+              <span class="ins-badge">보장강화</span>
+              <div>
+                <div class="ins-title">질병 보장형 플랜</div>
+                <div class="ins-desc">연세·만성질환 대비, 주담보+특약 설계 추천</div>
+                <a class="ins-link" href="#" target="_blank" rel="noopener">추천 플랜 확인 →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- placeholder image (SVG data URI) -->
+  <img id="ph" class="hide" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="100%" height="100%" fill="%23eaf0ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2390a3ff" font-family="Arial" font-size="26">no image</text></svg>' alt=""/>
+
+<script>
+/* -------------------------------------------
+   1) payload 수신 (question.html → /result.html?payload=...)
+   2) 도넛 그래프 렌더
+   3) 10줄/5줄 섹션 렌더
+   4) 제휴상품 2열 그리드 (모바일 유지) + 카드 전체 클릭
+------------------------------------------- */
+
+(function(){
+  const qs = new URLSearchParams(location.search);
+  const payloadStr = qs.get('payload');
+
+  // UI 엘리먼트
+  const riskTxt = document.getElementById('riskTxt');
+  const kvTopic = document.getElementById('kvTopic');
+  const kvRiskPct = document.getElementById('kvRiskPct');
+  const kvTier = document.getElementById('kvTier');
+  const kvAction = document.getElementById('kvAction');
+  const ulDetail = document.getElementById('detailList');
+  const ulSummary = document.getElementById('summaryList');
+  const ulOpinion = document.getElementById('opinionList');
+
+  // 안전 파싱
+  let data = {};
+  try{ data = payloadStr ? JSON.parse(decodeURIComponent(payloadStr)) : {}; }catch(e){ data = {}; }
+  // 서버 표준 필드 보정
+  const topic = data.topic || '미지정';
+  const risk  = Number(data.risk ?? 60);
+  const detail = Array.isArray(data.detail) ? data.detail : ['현재 상태 해석 데이터가 부족합니다. 추가 점검이 필요합니다.'];
+  const summary = Array.isArray(data.summary) ? data.summary : ['추가 데이터 확보 후 요약을 제공합니다.'];
+  const opinion = Array.isArray(data.opinion) ? data.opinion : ['전문의 상담을 통해 보완을 권합니다.'];
+
+  // 위험도 등급
+  let tier='중간 위험';
+  let riskCls='warn';
+  if(risk >= 85){ tier='고위험'; riskCls='bad'; }
+  else if(risk <= 60){ tier='관리 필요'; riskCls='good'; }
+
+  // 상단 Key-Values
+  kvTopic.textContent = topic;
+  kvRiskPct.textContent = risk + '%';
+  kvTier.textContent = tier;
+  kvAction.textContent = (data.action || (risk>=85?'의료진 진료를 권장합니다.':'생활 관리로 개선 가능합니다.'));
+
+  // 리스트 출력 헬퍼(최소 줄수 보장)
+  function renderList(ul, arr, min){
+    ul.innerHTML = '';
+    const items = arr.slice(0); // 복사
+    while(items.length < min){ items.push(arr[arr.length-1] || '-'); }
+    items.forEach(t=>{
+      const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+    });
+  }
+  renderList(ulDetail,  detail, 10);
+  renderList(ulSummary, summary, 10);
+  renderList(ulOpinion, opinion, 5);
+
+  // 도넛 그래프
+  const cvs = document.getElementById('donut');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width = 480, H = cvs.height = 480;
+  const cx=W/2, cy=H/2, r=180, thick=36;
+  function arc(color, start, end){
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = thick; ctx.lineCap = 'round';
+    ctx.arc(cx,cy,r,start,end,false); ctx.stroke();
+  }
+  const pct = Math.max(0, Math.min(100, risk)) / 100;
+  const start = -Math.PI/2;
+  const end = start + Math.PI*2*pct;
+  // bg
+  arc('#e8edff', 0, Math.PI*2);
+  // value
+  const ringColor = (risk>=85)?'#ef4444':(risk<=60?'#10b981':'#f59e0b');
+  arc(ringColor, start, end);
+  // center text
+  riskTxt.classList.add('risk', (risk>=85)?'bad':(risk<=60?'good':'warn'));
+  riskTxt.textContent = risk + '%';
+
+  // 제휴상품 (affiliate.json → topic 매칭 or all)
+  const goodsGrid = document.getElementById('goodsGrid');
+  const ph = document.getElementById('ph').src;
+
+  fetch('/affiliate.json',{cache:'no-store'})
+    .then(r=>r.ok?r.json():{})
+    .then(json=>{
+      const list = (json && (json[topic]||json['공통']||json.items)) || [];
+      goodsGrid.innerHTML = '';
+      if(!Array.isArray(list) || list.length===0){
+        const div=document.createElement('div');
+        div.textContent='등록된 제휴상품이 없습니다.'; div.style.color='#6b7280'; div.style.fontSize='13px';
+        goodsGrid.appendChild(div); return;
+      }
+      list.forEach(item=>{
+        const a = document.createElement('a');
+        a.className='gcard';
+        a.href = item.url || item.link || '#';
+        a.target='_blank'; a.rel='noopener';
+
+        // 이미지
+        const img=document.createElement('img');
+        img.className='gimg';
+        img.src=item.image||item.img||ph;
+        img.alt=item.title||'상품';
+        img.onerror=()=>{ img.src=ph; };
+
+        // 텍스트
+        const box=document.createElement('div'); box.className='gtxt';
+        const t1=document.createElement('div'); t1.className='gt1'; t1.textContent=item.title||'제휴상품';
+        const t2=document.createElement('div'); t2.className='gt2'; t2.textContent=item.subtitle||item.note||'';
+        box.appendChild(t1); box.appendChild(t2);
+
+        // 카드 전체 클릭(파란 테두리 안쪽 아무데나)
+        const overlay=document.createElement('span'); overlay.className='glink'; overlay.setAttribute('aria-hidden','true');
+
+        a.appendChild(img); a.appendChild(box); a.appendChild(overlay);
+        goodsGrid.appendChild(a);
+      });
+    })
+    .catch(()=>{ goodsGrid.innerHTML='<div style="color:#6b7280;font-size:13px">제휴상품 정보를 불러오지 못했습니다.</div>'; });
+
+})();
+</script>
 </body>
 </html>
