@@ -13,27 +13,33 @@
       padding: 0;
       text-align: center;
     }
+
     h1 {
       color: #6ba7ff;
       margin-top: 40px;
-      font-size: 1.9em;
+      font-size: 1.8em;
+      word-break: keep-all;
+      line-height: 1.4em;
     }
+
     p {
       color: #b8c9e0;
       font-size: 1.05em;
       margin-bottom: 35px;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
-      width: 85%;
+      width: 90%;
       max-width: 1000px;
       margin: 0 auto 60px auto;
     }
+
     .card {
       background: #182539;
-      padding: 24px;
+      padding: 22px;
       border-radius: 14px;
       border: 1px solid #294e80;
       transition: 0.25s;
@@ -41,16 +47,46 @@
       font-size: 1.05em;
       font-weight: 500;
       color: #dbe7ff;
+      word-break: keep-all;
     }
+
     .card:hover {
       background: #2d4f80;
-      transform: translateY(-5px);
+      transform: translateY(-4px);
       color: #fff;
     }
+
     footer {
       color: #8899bb;
       font-size: 0.9em;
       margin-bottom: 25px;
+    }
+
+    /* ✅ 반응형 디자인 */
+    @media (max-width: 1000px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 14px;
+      }
+
+      .card {
+        font-size: 1.1em;
+        padding: 18px 14px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      p {
+        font-size: 0.95em;
+      }
     }
   </style>
 </head>
@@ -78,7 +114,6 @@
 
   <script>
     function goTo(topic) {
-      // URL 인코딩을 반드시 적용해야 주제명이 깨지지 않음
       window.location.href = `question.html?topic=${encodeURIComponent(topic)}`;
     }
   </script>
