@@ -1,106 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>노을빛하루 AI 종합 진단</title>
-<style>
-  body {
-    font-family: "Pretendard", system-ui, -apple-system, sans-serif;
-    background-color: #0d0f14;
-    color: #e8ecf3;
-    margin: 0;
-    padding: 0;
-  }
-
-  header {
-    text-align: center;
-    padding: 48px 20px 16px;
-  }
-  header h1 {
-    font-size: 26px;
-    font-weight: 700;
-  }
-  header p {
-    font-size: 15px;
-    color: #9aa0b1;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 18px;
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px 60px;
-  }
-
-  .card {
-    background: #151922;
-    border: 1px solid #2a2f3a;
-    border-radius: 14px;
-    text-align: center;
-    padding: 24px 16px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 0 14px rgba(0,0,0,0.3);
-  }
-
-  .card:hover {
-    transform: translateY(-3px);
-    border-color: #4c8dff;
-    background: #1a1f2b;
-  }
-
-  .card h2 {
-    font-size: 18px;
-    color: #e8ecf3;
-    margin: 6px 0 4px;
-  }
-
-  .footer {
-    text-align: center;
-    font-size: 13px;
-    color: #707783;
-    margin-bottom: 40px;
-  }
-
-  @media (max-width: 600px) {
-    .grid {
-      grid-template-columns: 1fr 1fr;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>노을빛하루 AI 종합 진단</title>
+  <style>
+    body {
+      font-family: "Pretendard", sans-serif;
+      background-color: #0e141b;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
     }
-  }
-</style>
+    h1 {
+      color: #78aaff;
+      margin-top: 40px;
+      font-size: 1.9em;
+    }
+    p {
+      color: #bbb;
+      font-size: 1.1em;
+      margin-bottom: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 85%;
+      max-width: 1000px;
+      margin: 0 auto 60px auto;
+    }
+    .card {
+      background: #19212b;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.25s ease;
+      font-weight: 500;
+      font-size: 1.05em;
+      cursor: pointer;
+      border: 1px solid #233a5e;
+    }
+    .card:hover {
+      background: #2b4a78;
+      transform: translateY(-5px);
+      color: #fff;
+    }
+    footer {
+      color: #777;
+      font-size: 0.9em;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
+
 <body>
-<header>
   <h1>노을빛하루 AI 종합 진단 시스템</h1>
-  <p>12가지 건강·생활 주제 중 하나를 선택하세요.</p>
-</header>
+  <p>아래 주제 중 하나를 선택하여 건강 상태를 진단해보세요.</p>
 
-<div class="grid">
-  <div class="card" onclick="startTopic('관절 통증')"><h2>관절 통증</h2></div>
-  <div class="card" onclick="startTopic('혈압 관리')"><h2>혈압 관리</h2></div>
-  <div class="card" onclick="startTopic('혈당·당뇨')"><h2>혈당·당뇨</h2></div>
-  <div class="card" onclick="startTopic('불면증·수면장애')"><h2>불면증·수면장애</h2></div>
-  <div class="card" onclick="startTopic('어깨·목 통증')"><h2>어깨·목 통증</h2></div>
-  <div class="card" onclick="startTopic('심장·호흡·가슴통증')"><h2>심장·호흡·가슴통증</h2></div>
-  <div class="card" onclick="startTopic('노안·시력저하')"><h2>노안·시력저하</h2></div>
-  <div class="card" onclick="startTopic('치매·기억력 문제')"><h2>치매·기억력 문제</h2></div>
-  <div class="card" onclick="startTopic('전립선·배뇨 문제')"><h2>전립선·배뇨 문제</h2></div>
-  <div class="card" onclick="startTopic('종합 건강 체크')"><h2>종합 건강 체크</h2></div>
-  <div class="card" onclick="startTopic('보험비용 종합점검')"><h2>보험비용 종합점검</h2></div>
-  <div class="card" onclick="startTopic('최저가 자동차 견적 비교')"><h2>최저가 자동차 견적 비교</h2></div>
-</div>
+  <div class="grid">
+    <div class="card" onclick="goTo('관절 통증')">관절 통증</div>
+    <div class="card" onclick="goTo('혈압 관리')">혈압 관리</div>
+    <div class="card" onclick="goTo('혈당·당뇨')">혈당·당뇨</div>
+    <div class="card" onclick="goTo('불면증·수면장애')">불면증·수면장애</div>
+    <div class="card" onclick="goTo('어깨·목 통증')">어깨·목 통증</div>
+    <div class="card" onclick="goTo('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
+    <div class="card" onclick="goTo('노안·시력저하')">노안·시력저하</div>
+    <div class="card" onclick="goTo('치매·기억력 문제')">치매·기억력 문제</div>
+    <div class="card" onclick="goTo('전립선·배뇨 문제')">전립선·배뇨 문제</div>
+    <div class="card" onclick="goTo('복지·생활지원금')">복지·생활지원금</div>
+    <div class="card" onclick="goTo('보험비용 종합점검')">보험비용 종합점검</div>
+    <div class="card" onclick="goTo('자동차 견적·보험비용 점검')">자동차 견적·보험비용 점검</div>
+  </div>
 
-<div class="footer">
-  © 2025 노을빛하루 AI 진단 시스템. 모든 권리 보유.
-</div>
+  <footer>© 2025 노을빛하루 AI 진단 시스템</footer>
 
-<script>
-function startTopic(topic) {
-  window.location.href = `question.html?topic=${encodeURIComponent(topic)}`;
-}
-</script>
+  <script>
+    function goTo(topic) {
+      window.location.href = `question.html?topic=${encodeURIComponent(topic)}`;
+    }
+  </script>
 </body>
 </html>
