@@ -87,6 +87,10 @@
     .supplement-card small {
       color: #9aa3b7;
     }
+
+    @media (max-width: 768px) {
+      .card { min-width: 100%; max-width: none; }
+    }
   </style>
 </head>
 <body>
@@ -132,16 +136,19 @@
       document.getElementById("detail").textContent = result.detail || "상세 진단 데이터 없음";
       document.getElementById("riskBar").style.width = `${result.riskPercent || 0}%`;
 
-      // 요약
+      // ✅ 요약 배열 안정 처리
+      const summary = Array.isArray(result.summary) ? result.summary : [result.summary];
       document.getElementById("summary").innerHTML =
-        (result.summary || []).length
-          ? result.summary.map(i => `<li>${i}</li>`).join("")
+        summary && summary[0]
+          ? summary.map(i => `<li>${i}</li>`).join("")
           : "<li>요약 데이터 없음</li>";
 
-      // 전문가 의견
+      // ✅ 전문가 의견 배열 안정 처리
+      const opinionData = result.opinion || result.advice;
+      const opinion = Array.isArray(opinionData) ? opinionData : [opinionData];
       document.getElementById("opinion").innerHTML =
-        (result.opinion || result.advice || []).length
-          ? (result.opinion || result.advice).map(i => `<li>${i}</li>`).join("")
+        opinion && opinion[0]
+          ? opinion.map(i => `<li>${i}</li>`).join("")
           : "<li>전문가 의견 데이터 없음</li>";
     }
 
@@ -200,8 +207,11 @@
     };
 
     const supplementList = document.getElementById("supplementList");
-    if (result && linkMap[result.topic]) {
-      linkMap[result.topic].forEach(item => {
+    if (result) {
+      let matchedKey =
+        Object.keys(linkMap).find(k => result.topic && result.topic.includes(k)) || "종합 건강 체크";
+
+      linkMap[matchedKey].forEach(item => {
         const div = document.createElement("div");
         div.className = "supplement-card";
         div.innerHTML = `<strong>${item.name}</strong><br><small>쿠팡 바로가기</small>`;
