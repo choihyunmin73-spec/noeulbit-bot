@@ -1,160 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>노을빛하루 AI 문항</title>
-<style>
-  body {
-    font-family: "Pretendard", system-ui, -apple-system, sans-serif;
-    background-color: #0d0f14;
-    color: #e8ecf3;
-    margin: 0;
-    padding: 0;
-  }
-
-  header {
-    text-align: center;
-    padding: 40px 20px 10px;
-  }
-
-  header h1 {
-    font-size: 24px;
-    font-weight: 700;
-  }
-
-  header p {
-    font-size: 14px;
-    color: #9aa0b1;
-  }
-
-  .progress {
-    height: 6px;
-    width: 80%;
-    background: #2a2f3a;
-    border-radius: 10px;
-    margin: 30px auto;
-    overflow: hidden;
-  }
-  .fill {
-    height: 100%;
-    width: 0%;
-    background: #4c8dff;
-    transition: width 0.5s ease;
-  }
-
-  .card {
-    background: #151922;
-    border: 1px solid #2a2f3a;
-    border-radius: 14px;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 28px 24px 40px;
-    box-shadow: 0 0 14px rgba(0,0,0,0.3);
-  }
-
-  .question {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-  }
-
-  .option {
-    display: block;
-    background: #1b2130;
-    border: 1px solid #2a2f3a;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin: 10px 0;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    text-align: center;
-  }
-
-  .option:hover {
-    background: #232a3a;
-    border-color: #4c8dff;
-  }
-
-  .footer {
-    text-align: center;
-    font-size: 14px;
-    color: #707783;
-    margin-top: 40px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>노을빛하루 AI 진단 질문</title>
+  <style>
+    body {
+      font-family: "Pretendard", "Noto Sans KR", sans-serif;
+      background-color: #0d1420;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 100vh;
+    }
+    h2 {
+      color: #6ba7ff;
+      margin-top: 40px;
+      font-size: 1.7em;
+    }
+    #question-box {
+      background: #182539;
+      border-radius: 16px;
+      border: 1px solid #294e80;
+      padding: 30px;
+      width: 85%;
+      max-width: 700px;
+      margin-top: 40px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    #question-text {
+      font-size: 1.2em;
+      line-height: 1.6em;
+      margin-bottom: 30px;
+      color: #e1ecff;
+    }
+    .option {
+      background-color: #22324b;
+      border: 1px solid #315d93;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      transition: 0.2s;
+      cursor: pointer;
+      font-size: 1.05em;
+      color: #cfe2ff;
+    }
+    .option:hover {
+      background-color: #3969b5;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    #progress {
+      margin-top: 25px;
+      font-size: 0.95em;
+      color: #a4b6d6;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1 id="topicTitle">AI 진단</h1>
-  <p>문항에 답해주세요. 마지막 문항 후 결과가 자동 분석됩니다.</p>
-</header>
+  <h2 id="topic-title">AI 건강 진단</h2>
 
-<div class="progress"><div class="fill" id="progressBar"></div></div>
+  <div id="question-box">
+    <div id="question-text">질문을 불러오는 중입니다...</div>
+    <div id="options"></div>
+    <div id="progress"></div>
+  </div>
 
-<div class="card">
-  <div class="question" id="questionText">문항이 불러오는 중입니다...</div>
-  <div id="options"></div>
-</div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const topic = urlParams.get("topic");
+    document.getElementById("topic-title").innerText = `주제: ${topic}`;
 
-<div class="footer">
-  노을빛하루 AI 종합 진단 시스템
-</div>
+    let surveyData = {};
+    let currentIndex = 0;
+    let answers = [];
 
-<script>
-let topic = new URLSearchParams(window.location.search).get("topic");
-let surveyData = {};
-let currentIndex = 0;
-let selectedAnswers = [];
+    fetch("survey.json")
+      .then((response) => response.json())
+      .then((data) => {
+        surveyData = data;
+        if (!surveyData[topic]) {
+          document.getElementById("question-text").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
+          return;
+        }
+        showQuestion();
+      })
+      .catch(() => {
+        document.getElementById("question-text").innerText = "문항 데이터를 불러오지 못했습니다.";
+      });
 
-async function loadSurvey() {
-  const res = await fetch("survey.json");
-  surveyData = await res.json();
+    function showQuestion() {
+      const questionData = surveyData[topic][currentIndex];
+      document.getElementById("question-text").innerText = questionData.question;
 
-  if (!surveyData[topic]) {
-    document.getElementById("questionText").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
-    return;
-  }
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      questionData.choices.forEach((choice) => {
+        const btn = document.createElement("div");
+        btn.className = "option";
+        btn.innerText = choice;
+        btn.onclick = () => selectOption(choice);
+        optionsDiv.appendChild(btn);
+      });
 
-  document.getElementById("topicTitle").innerText = topic;
-  showQuestion();
-}
+      document.getElementById("progress").innerText = `질문 ${currentIndex + 1} / ${surveyData[topic].length}`;
+    }
 
-function showQuestion() {
-  const topicSet = surveyData[topic];
-  const total = topicSet.count;
-  const seeds = topicSet.seeds;
-  const pool = topicSet.option_pool;
-  const randomSeed = seeds[currentIndex % seeds.length];
-  const randomOptions = pool.slice(0, topicSet.min_options);
+    function selectOption(choice) {
+      answers.push(choice);
+      currentIndex++;
 
-  document.getElementById("progressBar").style.width = `${(currentIndex / total) * 100}%`;
-  document.getElementById("questionText").innerText = `${currentIndex + 1}. ${randomSeed}`;
-
-  const optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
-  randomOptions.forEach(opt => {
-    const btn = document.createElement("div");
-    btn.className = "option";
-    btn.innerText = opt;
-    btn.onclick = () => selectOption(opt);
-    optionsDiv.appendChild(btn);
-  });
-}
-
-function selectOption(opt) {
-  selectedAnswers.push(opt);
-  const topicSet = surveyData[topic];
-  if (currentIndex + 1 >= topicSet.count) {
-    localStorage.setItem("answers", JSON.stringify(selectedAnswers));
-    window.location.href = `result.html?topic=${encodeURIComponent(topic)}`;
-  } else {
-    currentIndex++;
-    showQuestion();
-  }
-}
-
-loadSurvey();
-</script>
+      if (currentIndex < surveyData[topic].length) {
+        showQuestion();
+      } else {
+        const query = `result.html?topic=${encodeURIComponent(topic)}&answers=${encodeURIComponent(JSON.stringify(answers))}`;
+        window.location.href = query;
+      }
+    }
+  </script>
 </body>
 </html>
