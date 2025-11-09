@@ -1,39 +1,95 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>노을빛하루 AI 무료 분석 서비스</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body{margin:0;background:#f3f6fb;font-family:'Noto Sans KR',sans-serif}
-.header{background:#2f6efc;color:#fff;text-align:center;padding:22px;font-size:22px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-.container{max-width:900px;margin:40px auto;padding:20px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:25px}
-.btn-topic{background:#fff;padding:18px 12px;border-radius:14px;border:1.5px solid #cfd8ff;text-align:center;cursor:pointer;font-size:16px;font-weight:500;transition:all .3s;box-shadow:0 4px 8px rgba(0,0,0,.05)}
-.btn-topic:hover{background:#2f6efc;color:#fff;transform:translateY(-2px);box-shadow:0 6px 15px rgba(47,110,252,.25)}
-.footer{text-align:center;margin-top:30px;color:#8a8fa3;font-size:13px}
-@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){.grid{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>노을빛하루 AI 건강·생활 진단</title>
+  <style>
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background: #0f4fff;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #0f4fff;
+      font-size: 20px;
+      margin-bottom: 25px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+    }
+    .item {
+      background: #eef3ff;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      font-size: 16px;
+      color: #333;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    .item:hover {
+      border-color: #0f4fff;
+      background: #dce7ff;
+    }
+    footer {
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 25px;
+    }
+    @media (max-width: 480px) {
+      .container { margin: 15px; padding: 20px; }
+      .item { font-size: 15px; padding: 15px; }
+    }
+  </style>
 </head>
 <body>
-<div class="header">노을빛하루 AI 무료 분석 서비스</div>
-<div class="container">
-  <h2>필요한 건강·생활 주제를 선택하세요</h2>
-  <p>8문항에 답하면 맞춤 분석 결과가 자동 생성됩니다.</p>
-  <div class="grid" id="topics"></div>
-  <div class="footer">© 2025 노을빛하루 AI 진단 시스템</div>
-</div>
+  <div class="header">노을빛하루 AI 건강·생활 진단</div>
+  <div class="container">
+    <h2>진단할 항목을 선택하세요</h2>
+    <div class="grid">
+      <div class="item" onclick="start('관절 통증')">관절 통증</div>
+      <div class="item" onclick="start('혈압 관리')">혈압 관리</div>
+      <div class="item" onclick="start('혈당·당뇨')">혈당·당뇨</div>
+      <div class="item" onclick="start('불면증·수면장애')">불면증·수면장애</div>
+      <div class="item" onclick="start('어깨·목 통증')">어깨·목 통증</div>
+      <div class="item" onclick="start('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
+      <div class="item" onclick="start('노안·시력저하')">노안·시력저하</div>
+      <div class="item" onclick="start('치매·기억력 문제')">치매·기억력 문제</div>
+      <div class="item" onclick="start('전립선·배뇨 문제')">전립선·배뇨 문제</div>
+      <div class="item" onclick="start('소화불량·위장')">소화불량·위장</div>
+      <div class="item" onclick="start('보험비용 종합점검')">보험비용 종합점검</div>
+      <div class="item" onclick="start('최저가 자동차 견적 비교')">최저가 자동차 견적 비교</div>
+    </div>
+    <footer>© 2025 노을빛하루 | AI 진단 서비스</footer>
+  </div>
 
-<script>
-const topics = [
-  "관절 통증","혈압 관리","혈당·당뇨","불면증·수면장애",
-  "어깨·목 통증","심장·호흡·가슴통증","노안·시력저하","치매·기억력 문제",
-  "전립선·배뇨 문제","종합 건강 체크","보이스피싱 예방","복지·생활지원금"
-];
-document.getElementById("topics").innerHTML =
-  topics.map(t=>`<div class="btn-topic" onclick="go('${t}')">${t}</div>`).join("");
-function go(t){location.href=`/question.html?topic=${encodeURIComponent(t)}`;}
-</script>
+  <script>
+    function start(topic) {
+      window.location.href = `question.html?topic=${encodeURIComponent(topic)}`;
+    }
+  </script>
 </body>
 </html>
