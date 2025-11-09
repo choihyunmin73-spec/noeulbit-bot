@@ -1,211 +1,151 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>노을빛하루 AI 진단 결과</title>
-<style>
-  body {
-    font-family:'Pretendard',sans-serif;
-    background:#0e1117;
-    color:#fff;
-    margin:0;
-  }
-  h1 {
-    margin:32px 0;
-    text-align:center;
-    color:#bcd4ff;
-  }
-  .wrap {
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-    justify-content:center;
-    padding:0 20px 40px;
-  }
-  .card {
-    background:#161a22;
-    border-radius:14px;
-    box-shadow:0 0 12px rgba(0,0,0,.4);
-    padding:22px;
-    min-width:380px;
-    max-width:620px;
-    flex:1;
-  }
-  .hl {
-    border-left:4px solid #5b8cff;
-    padding-left:10px;
-    margin:0 0 14px 0;
-  }
-  .level {
-    color:#cdd8ff;
-    margin:6px 0 10px;
-  }
-  .bar {
-    height:6px;
-    background:#2a3140;
-    border-radius:4px;
-    overflow:hidden;
-    margin:8px 0 14px;
-  }
-  .bar>span {
-    display:block;
-    height:100%;
-    background:#5b8cff;
-    width:0;
-    transition:width .8s;
-  }
-  .section {
-    color:#9eb2ff;
-    margin:18px 0 6px;
-    border-left:3px solid #5b8cff;
-    padding-left:8px;
-  }
-  ul {
-    margin:6px 0 10px 18px;
-    color:#d5d7de;
-  }
-  li { margin:4px 0; }
-  .pill {
-    display:flex;
-    gap:12px;
-    flex-direction:column;
-  }
-  .aff {
-    display:flex;
-    align-items:flex-start;
-    gap:12px;
-    background:#1f2531;
-    border:1px solid #283142;
-    border-radius:12px;
-    padding:14px;
-    cursor:pointer;
-    transition:.2s;
-  }
-  .aff:hover {
-    transform:translateY(-2px);
-    background:#232c3d;
-  }
-  .aff img {
-    width:28px;
-    height:28px;
-  }
-  .muted {
-    color:#98a0b3;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>노을빛하루 AI 진단 질문</title>
+  <style>
+    body {
+      font-family: "Pretendard", "Noto Sans KR", sans-serif;
+      background-color: #0d1420;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 100vh;
+    }
+    h2 {
+      color: #6ba7ff;
+      margin-top: 40px;
+      font-size: 1.7em;
+    }
+    #question-box {
+      background: #182539;
+      border-radius: 16px;
+      border: 1px solid #294e80;
+      padding: 30px;
+      width: 85%;
+      max-width: 700px;
+      margin-top: 40px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    #question-text {
+      font-size: 1.2em;
+      line-height: 1.6em;
+      margin-bottom: 30px;
+      color: #e1ecff;
+    }
+    .option {
+      background-color: #22324b;
+      border: 1px solid #315d93;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      transition: 0.2s;
+      cursor: pointer;
+      font-size: 1.05em;
+      color: #cfe2ff;
+    }
+    .option:hover {
+      background-color: #3969b5;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    #progress {
+      margin-top: 25px;
+      font-size: 0.95em;
+      color: #a4b6d6;
+    }
+    #progress-bar {
+      width: 80%;
+      height: 8px;
+      background-color: #22324b;
+      border-radius: 4px;
+      margin: 8px auto 0;
+      overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%;
+      background-color: #5b8cff;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
 </head>
 <body>
-  <h1>노을빛하루 AI 진단 결과</h1>
+  <h2 id="topic-title">AI 건강 진단</h2>
 
-  <div class="wrap">
-    <!-- LEFT -->
-    <section class="card">
-      <h2 class="hl" id="topic">주제</h2>
-      <div class="level" id="level">mild</div>
-      <div class="bar"><span id="riskBar"></span></div>
-      <div><strong>위험도 지표:</strong> <span id="risk">0</span>/100</div>
-
-      <h3 class="section">상세 진단</h3>
-      <p id="detail" class="muted">불러오는 중...</p>
-
-      <h3 class="section">요약</h3>
-      <ul id="summary"></ul>
-
-      <h3 class="section">전문가 의견</h3>
-      <ul id="opinion"></ul>
-    </section>
-
-    <!-- RIGHT -->
-    <aside class="card">
-      <h2 class="hl">제휴상품 (필요하신 영양제)</h2>
-      <div id="supps" class="pill"></div>
-
-      <h2 class="section">제휴보험 (체크해 보세요)</h2>
-      <div id="ins" class="pill"></div>
-    </aside>
+  <div id="question-box">
+    <div id="question-text">질문을 불러오는 중입니다...</div>
+    <div id="options"></div>
+    <div id="progress"></div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
 
-<script>
-(function(){
-  const res = JSON.parse(localStorage.getItem("aiResult") || "null");
-  const $ = id => document.getElementById(id);
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const topic = urlParams.get("topic");
+    document.getElementById("topic-title").innerText = `주제: ${topic}`;
 
-  if (!res) {
-    $("detail").textContent = "결과 데이터를 불러올 수 없습니다.";
-    return;
-  }
+    let surveyData = {};
+    let currentIndex = 0;
+    let answers = [];
 
-  // 기본 정보
-  $("topic").textContent = res.topic || "진단 결과";
-  $("level").textContent = res.level || "mild";
-  $("risk").textContent  = res.riskPercent ?? 0;
-  $("riskBar").style.width = ((res.riskPercent ?? 0) + "%");
-
-  // 상세 진단 (문자열 또는 배열 지원)
-  if (Array.isArray(res.detail)) {
-    $("detail").innerHTML = res.detail.map(line => `<div>${line}</div>`).join("");
-  } else {
-    $("detail").textContent = res.detail || "상세 진단 데이터 없음.";
-  }
-
-  // 요약 (7줄 구성)
-  const summaries = Array.isArray(res.summary) ? res.summary : [];
-  $("summary").innerHTML = summaries.length
-    ? summaries.map(s => `<li>${s}</li>`).join("")
-    : "<li>요약 데이터 없음</li>";
-
-  // 전문가 의견 (2줄 구성)
-  const opinions = Array.isArray(res.opinion) ? res.opinion : (Array.isArray(res.advice) ? res.advice : []);
-  $("opinion").innerHTML = opinions.length
-    ? opinions.map(o => `<li>${o}</li>`).join("")
-    : "<li>전문가 의견 데이터 없음</li>";
-
-  // ✅ affiliate.json 자동 로드
-  fetch("/affiliate.json")
-    .then(r => r.json())
-    .then(map => {
-      const supps = $("supps");
-      const list = map[res.topic] || [];
-      if (!list.length) {
-        supps.innerHTML = `<div class='muted'>등록된 제휴상품이 없습니다.</div>`;
-        return;
-      }
-      list.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "aff";
-        div.innerHTML = `
-          <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="pill" />
-          <div>
-            <div><strong>${item.name}</strong></div>
-            <div class="muted">${item.desc}</div>
-            <div class="muted">쿠팡 바로가기</div>
-          </div>`;
-        div.onclick = () => window.open(item.link, "_blank");
-        supps.appendChild(div);
+    // 설문 데이터 로드
+    fetch("survey.json")
+      .then((response) => response.json())
+      .then((data) => {
+        surveyData = data;
+        if (!surveyData[topic]) {
+          document.getElementById("question-text").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
+          return;
+        }
+        showQuestion();
+      })
+      .catch((err) => {
+        console.error("설문 로드 오류:", err);
+        document.getElementById("question-text").innerText = "문항 데이터를 불러오지 못했습니다.";
       });
-    })
-    .catch(() => {
-      $("supps").innerHTML = `<div class='muted'>제휴상품 정보를 불러오지 못했습니다.</div>`;
-    });
 
-  // 제휴보험 (고정 2종)
-  const ins = $("ins");
-  [
-    { name:"고혈압·심장 보장보험", desc:"혈압·심혈관질환 중심 보장 상품" },
-    { name:"만성질환 실손보험", desc:"정기 내과·검사비 보장 상품" }
-  ].forEach(i => {
-    const div = document.createElement("div");
-    div.className = "aff";
-    div.innerHTML = `
-      <img src="https://cdn-icons-png.flaticon.com/512/2965/2965401.png" alt="shield" />
-      <div>
-        <div><strong>${i.name}</strong></div>
-        <div class="muted">${i.desc}</div>
-      </div>`;
-    ins.appendChild(div);
-  });
-})();
-</script>
+    function showQuestion() {
+      const questions = surveyData[topic];
+      const questionData = questions[currentIndex];
+
+      document.getElementById("question-text").innerText = questionData.question;
+
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      questionData.choices.forEach((choice) => {
+        const btn = document.createElement("div");
+        btn.className = "option";
+        btn.innerText = choice;
+        btn.onclick = () => selectOption(choice);
+        optionsDiv.appendChild(btn);
+      });
+
+      // 진행상황 표시
+      const progressText = `질문 ${currentIndex + 1} / ${questions.length}`;
+      document.getElementById("progress").innerText = progressText;
+      const fillWidth = ((currentIndex + 1) / questions.length) * 100;
+      document.getElementById("progress-fill").style.width = fillWidth + "%";
+    }
+
+    function selectOption(choice) {
+      answers.push(choice);
+      currentIndex++;
+
+      if (currentIndex < surveyData[topic].length) {
+        showQuestion();
+      } else {
+        // ✅ 로컬스토리지 방식으로 result.html로 데이터 전달
+        localStorage.setItem("aiAnswers", JSON.stringify(answers));
+        localStorage.setItem("aiTopic", topic);
+        window.location.href = "result.html";
+      }
+    }
+  </script>
 </body>
 </html>
