@@ -1,192 +1,180 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>노을빛하루 AI 건강 진단</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>노을빛하루 AI 진단 - 질문</title>
 <style>
   body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    background: #f6f9ff;
+    font-family: "Pretendard", system-ui, -apple-system, sans-serif;
+    background-color: #0d0f14;
+    color: #e8ecf3;
     margin: 0;
-    overflow-x: hidden;
+    padding: 0;
   }
+
   header {
-    background: #1e6eff;
-    color: #fff;
-    padding: 24px;
     text-align: center;
+    padding: 40px 20px 20px;
   }
-  .container {
-    max-width: 700px;
+
+  header h1 {
+    font-size: 26px;
+    margin-bottom: 6px;
+    color: #e8ecf3;
+  }
+
+  header p {
+    color: #9aa0b1;
+    font-size: 15px;
+  }
+
+  .question-box {
+    max-width: 800px;
+    background: #151922;
+    border: 1px solid #2a2f3a;
+    border-radius: 16px;
+    padding: 30px 24px;
     margin: 40px auto;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.08);
-    padding: 32px;
-    text-align: center;
-    transition: opacity .6s ease, transform .4s ease;
+    box-shadow: 0 0 14px rgba(0,0,0,0.3);
   }
-  h2 {
-    color: #1e6eff;
-    margin-bottom: 8px;
-    transition: opacity .4s ease;
+
+  .question-text {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #e8ecf3;
   }
-  .count {
-    color: #6a7aa3;
-    font-size: 14px;
-    margin-bottom: 20px;
-    transition: opacity .4s ease;
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
-  .opts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 20px;
-  }
-  button.opt {
-    border: 2px solid #cfd8ff;
-    background: #f5f8ff;
+
+  button.option {
+    background: #1b2130;
+    color: #e8ecf3;
+    border: 1px solid #2a2f3a;
     border-radius: 10px;
     padding: 14px;
-    cursor: pointer;
     font-size: 16px;
-    transition: all .3s ease;
+    cursor: pointer;
+    transition: all .25s ease;
   }
-  button.opt:hover {
-    background: #e6eeff;
-    border-color: #1e6eff;
-    transform: translateY(-2px);
+
+  button.option:hover {
+    background: #232a3a;
+    border-color: #4c8dff;
+    color: #4c8dff;
   }
-  button.opt:active {
-    background: #d5e3ff;
+
+  .progress-container {
+    max-width: 800px;
+    margin: 20px auto 10px;
+    padding: 0 24px;
   }
-  #progress {
-    margin-top: 24px;
+
+  .progress-bar {
     height: 8px;
-    background: #e5edff;
-    border-radius: 6px;
+    background: #2a2f3a;
+    border-radius: 8px;
     overflow: hidden;
   }
-  #bar {
-    height: 100%;
+
+  .progress-fill {
     width: 0%;
-    background: #1e6eff;
-    transition: width .4s;
+    height: 100%;
+    background: #4c8dff;
+    transition: width .4s ease;
   }
-  .fade-out {
-    opacity: 0;
-    transform: translateY(15px);
+
+  footer {
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    padding: 30px 0 20px;
+    border-top: 1px solid #2a2f3a;
+    margin-top: 50px;
   }
-  .fade-in {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
   @media(max-width:600px){
-    .opts{ grid-template-columns:1fr; }
+    .question-text { font-size:18px; }
   }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>노을빛하루 AI 건강 진단</h1>
+  <h1 id="topicTitle">AI 진단</h1>
+  <p>문항에 답해주세요. 마지막에 결과가 자동으로 분석됩니다.</p>
 </header>
 
-<div class="container fade-in" id="quizBox">
-  <div class="count" id="count"></div>
-  <h2 id="qtext">문항을 불러오는 중입니다...</h2>
-  <div class="opts" id="opts"></div>
-  <div id="progress"><div id="bar"></div></div>
+<div class="progress-container">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
 </div>
 
+<div class="question-box">
+  <div class="question-text" id="questionText"></div>
+  <div class="options" id="options"></div>
+</div>
+
+<footer>© 2025 노을빛하루 AI 진단 시스템</footer>
+
 <script>
-const params = new URLSearchParams(location.search);
-const topic = params.get("topic");
-const qtext = document.getElementById("qtext");
-const opts = document.getElementById("opts");
-const count = document.getElementById("count");
-const bar = document.getElementById("bar");
-const quizBox = document.getElementById("quizBox");
+  const urlParams = new URLSearchParams(window.location.search);
+  const topic = urlParams.get("topic") || "건강 진단";
+  document.getElementById("topicTitle").textContent = topic;
 
-let data = null;
-let current = 0;
-let answers = [];
+  // 예시 문항 구조 (필요 시 topic별로 교체 가능)
+  const questions = [
+    { text: "최근 들어 해당 부위에 불편함을 느낀 적이 있나요?", options: ["거의 없음", "가끔 있음", "자주 있음"] },
+    { text: "증상이 일상생활에 영향을 주나요?", options: ["전혀 없음", "조금 있음", "많이 있음"] },
+    { text: "최근 1주일 내 관련 증상이 악화된 적이 있나요?", options: ["아니오", "약간", "예"] },
+    { text: "관련 질환 이력이 있나요?", options: ["없음", "있음", "확진받음"] },
+    { text: "생활습관(식사, 수면, 운동)에 변화가 있었나요?", options: ["없음", "조금 있음", "많이 있음"] },
+    { text: "최근 피로감이나 집중력 저하가 느껴지나요?", options: ["없음", "약간", "심함"] },
+    { text: "병원 진료나 검사를 받은 적이 있나요?", options: ["없음", "예, 1회", "예, 지속적으로"] },
+    { text: "현재 해당 증상으로 불안감을 느끼시나요?", options: ["없음", "약간 있음", "심하게 있음"] }
+  ];
 
-async function loadSurvey() {
-  try {
-    const res = await fetch(`/api/survey?topic=${encodeURIComponent(topic)}`);
-    data = await res.json();
-    current = 0;
-    showQuestion();
-  } catch (e) {
-    qtext.textContent = "설문을 불러오지 못했습니다.";
-  }
-}
+  let current = 0;
+  const answers = [];
 
-function fadeOutIn(callback) {
-  quizBox.classList.add("fade-out");
-  setTimeout(() => {
-    callback();
-    quizBox.classList.remove("fade-out");
-    quizBox.classList.add("fade-in");
-  }, 300);
-}
+  const qText = document.getElementById("questionText");
+  const qOpts = document.getElementById("options");
+  const progress = document.getElementById("progress");
 
-function showQuestion() {
-  if (!data || current >= data.questions.length) {
-    submitSurvey();
-    return;
-  }
-
-  const q = data.questions[current];
-  fadeOutIn(() => {
-    qtext.textContent = q.text;
-    count.textContent = `문항 ${current + 1} / ${data.questions.length}`;
-    opts.innerHTML = "";
-    const pct = ((current) / data.questions.length) * 100;
-    bar.style.width = pct + "%";
-
-    q.options.forEach(op => {
+  function renderQuestion() {
+    const q = questions[current];
+    qText.textContent = `${current + 1}. ${q.text}`;
+    qOpts.innerHTML = "";
+    q.options.forEach(opt => {
       const btn = document.createElement("button");
-      btn.className = "opt";
-      btn.textContent = op;
-      btn.onclick = () => {
-        answers.push(op);
-        current++;
-        showQuestion();
-      };
-      opts.appendChild(btn);
+      btn.className = "option";
+      btn.textContent = opt;
+      btn.onclick = () => handleAnswer(opt);
+      qOpts.appendChild(btn);
     });
-  });
-}
-
-async function submitSurvey() {
-  fadeOutIn(() => {
-    qtext.textContent = "AI가 결과를 분석 중입니다...";
-    opts.innerHTML = "";
-    count.textContent = "";
-    bar.style.width = "100%";
-  });
-
-  const resp = await fetch("/api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic, answers })
-  });
-
-  if (!resp.ok) {
-    qtext.textContent = "결과 분석 중 오류가 발생했습니다.";
-    return;
+    progress.style.width = `${((current)/questions.length)*100}%`;
   }
 
-  const result = await resp.json();
-  sessionStorage.setItem("latestResult", JSON.stringify(result));
-  setTimeout(() => {
-    location.href = `result.html?topic=${encodeURIComponent(topic)}`;
-  }, 800);
-}
+  function handleAnswer(answer) {
+    answers.push(answer);
+    current++;
+    if (current < questions.length) {
+      renderQuestion();
+    } else {
+      progress.style.width = "100%";
+      // 결과 페이지로 이동
+      localStorage.setItem("answers", JSON.stringify(answers));
+      window.location.href = `result.html?topic=${encodeURIComponent(topic)}`;
+    }
+  }
 
-loadSurvey();
+  renderQuestion();
 </script>
 </body>
 </html>
