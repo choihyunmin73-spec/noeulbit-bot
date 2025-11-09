@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>노을빛하루 AI 진단 결과</title>
   <style>
     body {
@@ -66,7 +66,9 @@
       padding-left: 18px;
       color: #d0d3da;
     }
-    li { margin-bottom: 4px; }
+    li {
+      margin-bottom: 4px;
+    }
 
     .supplement-card {
       background-color: #232731;
@@ -75,10 +77,17 @@
       margin-bottom: 15px;
       cursor: pointer;
       transition: transform 0.2s ease, background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .supplement-card:hover {
       transform: translateY(-3px);
       background-color: #2d3240;
+    }
+    .supplement-card img {
+      width: 28px;
+      height: 28px;
     }
     .supplement-card strong {
       font-size: 16px;
@@ -89,7 +98,10 @@
     }
 
     @media (max-width: 768px) {
-      .card { min-width: 100%; max-width: none; }
+      .card {
+        min-width: 100%;
+        max-width: none;
+      }
     }
   </style>
 </head>
@@ -101,7 +113,9 @@
     <div class="card">
       <h2 id="topic">주제</h2>
       <h3 id="level">진단 단계</h3>
-      <div class="bar"><div class="bar-inner" id="riskBar"></div></div>
+      <div class="bar">
+        <div class="bar-inner" id="riskBar"></div>
+      </div>
       <div><strong>위험도 지표:</strong> <span id="riskPercent">0</span>/100</div>
 
       <h3>상세 진단</h3>
@@ -125,109 +139,129 @@
   </div>
 
   <script>
-    // ✅ 결과 데이터 불러오기
+    // ✅ 진단 결과 데이터 불러오기
     const result = JSON.parse(localStorage.getItem("aiResult"));
+
     if (!result) {
-      document.getElementById("detail").textContent = "결과 데이터를 불러올 수 없습니다.";
+      document.getElementById("detail").textContent =
+        "결과 데이터를 불러올 수 없습니다.";
     } else {
       document.getElementById("topic").textContent = result.topic || "진단 결과";
       document.getElementById("level").textContent = result.level || "단계 정보 없음";
       document.getElementById("riskPercent").textContent = result.riskPercent || 0;
-      document.getElementById("detail").textContent = result.detail || "상세 진단 데이터 없음";
-      document.getElementById("riskBar").style.width = `${result.riskPercent || 0}%`;
+      document.getElementById("riskBar").style.width = `${
+        result.riskPercent || 0
+      }%`;
+      document.getElementById("detail").textContent =
+        result.detail || "상세 진단 데이터 없음";
 
-      // ✅ 요약 배열 안정 처리
-      const summary = Array.isArray(result.summary) ? result.summary : [result.summary];
+      const summary = Array.isArray(result.summary)
+        ? result.summary
+        : [result.summary];
       document.getElementById("summary").innerHTML =
         summary && summary[0]
-          ? summary.map(i => `<li>${i}</li>`).join("")
+          ? summary.map((i) => `<li>${i}</li>`).join("")
           : "<li>요약 데이터 없음</li>";
 
-      // ✅ 전문가 의견 배열 안정 처리
       const opinionData = result.opinion || result.advice;
-      const opinion = Array.isArray(opinionData) ? opinionData : [opinionData];
+      const opinion = Array.isArray(opinionData)
+        ? opinionData
+        : [opinionData];
       document.getElementById("opinion").innerHTML =
         opinion && opinion[0]
-          ? opinion.map(i => `<li>${i}</li>`).join("")
+          ? opinion.map((i) => `<li>${i}</li>`).join("")
           : "<li>전문가 의견 데이터 없음</li>";
     }
 
-    // ✅ 제휴상품 링크 매핑
+    // ✅ 제휴상품 매핑
     const linkMap = {
       "관절 통증": [
         { name: "글루코사민", url: "https://link.coupang.com/a/c2RH71" },
         { name: "MSM 관절영양", url: "https://link.coupang.com/a/c2RKZl" },
-        { name: "콜라겐 플러스", url: "https://link.coupang.com/a/c2RNHD" }
+        { name: "콜라겐 플러스", url: "https://link.coupang.com/a/c2RNHD" },
       ],
       "혈압 관리": [
         { name: "오메가3 트리플케어", url: "https://link.coupang.com/a/c2RQAG" },
         { name: "마그네슘 밸런스", url: "https://link.coupang.com/a/c2RTRr" },
-        { name: "코엔자임Q10 플러스", url: "https://link.coupang.com/a/c2RWlM" }
+        { name: "코엔자임Q10 플러스", url: "https://link.coupang.com/a/c2RWlM" },
       ],
       "혈당·당뇨": [
         { name: "알파리포산 600", url: "https://link.coupang.com/a/c2RXDT" },
         { name: "크롬 포뮬러", url: "https://link.coupang.com/a/c2RZ7S" },
-        { name: "오메가3 밸런스", url: "https://link.coupang.com/a/c2R1hr" }
+        { name: "오메가3 밸런스", url: "https://link.coupang.com/a/c2R1hr" },
       ],
       "불면증·수면장애": [
         { name: "테아닌 릴렉스", url: "https://link.coupang.com/a/c2R26o" },
         { name: "마그네슘 나이트", url: "https://link.coupang.com/a/c2R5lm" },
-        { name: "GABA 컴플렉스", url: "https://link.coupang.com/a/c2R9RO" }
+        { name: "GABA 컴플렉스", url: "https://link.coupang.com/a/c2R9RO" },
       ],
       "어깨·목 통증": [
         { name: "MSM 관절근육 포뮬러", url: "https://link.coupang.com/a/c2SdN1" },
         { name: "마그네슘 이지업", url: "https://link.coupang.com/a/c2SeX4" },
-        { name: "비타민B 컴플렉스", url: "https://link.coupang.com/a/c2SgkD" }
+        { name: "비타민B 컴플렉스", url: "https://link.coupang.com/a/c2SgkD" },
       ],
       "심장·호흡·가슴통증": [
         { name: "코엔자임Q10 하트케어", url: "https://link.coupang.com/a/c2SnFt" },
         { name: "오메가3 심혈관 포뮬러", url: "https://link.coupang.com/a/c2So9Q" },
-        { name: "폴리코사놀 10", url: "https://link.coupang.com/a/c2SrCT" }
+        { name: "폴리코사놀 10", url: "https://link.coupang.com/a/c2SrCT" },
       ],
       "노안·시력저하": [
         { name: "루테인 지아잔틴", url: "https://link.coupang.com/a/c2StF3" },
         { name: "비타민A 아이케어", url: "https://link.coupang.com/a/c2Svgp" },
-        { name: "아스타잔틴 비전", url: "https://link.coupang.com/a/c2SwxO" }
+        { name: "아스타잔틴 비전", url: "https://link.coupang.com/a/c2SwxO" },
       ],
       "치매·기억력 문제": [
         { name: "오메가3", url: "https://link.coupang.com/a/c2SxOq" },
         { name: "포스파티딜세린", url: "https://link.coupang.com/a/c2SzKf" },
-        { name: "은행잎추출물", url: "https://link.coupang.com/a/c2SBSY" }
+        { name: "은행잎추출물", url: "https://link.coupang.com/a/c2SBSY" },
       ],
       "전립선·배뇨 문제": [
         { name: "아연", url: "https://link.coupang.com/a/c2SC9E" },
         { name: "쏘팔메토", url: "https://link.coupang.com/a/c2SH2O" },
-        { name: "비타민E", url: "https://link.coupang.com/a/c2SJVq" }
+        { name: "비타민E", url: "https://link.coupang.com/a/c2SJVq" },
       ],
       "종합 건강 체크": [
         { name: "멀티비타민", url: "https://link.coupang.com/a/c2SKDt" },
         { name: "유산균", url: "https://link.coupang.com/a/c2SLLs" },
-        { name: "오메가3", url: "https://link.coupang.com/a/c2SxOq" }
-      ]
+        { name: "오메가3", url: "https://link.coupang.com/a/c2SxOq" },
+      ],
     };
 
     const supplementList = document.getElementById("supplementList");
     if (result) {
-      let matchedKey =
-        Object.keys(linkMap).find(k => result.topic && result.topic.includes(k)) || "종합 건강 체크";
+      const matchedKey =
+        Object.keys(linkMap).find(
+          (k) => result.topic && result.topic.includes(k)
+        ) || "종합 건강 체크";
 
-      linkMap[matchedKey].forEach(item => {
+      linkMap[matchedKey].forEach((item) => {
         const div = document.createElement("div");
         div.className = "supplement-card";
-        div.innerHTML = `<strong>${item.name}</strong><br><small>쿠팡 바로가기</small>`;
+        div.innerHTML = `
+          <img src="https://cdn-icons-png.flaticon.com/512/2913/2913135.png" alt="${item.name}">
+          <div>
+            <strong>${item.name}</strong><br>
+            <small>쿠팡 바로가기</small>
+          </div>`;
         div.onclick = () => window.open(item.url, "_blank");
         supplementList.appendChild(div);
       });
     }
 
+    // ✅ 보험 리스트
     const insuranceList = document.getElementById("insuranceList");
     [
       { name: "고혈압·심장 보장보험", desc: "혈압·심혈관질환 중심 보장 상품" },
-      { name: "만성질환 실손보험", desc: "정기 내과·검사비 보장 상품" }
-    ].forEach(item => {
+      { name: "만성질환 실손보험", desc: "정기 내과·검사비 보장 상품" },
+    ].forEach((item) => {
       const div = document.createElement("div");
       div.className = "supplement-card";
-      div.innerHTML = `<strong>${item.name}</strong><br><small>${item.desc}</small>`;
+      div.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920345.png" alt="${item.name}">
+        <div>
+          <strong>${item.name}</strong><br>
+          <small>${item.desc}</small>
+        </div>`;
       insuranceList.appendChild(div);
     });
   </script>
