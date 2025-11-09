@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>문항 선택 | 노을빛하루 AI 진단</title>
+  <title>AI 증상 문항 | 노을빛하루</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -24,7 +24,7 @@
       background: #fff;
       padding: 28px;
       border-radius: 15px;
-      box-shadow: 0 5px 18px rgba(0,0,0,.12);
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
     }
     .title {
       font-size: 22px;
@@ -34,149 +34,133 @@
       color: #0f4fff;
     }
     .option {
-      padding: 16px;
+      padding: 14px;
       background: #eef3ff;
-      margin: 12px 0;
+      margin: 8px 0;
       border-radius: 10px;
       cursor: pointer;
       font-size: 18px;
-      transition: .25s;
       border: 2px solid transparent;
+      transition: 0.25s;
     }
     .option:hover {
       background: #dce7ff;
       border-color: #0f4fff;
     }
     .progress {
-      margin-top: 20px;
+      margin-top: 18px;
       text-align: center;
       font-size: 14px;
       color: #5b6472;
-    }
-    .pill {
-      display: inline-block;
-      background: #eef2ff;
-      color: #3742b1;
-      padding: 5px 10px;
-      border-radius: 999px;
-      margin: 2px;
-      font-size: 12px;
     }
     .error {
       padding: 16px;
       background: #fff1f1;
       color: #b40000;
       border-radius: 10px;
+      margin-top: 12px;
     }
-    @media (max-width:480px){
-      .header {font-size:20px;padding:18px}
-      .wrap {margin:15px;padding:20px}
-      .title {font-size:19px}
-      .option {font-size:17px;padding:16px}
+    @media (max-width: 480px) {
+      .header {
+        font-size: 20px;
+        padding: 18px;
+      }
+      .wrap {
+        margin: 15px;
+        padding: 20px;
+      }
+      .title {
+        font-size: 19px;
+      }
+      .option {
+        font-size: 17px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="header">문항 선택</div>
+  <div class="header">AI 증상 문항</div>
   <div class="wrap">
-    <div id="head">
-      <div id="topic-pill" class="pill"></div>
-    </div>
-    <div id="question-block" style="margin-top:8px">
-      <div id="question-text" class="title"></div>
-      <div id="options"></div>
-      <div id="progress" class="progress"></div>
-    </div>
+    <div id="question-text" class="title"></div>
+    <div id="options"></div>
+    <div id="progress" class="progress"></div>
     <div id="error-box" class="error" style="display:none"></div>
   </div>
 
   <script>
-    (async function(){
+    (async function() {
       const qs = new URLSearchParams(location.search);
       const topic = qs.get("topic");
-      const topicPill = document.getElementById("topic-pill");
       const qText = document.getElementById("question-text");
       const optBox = document.getElementById("options");
       const prog = document.getElementById("progress");
       const err = document.getElementById("error-box");
-      const qBlock = document.getElementById("question-block");
 
-      topicPill.textContent = topic ? `주제: ${topic}` : "주제 미선택";
-
-      if(!topic){
-        qBlock.style.display="none";
-        err.style.display="block";
-        err.textContent="주제가 선택되지 않았습니다. 첫 화면으로 돌아가주세요.";
+      if (!topic) {
+        err.style.display = "block";
+        err.textContent = "주제가 선택되지 않았습니다. 처음 화면으로 돌아가세요.";
         return;
       }
 
-      let survey;
-      try{
-        const res = await fetch("/survey.json",{cache:"no-store"});
-        if(!res.ok) throw new Error("설문 로드 실패");
-        survey = await res.json();
-      }catch(e){
-        qBlock.style.display="none";
-        err.style.display="block";
-        err.textContent="설문 데이터를 불러오지 못했습니다.";
-        console.error(e);
-        return;
-      }
+      try {
+        // ✅ 서버에서 자동 생성된 문항 + 선택지 로드
+        const res = await fetch(`/api/survey/${encodeURIComponent(topic)}`);
+        const data = await res.json();
 
-      const questions = survey[topic];
-      if(!Array.isArray(questions) || questions.length===0){
-        qBlock.style.display="none";
-        err.style.display="block";
-        err.textContent="해당 주제의 문항이 없습니다.";
-        return;
-      }
+        if (!data.success) throw new Error(data.error || "문항 로드 실패");
 
-      let idx=0;
-      const answers=[];
+        const questions = data.questions;
+        let idx = 0;
+        const answers = [];
 
-      function renderQuestion(){
-        const item = questions[idx];
-        const q = item.q || item.question || "";
-        const options = item.opt || item.options || [];
-        qText.textContent = `${idx+1}. ${q}`;
-        optBox.innerHTML = "";
-        options.forEach(label=>{
-          const div=document.createElement("div");
-          div.className="option";
-          div.textContent=label;
-          div.onclick=()=>{
-            answers.push(label);
-            idx++;
-            if(idx<questions.length){
-              renderQuestion();
-            }else{
-              submit();
-            }
-          };
-          optBox.appendChild(div);
-        });
-        prog.textContent=`문항 ${idx+1} / ${questions.length}`;
-      }
+        renderQuestion();
 
-      async function submit(){
-        try{
-          const res=await fetch("/api/analyze",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({topic,answers})
+        function renderQuestion() {
+          const item = questions[idx];
+          qText.textContent = `${idx + 1}. ${item.q}`;
+          optBox.innerHTML = "";
+
+          item.opt.forEach(label => {
+            const div = document.createElement("div");
+            div.className = "option";
+            div.textContent = label;
+            div.onclick = () => {
+              answers.push(label);
+              idx++;
+              if (idx < questions.length) {
+                renderQuestion();
+              } else {
+                submit();
+              }
+            };
+            optBox.appendChild(div);
           });
-          if(!res.ok) throw new Error("서버 오류");
-          const data=await res.json();
-          if(!data.success) throw new Error(data.error||"분석 실패");
-          location.href=`/result.html?payload=${encodeURIComponent(JSON.stringify(data))}`;
-        }catch(e){
-          err.style.display="block";
-          err.textContent="결과 전송에 실패했습니다. 네트워크 상태를 확인해주세요.";
-          console.error("❌ 전송 오류:",e);
-        }
-      }
 
-      renderQuestion();
+          prog.textContent = `문항 ${idx + 1} / ${questions.length}`;
+        }
+
+        async function submit() {
+          try {
+            const res = await fetch("/api/analyze", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ topic, answers })
+            });
+
+            const result = await res.json();
+            if (!result.success) throw new Error(result.error || "분석 실패");
+
+            location.href = `/result.html?payload=${encodeURIComponent(JSON.stringify(result))}`;
+          } catch (e) {
+            err.style.display = "block";
+            err.textContent = "결과 전송에 실패했습니다. 다시 시도해주세요.";
+          }
+        }
+      } catch (e) {
+        console.error("❌ 문항 로드 오류:", e);
+        err.style.display = "block";
+        err.textContent = "설문 데이터를 불러올 수 없습니다.";
+      }
     })();
   </script>
 </body>
