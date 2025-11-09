@@ -1,183 +1,216 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 진단 결과</title>
-  <style>
-    body {
-      font-family: "Pretendard", "Noto Sans KR", sans-serif;
-      background-color: #0d1420;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      min-height: 100vh;
-    }
-
-    h1 {
-      color: #6ba7ff;
-      margin-top: 40px;
-      font-size: 1.9em;
-    }
-
-    .box {
-      background: #182539;
-      border-radius: 14px;
-      border: 1px solid #294e80;
-      width: 85%;
-      max-width: 750px;
-      margin: 40px auto;
-      padding: 30px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-      text-align: left;
-    }
-
-    .topic {
-      color: #9fc3ff;
-      font-size: 1.3em;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .bar {
-      height: 8px;
-      background: #22324b;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 6px;
-      margin-bottom: 18px;
-    }
-    .bar span {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, #5b8cff, #6fe1ff);
-      width: 0%;
-      transition: width 0.8s ease;
-    }
-
-    .btns {
-      text-align: center;
-      margin-top: 35px;
-    }
-
-    button {
-      background: #5b8cff;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 22px;
-      margin: 8px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #6fa8ff;
-      transform: translateY(-2px);
-    }
-
-    footer {
-      color: #7f9bbd;
-      font-size: 0.85em;
-      margin-bottom: 25px;
-    }
-
-    .product {
-      background: #1c2d46;
-      border: 1px solid #315d93;
-      border-radius: 10px;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .product img {
-      width: 42px;
-      height: 42px;
-      border-radius: 8px;
-    }
-
-    .product a {
-      color: #9fc3ff;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .product a:hover {
-      text-decoration: underline;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>노을빛하루 AI 진단 결과</title>
+<style>
+  :root{
+    --bg:#0e1117;--card:#151a23;--ink:#e8eeff;--muted:#a7b3c9;
+    --key:#6ba7ff;--key2:#87b3ff;--line:#263145;--chip:#1f2634;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Pretendard','Noto Sans KR',system-ui,-apple-system,Segoe UI,sans-serif}
+  h1{margin:28px 0 6px;text-align:center;color:#bcd4ff;font-size:28px}
+  .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;padding:0 20px 34px}
+  .col{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 0 12px rgba(0,0,0,.35);padding:22px}
+  .left{flex:1;min-width:420px;max-width:900px}
+  .right{flex:1;min-width:360px;max-width:520px}
+  h2.section{margin:18px 0 10px;color:#dfe8ff;font-size:18px;border-left:4px solid var(--key);padding-left:10px}
+  .topic{font-size:22px;color:#dfe6ff;margin:6px 0 2px;border-left:4px solid var(--key2);padding-left:10px}
+  .level{color:#cdd8ff;margin:0 0 8px 14px}
+  .meter{height:8px;background:#223048;border-radius:5px;overflow:hidden;margin:8px 0 10px}
+  .meter>span{display:block;height:100%;background:linear-gradient(90deg,var(--key),#4e8bff);width:0;transition:width .8s}
+  .kv{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 12px}
+  .kv>div{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:#d4def3}
+  p{color:#d7deef;line-height:1.7;margin:6px 0 12px}
+  ul{margin:6px 0 10px 20px;color:#d9e3ff}
+  li{margin:4px 0}
+  .muted{color:var(--muted)}
+  .aff{display:flex;gap:12px;align-items:flex-start;background:#1a2130;border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;cursor:pointer;transition:.2s}
+  .aff:hover{transform:translateY(-2px);background:#1e2740}
+  .aff img{width:28px;height:28px}
+  .aff .name{font-weight:700}
+  .btns{display:flex;gap:12px;margin-top:18px}
+  .btn{background:#24324a;border:1px solid var(--line);color:#e7f0ff;padding:10px 16px;border-radius:10px;cursor:pointer}
+  .btn:hover{background:#2b3b59}
+  footer{color:#8ea1c6;text-align:center;margin:22px 0}
+  @media (max-width:800px){.right{min-width:100%}}
+</style>
 </head>
 <body>
-  <h1>AI 진단 결과</h1>
+  <h1>노을빛하루 AI 진단 결과</h1>
 
-  <div class="box">
-    <div class="topic" id="topic">주제: -</div>
+  <div class="wrap">
+    <!-- LEFT -->
+    <section class="col left">
+      <div class="topic" id="topic">주제</div>
+      <div class="level" id="level">mild</div>
 
-    <p id="summary"></p>
+      <div class="kv">
+        <div>총 응답 수: <strong id="ansCount">0</strong>개</div>
+        <div>위험도 감지 단어 수: <strong id="riskHits">0</strong>개</div>
+        <div>위험도 지표: <strong id="riskNum">0</strong>/100</div>
+      </div>
 
-    <p><b>총 응답 수:</b> <span id="count">0</span>개</p>
-    <p><b>위험도 감지 단어 수:</b> <span id="riskCount">0</span>개</p>
+      <div class="meter"><span id="riskBar"></span></div>
 
-    <p><b>위험도 지표:</b> <span id="risk">0</span>/100</p>
-    <div class="bar"><span id="riskBar"></span></div>
+      <h2 class="section">상세 진단</h2>
+      <p id="detail" class="muted">불러오는 중…</p>
 
-    <div id="message"></div>
+      <h2 class="section">요약</h2>
+      <ul id="summary"><li class="muted">요약 데이터 없음</li></ul>
 
-    <div id="product"></div>
+      <h2 class="section">전문가 의견</h2>
+      <ul id="opinion"><li class="muted">전문가 의견 데이터 없음</li></ul>
 
-    <div class="btns">
-      <button onclick="goHome()">처음으로 돌아가기</button>
-      <button onclick="retry()">다시 진단하기</button>
-    </div>
+      <div class="btns">
+        <button class="btn" onclick="location.href='index.html'">처음으로 돌아가기</button>
+        <button class="btn" onclick="location.href='question.html?topic='+encodeURIComponent(state.topic||'')">다시 진단하기</button>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="col right">
+      <h2 class="section">제휴상품 (필요하신 영양제)</h2>
+      <div id="supps"></div>
+
+      <h2 class="section">제휴보험 (체크해 보세요)</h2>
+      <div id="ins"></div>
+    </aside>
   </div>
 
   <footer>© 2025 노을빛하루 AI 진단 시스템</footer>
 
-  <script>
-    const data = JSON.parse(localStorage.getItem("aiResult") || "{}");
+<script>
+const state = {};
+const $ = id => document.getElementById(id);
 
-    document.getElementById("topic").innerText = `주제: ${data.topic || "알 수 없음"}`;
-    document.getElementById("count").innerText = data.totalAnswers ?? 0;
-    document.getElementById("riskCount").innerText = data.riskCount ?? 0;
+// 1) 데이터 소스: aiResult(있으면 그대로), 없으면 aiTopic+aiAnswers로 간단 분석
+(function bootstrap(){
+  const fromEngine = safeParse(localStorage.getItem('aiResult'));
+  if (fromEngine && typeof fromEngine === 'object') {
+    fill(fromEngine);
+    return;
+  }
+  // fallback: question.html → localStorage
+  const topic = localStorage.getItem('aiTopic') || '알 수 없음';
+  const answers = safeParse(localStorage.getItem('aiAnswers')) || [];
+  const result = simpleAnalyze(topic, answers);
+  fill(result);
+})();
 
-    const risk = data.riskPercent ?? 0;
-    document.getElementById("risk").innerText = risk;
-    document.getElementById("riskBar").style.width = `${risk}%`;
+function safeParse(s){ try{return JSON.parse(s);}catch{return null;} }
 
-    // 메시지 표시
-    document.getElementById("message").innerHTML =
-      data.message || "현재 상태는 비교적 양호합니다.<br>규칙적인 생활습관을 유지하세요.";
+// 2) 간단 분석기 (fallback일 때만 사용)
+function simpleAnalyze(topic, answers){
+  const riskWords = ["심함","매우","심각","숨","통증","저림","어려움","두근","두통","호흡","가슴","수면제","저하","불안","끊김"];
+  let hits = 0;
+  answers.forEach(a => riskWords.forEach(r=>{ if(String(a).includes(r)) hits++; }));
+  const score = Math.min(100, hits*12 + (answers.length?5:0));
+  const level  = score>=70?"severe":score>=40?"moderate":"mild";
 
-    // 제휴상품 표시
-    if (data.product) {
-      const box = document.getElementById("product");
-      box.innerHTML = `
-        <div class="product">
-          <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f48a.svg" alt="product">
+  return {
+    topic,
+    level,
+    answers,
+    riskPercent: score,
+    riskHits: hits,
+    detail: "응답 내용을 기반으로 자동 산출된 임시 결과입니다. 실제 건강 상태는 개인차가 있으며, 증상이 지속되거나 심해지면 전문 진료를 권장합니다.",
+    summary: [
+      "최근 응답에서 위험 키워드가 "+hits+"개 감지되었습니다.",
+      "생활습관(수면·스트레스·자세) 개선이 도움이 될 수 있습니다.",
+      "증상이 지속되면 1차 의료기관 상담을 권합니다."
+    ],
+    opinion: [
+      "과사용/자세 문제는 1시간마다 스트레칭으로 완화하세요.",
+      "걷기·가벼운 근력운동을 주 3회 이상 유지하세요.",
+      "야간 증상이 있으면 수면 위생을 점검해 보세요."
+    ]
+  };
+}
+
+// 3) 화면 채우기
+function fill(res){
+  state.topic = res.topic || "알 수 없음";
+
+  $("topic").textContent = "주제: " + state.topic;
+  $("level").textContent = res.level || "mild";
+
+  const ansCount = (res.answers && res.answers.length) || Number(localStorage.getItem("aiAnswersLength")) || 0;
+  $("ansCount").textContent = ansCount;
+
+  const riskPct = Number(res.riskPercent ?? 0);
+  $("riskNum").textContent = riskPct;
+  $("riskBar").style.width = riskPct + "%";
+
+  $("riskHits").textContent = Number(res.riskHits ?? 0);
+
+  $("detail").textContent = res.detail || "상세 진단 데이터가 없습니다.";
+
+  const sum = Array.isArray(res.summary) ? res.summary : [];
+  $("summary").innerHTML = sum.length ? sum.map(s=>`<li>${escapeHtml(s)}</li>`).join("") : `<li class="muted">요약 데이터 없음</li>`;
+
+  const adv = Array.isArray(res.opinion) ? res.opinion : (Array.isArray(res.advice)?res.advice:[]);
+  $("opinion").innerHTML = adv.length ? adv.map(s=>`<li>${escapeHtml(s)}</li>`).join("") : `<li class="muted">전문가 의견 데이터 없음</li>`;
+
+  loadAffiliates(state.topic);
+  loadInsurances();
+}
+
+// 4) 제휴상품 로드 (affiliate.json)
+function loadAffiliates(topic){
+  const box = $("supps"); box.innerHTML = `<div class="muted">불러오는 중…</div>`;
+  fetch("/affiliate.json")
+    .then(r => r.json())
+    .then(map => {
+      const list = map[topic] || [];
+      if(!Array.isArray(list) || list.length===0){
+        box.innerHTML = `<div class="muted">해당 주제에 등록된 제휴상품이 없습니다.</div>`;
+        return;
+      }
+      box.innerHTML = "";
+      list.slice(0,4).forEach(item=>{
+        const div = document.createElement("div");
+        div.className = "aff";
+        div.innerHTML = `
+          <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="pill"/>
           <div>
-            <b>${data.product.title}</b><br>
-            ${data.product.desc}<br>
-            <a href="${data.product.link}" target="_blank">쿠팡 바로가기</a>
-          </div>
-        </div>
-      `;
-    }
+            <div class="name">${escapeHtml(item.name||"상품")}</div>
+            <div class="muted">${escapeHtml(item.desc||"")}</div>
+            <div class="muted">쿠팡 바로가기</div>
+          </div>`;
+        div.onclick = ()=> window.open(item.link||item.url,"_blank");
+        box.appendChild(div);
+      });
+    })
+    .catch(()=>{
+      box.innerHTML = `<div class="muted">제휴상품 정보를 불러오지 못했습니다.</div>`;
+    });
+}
 
-    function goHome() {
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
+// 5) 제휴보험 (고정 2종 표시)
+function loadInsurances(){
+  const box = $("ins"); box.innerHTML = "";
+  [
+    {name:"고혈압·심장 보장보험", desc:"혈압·심혈관질환 중심 보장 상품", url:"#"},
+    {name:"만성질환 실손보험",   desc:"정기 내과·검사비 보장 상품",   url:"#"}
+  ].forEach(i=>{
+    const div = document.createElement("div");
+    div.className = "aff";
+    div.innerHTML = `
+      <img src="https://cdn-icons-png.flaticon.com/512/2965/2965401.png" alt="shield"/>
+      <div>
+        <div class="name">${i.name}</div>
+        <div class="muted">${i.desc}</div>
+      </div>`;
+    div.onclick = ()=>{ if(i.url && i.url !== "#") window.open(i.url,"_blank"); };
+    box.appendChild(div);
+  });
+}
 
-    function retry() {
-      const topic = data.topic ? encodeURIComponent(data.topic) : "";
-      localStorage.removeItem("aiResult");
-      window.location.href = `question.html?topic=${topic}`;
-    }
-  </script>
+// util
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]))}
+</script>
 </body>
 </html>
