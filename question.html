@@ -1,94 +1,147 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>문항 진행</title>
-<style>
-  body{margin:0;background:#f5f7fb;font-family:"Noto Sans KR",system-ui}
-  .wrap{max-width:740px;margin:40px auto;padding:0 16px}
-  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.05);padding:20px}
-  h2{margin:0 0 6px;color:#0f172a;font-size:20px}
-  .sub{color:#475569;margin-bottom:14px}
-  .opt{display:block;width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin:10px 0;cursor:pointer;text-align:center}
-  .opt:hover{background:#eef2ff;border-color:#c7d2fe}
-  .step{color:#64748b;margin-top:6px;text-align:center}
-  .err{margin-top:12px;color:#b91c1c;text-align:center}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>문항 진행</title>
+  <style>
+    body{background:#f7fafc;margin:0;font-family:"Noto Sans KR",system-ui,-apple-system,Segoe UI,Roboto}
+    .wrap{max-width:780px;margin:40px auto;padding:0 16px}
+    h1{font-size:22px;color:#0f172a;margin:0 0 8px}
+    .sub{color:#334155;margin:0 0 24px}
+    .qbox{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 18px;margin-bottom:14px;cursor:pointer;transition:.15s}
+    .qbox:hover{background:#f8fafc}
+    .muted{color:#64748b;font-size:13px;margin-top:18px;text-align:center}
+    .pill{display:inline-block;background:#e2e8f0;color:#0f172a;font-weight:600;border-radius:9999px;padding:6px 12px;margin:16px 0}
+    .error{color:#b91c1c;background:#fee2e2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px;margin-top:12px;display:none}
+    .progress{color:#475569;font-size:13px;text-align:center;margin-top:14px}
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <h2 id="title"></h2>
-    <div class="sub" id="desc"></div>
-    <div id="opts"></div>
-    <div class="step" id="step"></div>
-    <div class="err" id="err"></div>
+  <div class="wrap">
+    <h1 id="title">진단</h1>
+    <p class="sub" id="subtitle"></p>
+
+    <div id="options"></div>
+
+    <div class="progress" id="progress">문항 1 / 1</div>
+    <div class="error" id="err"></div>
   </div>
-</div>
 
 <script>
-const qs=(k)=>new URLSearchParams(location.search).get(k)||"";
-const topic=qs("topic");
-const title=document.getElementById("title");
-const desc=document.getElementById("desc");
-const optsDiv=document.getElementById("opts");
-const step=document.getElementById("step");
-const err=document.getElementById("err");
+(async () => {
+  const $title = document.getElementById("title");
+  const $subtitle = document.getElementById("subtitle");
+  const $options = document.getElementById("options");
+  const $progress = document.getElementById("progress");
+  const $err = document.getElementById("err");
 
-let Q=[], A=[], i=0;
-
-async function loadSurvey(){
-  try{
-    if(!topic){title.textContent="주제가 선택되지 않았습니다.";return;}
-    const r=await fetch(`/api/survey/${encodeURIComponent(topic)}`);
-    const data=await r.json();
-    if(!r.ok) throw new Error(data?.error||"문항 로드 실패");
-    Q=data.questions||[];
-    i=0; A=[]; render();
-  }catch(e){
-    title.textContent="문항 불러오기 오류";
-    err.textContent=e.message||"다시 시도해주세요.";
+  // 1) 주제 읽기 (index.html에서 저장한 topic)
+  const topic = localStorage.getItem("topic");
+  if(!topic){
+    $title.textContent = "❌ 주제가 선택되지 않았습니다.";
+    $subtitle.textContent = "처음 화면으로 돌아가 다시 선택해주세요.";
+    return;
   }
-}
 
-function render(){
-  if(i>=Q.length) return submit();
-  const q=Q[i];
-  title.textContent=`${topic} 진단`;
-  desc.textContent=`문항 ${i+1}. ${q.text}`;
-  optsDiv.innerHTML="";
-  q.options.forEach(op=>{
-    const b=document.createElement("button");
-    b.className="opt"; b.textContent=op;
-    b.onclick=()=>{ A.push(`${q.text}=${op}`); i++; render(); };
-    optsDiv.appendChild(b);
-  });
-  step.textContent=`문항 ${i+1} / ${Q.length}`;
-}
-
-async function submit(){
-  title.textContent="분석 중…";
-  desc.textContent="응답을 바탕으로 결과를 만들고 있습니다.";
-  optsDiv.innerHTML=""; step.textContent="잠시만 기다려주세요.";
-  err.textContent="";
-
+  // 2) 설문 로드
+  let questions = [];
   try{
-    const r=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic,answers:A})});
-    const data=await r.json();
-    if(!r.ok||!data.success) throw new Error(data?.error||"결과 생성 실패");
-    localStorage.setItem("aiResult", JSON.stringify(data));
-    location.href="result.html";
+    const r = await fetch(`/api/survey/${encodeURIComponent(topic)}`);
+    if(!r.ok) throw new Error("문항 로드 실패");
+    const data = await r.json();
+    // data.questions: (1) 객체배열 [{q,opts:[...]}, ...]  또는 (2) 문자열배열 ["질문", ...]
+    if(Array.isArray(data.questions) && data.questions.length){
+      questions = data.questions.map(item => {
+        if (typeof item === "string") {
+          // 기존 문자열 문항 호환: 기본 6지 생성 (한 번만 사용될 백업용)
+          return {
+            q: item,
+            opts: ["전혀 아니다","가끔 그렇다","자주 그렇다","매우 그렇다","모르겠다","상담필요"]
+          };
+        }
+        // 새 구조: { q, opts: [...] }
+        return {
+          q: item.q,
+          opts: Array.isArray(item.opts) && item.opts.length ? item.opts.slice(0,6) : ["전혀 아니다","가끔 그렇다","자주 그렇다","매우 그렇다","모르겠다","상담필요"]
+        };
+      });
+    }
   }catch(e){
-    err.textContent="결과 전송 실패. 다시 시도해주세요.";
-    const retry=document.createElement("button");
-    retry.className="opt"; retry.textContent="다시 시도";
-    retry.onclick=submit;
-    optsDiv.appendChild(retry);
+    $err.style.display="block";
+    $err.textContent="문항 불러오기 오류: " + e.message;
+    return;
   }
-}
 
-loadSurvey();
+  if(!questions.length){
+    $title.textContent = "❌ 문항이 준비되지 않았습니다.";
+    $subtitle.textContent = "관리자에게 문의해주세요.";
+    return;
+  }
+
+  // 3) 진행 상태
+  $title.textContent = `${topic} 진단`;
+  $subtitle.innerHTML = `아래 선택지 중 <span class="pill">하나씩</span> 선택하면 자동으로 다음 문항으로 이동합니다.`;
+  let idx = 0;
+  const answers = [];
+
+  const render = () => {
+    const total = questions.length;
+    const { q, opts } = questions[idx];
+
+    $options.innerHTML = "";
+    const header = document.createElement("div");
+    header.className = "sub";
+    header.style.fontWeight = "700";
+    header.style.margin = "10px 0 12px";
+    header.textContent = `문항 ${idx+1}. ${q}`;
+    $options.appendChild(header);
+
+    opts.forEach((opt) => {
+      const b = document.createElement("div");
+      b.className = "qbox";
+      b.textContent = opt;
+      b.onclick = () => {
+        answers.push({ q, a: opt });
+        idx++;
+        if(idx < total){
+          $progress.textContent = `문항 ${idx+1} / ${total}`;
+          render();
+        }else{
+          submit();
+        }
+      };
+      $options.appendChild(b);
+    });
+
+    $progress.textContent = `문항 ${idx+1} / ${total}`;
+  };
+
+  // 4) 완료 시 분석 호출
+  async function submit(){
+    try{
+      $subtitle.textContent = "분석 중입니다...";
+      const res = await fetch("/api/analyze",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ topic, answers })
+      });
+      if(!res.ok) throw new Error("분석 서버 오류: "+res.status);
+      const data = await res.json();
+      if(!data.success) throw new Error(data.error || "분석 실패");
+
+      // 결과 페이지로 전달
+      localStorage.setItem("answers", JSON.stringify(answers));
+      localStorage.setItem("aiResult", JSON.stringify(data));
+      location.href="result.html";
+    }catch(e){
+      $err.style.display="block";
+      $err.textContent = "결과 전송 실패. 다시 시도해주세요. ("+e.message+")";
+    }
+  }
+
+  render();
+})();
 </script>
 </body>
 </html>
