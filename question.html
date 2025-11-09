@@ -92,10 +92,11 @@
 
     title.textContent = `${topic} 진단`;
 
-    // ✅ 주제별 문항
-    const generateQuestions = (topic) => {
+    // ✅ 주제별 문항 자동 생성 (8~12개 랜덤)
+    function generateQuestions(topic) {
+      const base = [];
       if (topic.includes("자동차") || topic.includes("견적")) {
-        return [
+        base.push(
           "현재 차량을 보유 중이신가요?",
           "구매 방식은 어떤 것을 선호하시나요?",
           "월 차량 예산은 어느 정도인가요?",
@@ -103,10 +104,12 @@
           "차량 구매 또는 교체 시기는 언제인가요?",
           "보험료나 유지비에 대한 부담이 있나요?",
           "전기차나 하이브리드 차량에 관심이 있나요?",
-          "차량 구매 시 가장 중요하게 보는 요소는 무엇인가요?"
-        ];
+          "차량 구매 시 가장 중요하게 보는 요소는 무엇인가요?",
+          "최근 시승 경험이 있나요?",
+          "중고차 구매 의향이 있나요?"
+        );
       } else if (topic.includes("보험")) {
-        return [
+        base.push(
           "현재 가입한 보험이 몇 개 있나요?",
           "보험료가 부담스럽다고 느끼시나요?",
           "최근 보험 리모델링을 고려한 적이 있나요?",
@@ -114,39 +117,45 @@
           "보험금 청구 경험이 있으신가요?",
           "필요 없는 특약이 있다고 느끼시나요?",
           "가족 구성원의 보험도 함께 관리 중인가요?",
-          "보험 보장 범위를 정확히 알고 계신가요?"
-        ];
+          "보험 보장 범위를 정확히 알고 계신가요?",
+          "실손보험을 유지하고 계신가요?",
+          "상담을 원하시나요?"
+        );
       } else {
-        return [
-          "불편하거나 자주 겪는 증상은 무엇인가요?",
-          "이 문제가 언제부터 있었나요?",
-          "하루 중 증상이 가장 심한 시간대는?",
-          "생활습관 중 영향을 주는 요소가 있나요?",
+        base.push(
+          "자주 겪는 증상은 무엇인가요?",
+          "언제부터 증상이 있었나요?",
+          "증상이 가장 심한 시간대는 언제인가요?",
+          "생활습관 중 영향이 있다고 느끼시나요?",
           "통증 또는 불편감의 강도는 어느 정도인가요?",
-          "스트레스나 피로가 관련되어 있나요?",
+          "스트레스나 피로와 관련이 있나요?",
           "증상이 일상생활에 얼마나 영향을 주나요?",
-          "최근 복용 중인 약물 또는 치료가 있나요?"
-        ];
+          "최근 복용 중인 약물 또는 치료가 있나요?",
+          "휴식 후 증상 변화가 있나요?",
+          "의사의 진료를 받은 적이 있나요?"
+        );
       }
-    };
+      return base;
+    }
 
-    // ✅ 선택지 자동 생성
-    const generateOptions = (topic, index) => {
+    // ✅ 주제별 선택지
+    function generateOptions(topic, index) {
       if (topic.includes("자동차") || topic.includes("견적")) {
-        const carOptions = [
+        const car = [
           ["보유 중", "무보유", "렌트", "리스", "가족 차량", "기타"],
           ["현금", "할부", "리스", "렌트", "모름", "상담 원함"],
-          ["30만원 이하", "30~50만원", "50~80만원", "80~100만원", "100만 원 이상", "일시불"], // ✅ 수정 완료
+          ["30만원 이하", "30~50만원", "50~80만원", "80~100만원", "100만 원 이상", "일시불"],
           ["현대", "기아", "BMW", "벤츠", "제네시스", "기타"],
           ["즉시", "3개월 이내", "6개월 이내", "1년 이내", "1년 이상", "미정"],
           ["부담 없음", "보통", "조금 부담됨", "많이 부담됨", "모름", "기타"],
           ["매우 관심 있음", "관심 있음", "보통", "관심 없음", "모름", "기타"],
-          ["가격", "연비", "디자인", "브랜드", "안전성", "유지비"]
+          ["가격", "연비", "디자인", "브랜드", "안전성", "유지비"],
+          ["예", "아니오", "기억 안 남", "최근 1년 내 있음", "모름", "기타"],
+          ["있음", "없음", "고려 중", "모름", "상담 원함", "기타"]
         ];
-        return carOptions[index] || ["예", "아니오", "기타"];
-      }
-      else if (topic.includes("보험")) {
-        const insuranceOptions = [
+        return car[index] || ["예", "아니오", "기타"];
+      } else if (topic.includes("보험")) {
+        const ins = [
           ["1개", "2~3개", "4~5개", "6개 이상", "모름", "없음"],
           ["예", "아니오", "부분적으로", "모름", "상담 원함", "관심 없음"],
           ["예", "아니오", "고려 중", "이미 진행함", "모름", "기타"],
@@ -154,14 +163,14 @@
           ["있음", "없음", "진행 중", "보류 중", "모름", "기타"],
           ["있음", "없음", "모름", "조정 필요", "삭제 예정", "기타"],
           ["예", "아니오", "일부만", "모름", "가족 포함", "기타"],
-          ["정확히 알고 있음", "대략 알고 있음", "잘 모름", "관심 없음", "상담 원함", "기타"]
+          ["정확히 알고 있음", "대략 알고 있음", "잘 모름", "관심 없음", "상담 원함", "기타"],
+          ["유지 중", "해지함", "모름", "검토 중", "기타", "상담 원함"],
+          ["예", "아니오", "고민 중", "모름", "기타", "상담 원함"]
         ];
-        return insuranceOptions[index] || ["예", "아니오", "기타"];
+        return ins[index] || ["예", "아니오", "기타"];
       }
-      else {
-        return ["예", "아니오", "가끔", "자주", "모름", "기타"];
-      }
-    };
+      return ["예", "아니오", "가끔", "자주", "모름", "기타"];
+    }
 
     const questions = generateQuestions(topic);
     let current = 0;
@@ -179,11 +188,8 @@
         btn.onclick = () => {
           answers.push(opt);
           current++;
-          if (current < questions.length) {
-            renderQuestion();
-          } else {
-            submitAnswers();
-          }
+          if (current < questions.length) renderQuestion();
+          else submitAnswers();
         };
         optionsEl.appendChild(btn);
       });
@@ -192,18 +198,19 @@
 
     async function submitAnswers() {
       try {
-        const res = await fetch("https://noeulbitharu.onrender.com/api/analyze", {
+        const response = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic, answers })
         });
-        const data = await res.json();
+        const data = await response.json();
         if (!data.success) throw new Error(data.error);
         localStorage.setItem("aiResult", JSON.stringify(data));
         window.location.href = "result.html";
       } catch (err) {
-        errorBox.style.display = "block";
+        console.error("❌ 전송 오류:", err);
         errorBox.textContent = "결과 전송 실패. 다시 시도해주세요.";
+        errorBox.style.display = "block";
       }
     }
 
