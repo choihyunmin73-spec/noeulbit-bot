@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>노을빛하루 AI 진단 질문</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>노을빛하루 AI 진단 결과</title>
   <style>
     body {
       font-family: "Pretendard", "Noto Sans KR", sans-serif;
@@ -11,139 +11,150 @@
       color: #fff;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       text-align: center;
-      min-height: 100vh;
     }
+
     h2 {
       color: #6ba7ff;
       margin-top: 40px;
-      font-size: 1.7em;
+      font-size: 1.8em;
+      font-weight: 700;
     }
-    #question-box {
+
+    .result-box {
       background: #182539;
       border-radius: 16px;
       border: 1px solid #294e80;
       padding: 30px;
       width: 85%;
       max-width: 700px;
-      margin-top: 40px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      margin: 40px auto;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
     }
-    #question-text {
-      font-size: 1.2em;
+
+    .result-title {
+      font-size: 1.4em;
+      color: #a8c7ff;
+      margin-bottom: 20px;
+    }
+
+    .result-section {
+      text-align: left;
       line-height: 1.6em;
-      margin-bottom: 30px;
       color: #e1ecff;
-    }
-    .option {
-      background-color: #22324b;
-      border: 1px solid #315d93;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 10px 0;
-      transition: 0.2s;
-      cursor: pointer;
+      margin-bottom: 25px;
       font-size: 1.05em;
-      color: #cfe2ff;
+      white-space: pre-line;
     }
-    .option:hover {
+
+    .btn-area {
+      margin-top: 30px;
+    }
+
+    button {
+      background-color: #5b8cff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.2s;
+      margin: 5px;
+    }
+
+    button:hover {
       background-color: #3969b5;
-      color: #fff;
       transform: translateY(-2px);
     }
-    #progress {
-      margin-top: 25px;
-      font-size: 0.95em;
-      color: #a4b6d6;
+
+    footer {
+      color: #8899bb;
+      font-size: 0.9em;
+      margin: 30px 0;
     }
-    #progress-bar {
-      width: 80%;
-      height: 8px;
-      background-color: #22324b;
-      border-radius: 4px;
-      margin: 8px auto 0;
-      overflow: hidden;
-    }
-    #progress-fill {
-      height: 100%;
-      background-color: #5b8cff;
-      width: 0%;
-      transition: width 0.3s ease;
+
+    @media (max-width: 600px) {
+      h2 {
+        font-size: 1.5em;
+      }
+      .result-box {
+        width: 90%;
+        padding: 22px;
+      }
+      .result-section {
+        font-size: 0.95em;
+      }
     }
   </style>
 </head>
 <body>
-  <h2 id="topic-title">AI 건강 진단</h2>
+  <h2 id="result-title">AI 진단 결과</h2>
 
-  <div id="question-box">
-    <div id="question-text">질문을 불러오는 중입니다...</div>
-    <div id="options"></div>
-    <div id="progress"></div>
-    <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div class="result-box" id="result-box">
+    <div class="result-title" id="topic-name">주제: 불러오는 중...</div>
+    <div class="result-section" id="result-content">결과를 분석 중입니다...</div>
+
+    <div class="btn-area">
+      <button onclick="goHome()">처음으로 돌아가기</button>
+      <button onclick="retry()">다시 진단하기</button>
+    </div>
   </div>
 
+  <footer>© 2025 노을빛하루 AI 진단 시스템</footer>
+
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const topic = urlParams.get("topic");
-    document.getElementById("topic-title").innerText = `주제: ${topic}`;
+    const topic = localStorage.getItem("aiTopic");
+    const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
 
-    let surveyData = {};
-    let currentIndex = 0;
-    let answers = [];
+    // 주제 표시
+    document.getElementById("topic-name").innerText = topic
+      ? `주제: ${topic}`
+      : "주제 정보를 불러올 수 없습니다.";
 
-    // 설문 데이터 로드
-    fetch("survey.json")
-      .then((response) => response.json())
-      .then((data) => {
-        surveyData = data;
-        if (!surveyData[topic]) {
-          document.getElementById("question-text").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
-          return;
-        }
-        showQuestion();
-      })
-      .catch((err) => {
-        console.error("설문 로드 오류:", err);
-        document.getElementById("question-text").innerText = "문항 데이터를 불러오지 못했습니다.";
-      });
-
-    function showQuestion() {
-      const questions = surveyData[topic];
-      const questionData = questions[currentIndex];
-
-      document.getElementById("question-text").innerText = questionData.question;
-
-      const optionsDiv = document.getElementById("options");
-      optionsDiv.innerHTML = "";
-      questionData.choices.forEach((choice) => {
-        const btn = document.createElement("div");
-        btn.className = "option";
-        btn.innerText = choice;
-        btn.onclick = () => selectOption(choice);
-        optionsDiv.appendChild(btn);
-      });
-
-      // 진행상황 표시
-      const progressText = `질문 ${currentIndex + 1} / ${questions.length}`;
-      document.getElementById("progress").innerText = progressText;
-      const fillWidth = ((currentIndex + 1) / questions.length) * 100;
-      document.getElementById("progress-fill").style.width = fillWidth + "%";
+    // 기본 안내
+    const resultBox = document.getElementById("result-content");
+    if (!topic || answers.length === 0) {
+      resultBox.innerText = "이전 단계의 응답 데이터를 불러올 수 없습니다.\n다시 시도해주세요.";
+    } else {
+      analyzeResult(topic, answers);
     }
 
-    function selectOption(choice) {
-      answers.push(choice);
-      currentIndex++;
+    // ✅ 단순 분석 함수 (임시 요약)
+    function analyzeResult(topic, answers) {
+      let riskScore = 0;
+      const riskWords = ["심함", "악화", "위험", "불편", "통증", "저림", "어려움", "높음"];
 
-      if (currentIndex < surveyData[topic].length) {
-        showQuestion();
+      answers.forEach(a => {
+        riskWords.forEach(r => {
+          if (a.includes(r)) riskScore++;
+        });
+      });
+
+      let summary = "";
+      if (riskScore <= 2) {
+        summary = "현재 상태는 비교적 양호합니다.\n규칙적인 생활습관을 유지하세요.";
+      } else if (riskScore <= 5) {
+        summary = "경미한 주의가 필요합니다.\n생활습관 개선과 가벼운 운동을 권장드립니다.";
       } else {
-        // ✅ 로컬스토리지 방식으로 result.html로 데이터 전달
-        localStorage.setItem("aiAnswers", JSON.stringify(answers));
-        localStorage.setItem("aiTopic", topic);
-        window.location.href = "result.html";
+        summary = "건강 상태가 악화될 가능성이 있습니다.\n전문가 상담을 권장드립니다.";
+      }
+
+      // ✅ 결과 출력
+      resultBox.innerText = `총 응답 수: ${answers.length}개\n위험도 감지 단어 수: ${riskScore}개\n\n${summary}`;
+    }
+
+    function goHome() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    function retry() {
+      if (topic) {
+        localStorage.removeItem("aiAnswers");
+        window.location.href = `question.html?topic=${encodeURIComponent(topic)}`;
+      } else {
+        window.location.href = "index.html";
       }
     }
   </script>
