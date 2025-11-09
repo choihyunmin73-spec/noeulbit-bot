@@ -15,42 +15,60 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
     .box {
       background: #fff;
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      text-align: center;
-      width: 400px;
+      width: 480px;
+      max-width: 90%;
     }
     h2 {
       color: #1e293b;
       font-size: 20px;
       font-weight: 700;
       margin-bottom: 10px;
+      text-align: center;
     }
     p {
       color: #64748b;
       font-size: 14px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
+      text-align: center;
     }
-    label {
-      display: block;
-      text-align: left;
-      margin-bottom: 6px;
-      font-size: 14px;
-      color: #475569;
+    .question {
+      margin-bottom: 25px;
     }
-    input {
-      width: 100%;
-      padding: 10px;
+    .question h3 {
+      font-size: 15px;
+      color: #334155;
+      margin-bottom: 10px;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .option {
+      flex: 1 1 calc(50% - 8px);
+      background-color: #f1f5f9;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
       font-size: 14px;
-      margin-bottom: 20px;
-      outline: none;
+      transition: 0.2s;
+    }
+    .option:hover {
+      background-color: #e2e8f0;
+    }
+    .option.selected {
+      background-color: #2563eb;
+      color: white;
+      border-color: #1e40af;
     }
     button {
       width: 100%;
@@ -62,6 +80,7 @@
       font-size: 15px;
       cursor: pointer;
       font-weight: 600;
+      margin-top: 20px;
     }
     button:hover {
       background-color: #1e40af;
@@ -74,11 +93,7 @@
       background: #fee2e2;
       border-radius: 6px;
       padding: 8px;
-    }
-    .progress {
-      color: #475569;
-      font-size: 13px;
-      margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
@@ -86,24 +101,22 @@
   <div class="wrapper">
     <div class="box">
       <h2 id="title">AI 문항 자동 생성</h2>
-      <p id="desc">선택한 주제에 따라 맞춤 문항이 자동으로 생성됩니다.</p>
+      <p id="desc">선택한 주제에 따라 맞춤 문항이 자동 생성됩니다.</p>
 
-      <label>응답 입력 (쉼표로 구분)</label>
-      <input type="text" id="answers" placeholder="예: 피로, 두통, 어깨결림, 불면" />
+      <div id="questionList"></div>
 
       <button id="submitBtn">결과 보기</button>
-      <div id="progress" class="progress"></div>
       <div id="errorBox" class="error"></div>
     </div>
   </div>
 
   <script>
-    // ✅ URL에서 topic 파라미터 읽기
     const params = new URLSearchParams(window.location.search);
     const topic = params.get("topic");
-
     const title = document.getElementById("title");
     const desc = document.getElementById("desc");
+    const questionList = document.getElementById("questionList");
+    const errorBox = document.getElementById("errorBox");
 
     if (!topic) {
       document.body.innerHTML = `
@@ -115,47 +128,85 @@
     }
 
     title.textContent = `${topic} 진단`;
-    desc.textContent = `현재 "${topic}"에 대한 맞춤 문항을 생성 중입니다.`;
+    desc.textContent = `현재 "${topic}"에 대한 맞춤 문항을 자동 생성 중입니다.`;
 
-    // ✅ 버튼 클릭 시 서버로 분석 요청
+    // ✅ AI 문항 자동 생성 (임시 AI 모사)
+    const generateQuestions = (topic) => {
+      const base = [
+        "불편하거나 자주 겪는 증상은 무엇인가요?",
+        "이 문제가 언제부터 있었나요?",
+        "하루 중 증상이 가장 심한 시간대는?",
+        "생활습관 중 영향을 주는 요소가 있나요?",
+        "통증 또는 불편감의 강도는 어느 정도인가요?",
+        "스트레스나 피로가 관련되어 있나요?",
+        "증상이 일상생활에 얼마나 영향을 주나요?",
+        "최근 복용 중인 약물 또는 치료가 있나요?",
+        "휴식 후 증상 변화가 있나요?",
+        "병원 진료나 검사 이력이 있나요?"
+      ];
+      const shuffled = base.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 8 + Math.floor(Math.random() * 3));
+    };
+
+    const generateOptions = (questionIndex) => {
+      const sample = [
+        ["없음", "가끔", "자주", "매우 자주", "심함", "매우 심함"],
+        ["1주 이내", "1개월 이내", "3개월 이상", "6개월 이상", "1년 이상", "모름"],
+        ["오전", "오후", "저녁", "밤", "하루 종일", "불규칙"],
+        ["없음", "운동 부족", "흡연", "수면 부족", "스트레스", "카페인 섭취"],
+        ["거의 없음", "약간 있음", "보통", "심함", "매우 심함", "모름"],
+        ["아니오", "약간 관련 있음", "보통", "많이 관련 있음", "매우 관련 있음", "모름"],
+      ];
+      return sample[questionIndex % sample.length];
+    };
+
+    const questions = generateQuestions(topic);
+    questions.forEach((q, i) => {
+      const qDiv = document.createElement("div");
+      qDiv.classList.add("question");
+      qDiv.innerHTML = `<h3>문항 ${i + 1}. ${q}</h3>`;
+
+      const optionsDiv = document.createElement("div");
+      optionsDiv.classList.add("options");
+
+      const opts = generateOptions(i);
+      opts.forEach(opt => {
+        const o = document.createElement("div");
+        o.classList.add("option");
+        o.textContent = opt;
+        o.addEventListener("click", () => {
+          optionsDiv.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
+          o.classList.add("selected");
+        });
+        optionsDiv.appendChild(o);
+      });
+
+      qDiv.appendChild(optionsDiv);
+      questionList.appendChild(qDiv);
+    });
+
+    // ✅ 결과 전송
     document.getElementById("submitBtn").addEventListener("click", async () => {
-      const answersText = document.getElementById("answers").value.trim();
-      const progress = document.getElementById("progress");
-      const errorBox = document.getElementById("errorBox");
-
-      errorBox.style.display = "none";
-      progress.textContent = "";
-
-      if (!answersText) {
-        errorBox.textContent = "응답 내용을 입력해주세요.";
+      const selected = Array.from(document.querySelectorAll(".option.selected")).map(el => el.textContent);
+      if (selected.length < 5) {
+        errorBox.textContent = "모든 문항 또는 대부분의 문항을 선택해주세요.";
         errorBox.style.display = "block";
         return;
       }
 
-      const answers = answersText.split(",").map(a => a.trim());
-      progress.textContent = "문항 분석 중입니다...";
-
       try {
-        // ✅ 실제 API 경로로 수정
         const response = await fetch("https://noeulbitharu.onrender.com/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic, answers })
+          body: JSON.stringify({ topic, answers: selected })
         });
-
-        if (!response.ok) throw new Error("서버 응답 오류: " + response.status);
-
         const data = await response.json();
         if (!data.success) throw new Error(data.error || "결과 분석 실패");
-
         localStorage.setItem("aiResult", JSON.stringify(data));
         window.location.href = "result.html";
       } catch (err) {
-        console.error("❌ 전송 오류:", err);
         errorBox.textContent = "결과 전송에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.";
         errorBox.style.display = "block";
-      } finally {
-        progress.textContent = "";
       }
     });
   </script>
