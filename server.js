@@ -1,208 +1,164 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>노을빛하루 AI 진단 결과</title>
-  <style>
-    body {
-      font-family: 'Pretendard', sans-serif;
-      background-color: #0e1117;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      text-align: center;
-      margin-top: 40px;
-      color: #bcd4ff;
-      font-weight: 700;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      padding: 40px;
-    }
-    .card {
-      background-color: #1c1f26;
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
-      flex: 1;
-      min-width: 380px;
-      max-width: 600px;
-    }
-    .card h2 {
-      font-size: 20px;
-      color: #fff;
-      border-left: 4px solid #4685ff;
-      padding-left: 10px;
-      margin-bottom: 15px;
-    }
-    .card h3 {
-      color: #a2b5ff;
-      font-size: 16px;
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-    .bar {
-      width: 100%;
-      height: 6px;
-      border-radius: 4px;
-      background-color: #2f3542;
-      margin: 10px 0 20px;
-    }
-    .bar-inner {
-      height: 100%;
-      border-radius: 4px;
-      background-color: #4685ff;
-      width: 0;
-      transition: width 1s ease;
-    }
-    ul {
-      margin: 10px 0;
-      padding-left: 18px;
-      color: #d0d3da;
-    }
-    li { margin-bottom: 4px; }
+// ==============================
+// 🌇 노을빛하루 AI 진단 서버 (최종본)
+// ==============================
+const express = require("express");
+const path = require("path");
+const app = express();
 
-    .supplement-card {
-      background-color: #232731;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-    .supplement-card img {
-      width: 28px;
-      height: 28px;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-    .supplement-card strong {
-      font-size: 16px;
-      color: #fff;
-    }
-    .section-title {
-      color: #99b3ff;
-      font-size: 17px;
-      border-left: 3px solid #4685ff;
-      padding-left: 8px;
-      margin-top: 25px;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-  <h1>노을빛하루 AI 진단 결과</h1>
+app.use(express.json());
+app.use(express.static(__dirname)); // HTML, CSS, JS 직접 서빙
 
-  <div class="container">
-    <!-- 왼쪽: 진단 상세 -->
-    <div class="card" id="left-card">
-      <h2 id="topic">주제</h2>
-      <h3 id="level">진단 단계</h3>
-      <div class="bar"><div class="bar-inner" id="riskBar"></div></div>
-      <div><strong>위험도 지표:</strong> <span id="riskPercent">0</span>/100</div>
+// ==============================
+// ✅ 기본 라우팅
+// ==============================
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
-      <h3>상세 진단</h3>
-      <p id="detail">데이터 불러오는 중...</p>
+app.get("/question.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "question.html"));
+});
 
-      <h3>요약</h3>
-      <ul id="summary"></ul>
+app.get("/result.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "result.html"));
+});
 
-      <h3>전문가 의견</h3>
-      <ul id="opinion"></ul>
-    </div>
+// ==============================
+// ✅ 진단 분석 엔진
+// ==============================
+function analyzeTopic(topic, checks) {
+  const riskWords = ["심함", "악화", "어려움", "높음", "위험", "갑자기", "숨", "통증", "저림"];
+  let riskScore = 0;
+  checks.forEach(c => {
+    riskWords.forEach(r => {
+      if (c.includes(r)) riskScore++;
+    });
+  });
 
-    <!-- 오른쪽: 제휴상품 및 보험 -->
-    <div class="card" id="right-card">
-      <h2>제휴상품 (필요하신 영양제)</h2>
-      <div id="supplementList"></div>
+  // 위험도 계산
+  const riskPercent = Math.min(100, riskScore * 10);
+  const level =
+    riskPercent === 0 ? "정상 단계" :
+    riskPercent <= 30 ? "경미함 단계" :
+    riskPercent <= 60 ? "주의 단계" :
+    "고위험 단계";
 
-      <h2>제휴보험 (체크해 보세요)</h2>
-      <div id="insuranceList"></div>
-    </div>
-  </div>
+  // 초기 변수
+  let detail = "";
+  let supplements = [];
+  let advice = [];
+  let summary = [];
 
-  <script>
-    // ✅ 서버에서 전달받은 진단 데이터 가져오기
-    const result = JSON.parse(localStorage.getItem("aiResult"));
+  // ==============================
+  // 🧠 주제별 분석 로직
+  // ==============================
+  if (topic.includes("혈압")) {
+    detail = "혈압 관리가 필요한 단계입니다. 현재 혈압 수치가 일정하지 않다면 식이조절과 꾸준한 측정이 중요합니다.";
+    supplements = ["오메가3", "마그네슘", "코엔자임Q10"];
+    advice = [
+      "짜게 먹는 습관을 줄이고, 수분을 충분히 섭취하세요.",
+      "하루 30분 이상 가벼운 유산소 운동을 권장합니다.",
+      "혈압은 매일 같은 시간, 같은 자세로 측정하세요."
+    ];
+    summary = [
+      "혈압 수치 관리 필요",
+      "염분 섭취 줄이기 및 꾸준한 운동 권장"
+    ];
+  }
 
-    if (result) {
-      document.getElementById("topic").textContent = result.topic || "진단 결과";
-      document.getElementById("level").textContent = result.level || "단계 정보 없음";
-      document.getElementById("riskPercent").textContent = result.riskPercent || 0;
-      document.getElementById("detail").textContent = result.detail || "상세 진단 데이터 없음";
+  else if (topic.includes("혈당") || topic.includes("당뇨")) {
+    detail = "혈당 수치가 일시적으로 상승할 가능성이 있습니다. 식습관과 운동량 점검이 필요합니다.";
+    supplements = ["알파리포산", "크롬", "오메가3"];
+    advice = [
+      "단 음료, 빵, 주스 섭취를 줄이세요.",
+      "식사 후 20~30분 가벼운 걷기가 좋습니다.",
+      "혈당 기록을 꾸준히 남기세요."
+    ];
+    summary = ["혈당 조절 필요", "식단 조절 및 규칙적 운동 권장"];
+  }
 
-      const riskBar = document.getElementById("riskBar");
-      riskBar.style.width = `${result.riskPercent || 0}%`;
+  else if (topic.includes("수면") || topic.includes("불면")) {
+    detail = "수면 패턴의 불균형이 확인되었습니다. 스트레스와 수면 환경을 함께 관리해보세요.";
+    supplements = ["테아닌", "마그네슘", "GABA"];
+    advice = [
+      "취침 전 전자기기 사용을 줄이세요.",
+      "하루 일정한 수면 시간을 유지하세요.",
+      "잠들기 전 따뜻한 물로 족욕을 해보세요."
+    ];
+    summary = ["수면 질 개선 필요", "수면 위생 및 환경 관리 중요"];
+  }
 
-      // ✅ 요약 출력
-      const summaryEl = document.getElementById("summary");
-      summaryEl.innerHTML = (result.summary || [])
-        .map(item => `<li>${item}</li>`)
-        .join("");
+  else if (topic.includes("관절")) {
+    detail = "무릎, 어깨 등 관절 부위에 피로가 누적된 것으로 보입니다. 꾸준한 스트레칭이 필요합니다.";
+    supplements = ["MSM", "콜라겐", "오메가3"];
+    advice = [
+      "장시간 같은 자세를 피하고 자주 움직이세요.",
+      "체중 조절도 관절에 부담을 줄이는 데 도움이 됩니다.",
+      "칼슘과 단백질 섭취를 늘려보세요."
+    ];
+    summary = ["관절 건강 관리 필요", "스트레칭 및 체중 관리 권장"];
+  }
 
-      // ✅ 전문가 의견 출력 (advice → opinion 이름 통일)
-      const opinionEl = document.getElementById("opinion");
-      opinionEl.innerHTML = (result.opinion || result.advice || [])
-        .map(item => `<li>${item}</li>`)
-        .join("");
+  else if (topic.includes("시력") || topic.includes("눈") || topic.includes("노안")) {
+    detail = "눈의 피로도가 높습니다. 장시간 스마트폰, 모니터 사용을 줄이세요.";
+    supplements = ["루테인", "비타민A", "아스타잔틴"];
+    advice = [
+      "1시간마다 10분씩 먼 곳을 바라보세요.",
+      "눈을 비비지 말고 인공눈물을 활용하세요."
+    ];
+    summary = ["시력 피로 완화 필요", "루테인 및 항산화 영양소 섭취 권장"];
+  }
 
-      // ✅ 제휴상품 자동 매칭 (영양제)
-      const supplementMap = {
-        "오메가3": { name: "오메가3 트리플케어", desc: "혈압 및 혈중 중성지방 개선 도움" },
-        "마그네슘": { name: "마그네슘 밸런스", desc: "혈관 이완 및 스트레스 완화 지원" },
-        "코엔자임Q10": { name: "코엔자임Q10 플러스", desc: "심혈관 에너지 개선 및 피로 회복" },
-        "크롬": { name: "크롬 밸런스", desc: "혈당 조절 및 대사 기능 개선" },
-        "루테인": { name: "루테인 맥스비전", desc: "눈 건강 및 황반 색소 보호" },
-        "MSM": { name: "MSM 플렉스", desc: "관절 및 연골 건강 유지" },
-        "콜라겐": { name: "콜라겐 1000", desc: "피부 및 연골 탄력 강화" },
-        "비타민D": { name: "비타민D 데일리", desc: "면역 및 뼈 건강 지원" },
-        "비타민B": { name: "비타민B 컴플렉스", desc: "에너지 대사 및 피로 개선" },
-        "비타민C": { name: "비타민C 플러스", desc: "항산화 및 면역력 강화" },
-        "홍삼": { name: "홍삼 데일리", desc: "면역 및 피로 개선 도움" },
-        "쏘팔메토": { name: "쏘팔메토 포르테", desc: "전립선 건강 유지 및 배뇨 개선" },
-        "아연": { name: "아연 밸런스", desc: "면역 및 세포 기능 강화" },
-        "비타민E": { name: "비타민E 프리미엄", desc: "혈액순환 및 항산화 지원" },
-        "아스타잔틴": { name: "아스타잔틴 루테인 플러스", desc: "피로한 눈 보호 및 항산화" },
-        "테아닌": { name: "L-테아닌 릴렉스", desc: "스트레스 완화 및 수면 질 개선" },
-        "멜라토닌": { name: "멜라토닌 슬립케어", desc: "수면 유도 및 숙면 보조" }
-      };
+  else if (topic.includes("기억력") || topic.includes("치매")) {
+    detail = "기억력 저하 또는 집중력 문제가 감지되었습니다. 꾸준한 두뇌활동이 도움이 됩니다.";
+    supplements = ["오메가3", "포스파티딜세린", "은행잎추출물"];
+    advice = [
+      "하루 20분 독서나 글쓰기로 두뇌를 자극하세요.",
+      "규칙적인 수면과 산책이 기억력 유지에 도움됩니다."
+    ];
+    summary = ["기억력 관리 필요", "두뇌 자극 활동 권장"];
+  }
 
-      const supplementList = document.getElementById("supplementList");
-      (result.supplements || []).forEach(s => {
-        const info = supplementMap[s];
-        if (info) {
-          const div = document.createElement("div");
-          div.classList.add("supplement-card");
-          div.innerHTML = `
-            <img src="https://cdn-icons-png.flaticon.com/512/2913/2913135.png" alt="${info.name}">
-            <strong>${info.name}</strong><br>${info.desc}
-          `;
-          supplementList.appendChild(div);
-        }
-      });
+  else if (topic.includes("전립선") || topic.includes("배뇨")) {
+    detail = "전립선 또는 배뇨 기능에 약간의 변화가 감지되었습니다.";
+    supplements = ["아연", "쏘팔메토", "비타민E"];
+    advice = [
+      "카페인과 알코올 섭취를 줄이세요.",
+      "물을 자주, 조금씩 마시는 습관이 좋습니다."
+    ];
+    summary = ["전립선 건강 주의", "생활습관 개선 필요"];
+  }
 
-      // ✅ 제휴보험
-      const insuranceList = document.getElementById("insuranceList");
-      const insuranceData = [
-        { name: "고혈압·심장 보장보험", desc: "혈압·심혈관질환 보장 강화형 상품" },
-        { name: "만성질환 관리형 실손", desc: "정기 내과 진료 및 검사비 보장" }
-      ];
-      insuranceData.forEach(item => {
-        const div = document.createElement("div");
-        div.classList.add("supplement-card");
-        div.innerHTML = `
-          <img src="https://cdn-icons-png.flaticon.com/512/2920/2920345.png" alt="${item.name}">
-          <strong>${item.name}</strong><br>${item.desc}
-        `;
-        insuranceList.appendChild(div);
-      });
-    } else {
-      document.getElementById("detail").textContent = "결과 데이터를 불러올 수 없습니다.";
-    }
-  </script>
-</body>
-</html>
+  else {
+    detail = "현재 전반적인 건강상태는 양호합니다.";
+    supplements = ["멀티비타민", "유산균", "오메가3"];
+    advice = [
+      "균형 잡힌 식단을 유지하세요.",
+      "적당한 운동과 충분한 수면이 중요합니다."
+    ];
+    summary = ["전반적 양호", "기본 건강 관리 유지"];
+  }
+
+  // 결과 반환 (opinion 키 포함)
+  return { topic, level, riskPercent, detail, summary, opinion: advice, supplements };
+}
+
+// ==============================
+// ✅ API 라우터
+// ==============================
+app.post("/analyze", (req, res) => {
+  try {
+    const { topic, checks } = req.body;
+    const result = analyzeTopic(topic, checks);
+    res.json(result);
+  } catch (error) {
+    console.error("❌ 분석 오류:", error);
+    res.status(500).json({ error: "서버 내부 오류" });
+  }
+});
+
+// ==============================
+// ✅ 서버 실행
+// ==============================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 노을빛하루 AI 서버 실행중 (포트: ${PORT})`));
