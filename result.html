@@ -2,19 +2,20 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>AI 진단 결과 | 노을빛하루</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 종합 진단 결과 | 노을빛하루</title>
   <style>
     body {
       font-family: "Noto Sans KR", sans-serif;
+      background: #f3f6fb;
       margin: 0;
-      background: #f5f7fb;
+      padding: 0;
     }
     .header {
       background: #0f4fff;
-      color: white;
+      color: #fff;
       text-align: center;
-      padding: 20px;
+      padding: 22px;
       font-size: 22px;
       font-weight: 700;
     }
@@ -23,155 +24,171 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
-      padding: 30px;
+      padding: 25px;
     }
     .left, .right {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
       padding: 25px;
     }
     .left {
       flex: 1;
-      min-width: 420px;
-      max-width: 650px;
+      min-width: 300px;
+      max-width: 340px;
     }
     .right {
-      flex: 0.8;
-      min-width: 320px;
-      background: #f9fafc;
-      border: 1px solid #e2e8f0;
+      flex: 2;
+      min-width: 340px;
+      max-width: 600px;
     }
-    h2 {
+    .section-title {
+      font-size: 18px;
       color: #0f4fff;
-      font-size: 20px;
-      border-bottom: 2px solid #e5e7eb;
-      padding-bottom: 10px;
+      font-weight: 700;
+      border-bottom: 2px solid #dbe3ff;
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+    .summary, .opinion, .detail {
       margin-bottom: 20px;
     }
-    .risk-box {
-      background: #eef3ff;
-      border-left: 6px solid #2563eb;
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      font-weight: 600;
-      color: #1e293b;
-    }
-    ul {
-      padding-left: 18px;
-      color: #334155;
+    .summary li, .opinion li, .detail li {
+      margin: 6px 0;
+      color: #333;
       line-height: 1.6;
     }
-    .summary, .opinion {
-      margin-top: 20px;
-    }
-    .summary li {
-      list-style: square;
-    }
-    .opinion li {
-      list-style: disc;
-    }
-    .ads {
-      background: #fff;
-      border-radius: 10px;
-      padding: 18px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .ads h3 {
+    .risk {
+      background: #e8edff;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
       color: #0f4fff;
-      margin-top: 0;
-      font-size: 17px;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 18px;
     }
-    .ads a {
-      text-decoration: none;
-      color: #2563eb;
+    .partner-img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.25s;
+    }
+    .partner-img:hover {
+      border-color: #0f4fff;
+    }
+    .ad-title {
+      color: #1e293b;
+      font-size: 16px;
       font-weight: 600;
+      margin-bottom: 8px;
     }
     .footer {
       text-align: center;
-      color: #6b7280;
+      color: #64748b;
       font-size: 13px;
-      margin-top: 25px;
+      margin: 25px 0;
     }
     @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        align-items: center;
-      }
+      .container { flex-direction: column; align-items: center; }
+      .left, .right { width: 100%; max-width: 650px; }
     }
   </style>
 </head>
 <body>
   <div class="header">AI 종합 진단 결과</div>
   <div class="container">
+    
+    <!-- ✅ 좌측: 제휴상품 -->
     <div class="left">
-      <h2>진단 결과</h2>
-      <div id="risk" class="risk-box"></div>
-      <h3>세부 분석</h3>
-      <ul id="detail"></ul>
-      <div class="summary">
-        <h3>요약 정리</h3>
-        <ul id="summary"></ul>
-      </div>
-      <div class="opinion">
-        <h3>AI 의견</h3>
-        <ul id="opinion"></ul>
-      </div>
+      <div class="section-title">추천 제휴상품</div>
+      <img src="https://cdn-icons-png.flaticon.com/512/4319/4319103.png"
+           class="partner-img"
+           onclick="openLink('https://www.coupang.com/vp/products/6714055083')"
+           alt="영양제 추천" />
+      <div class="ad-title">AI 추천 건강 영양제</div>
+
+      <img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png"
+           class="partner-img"
+           onclick="openLink('https://www.coupang.com/vp/products/7042438821')"
+           alt="운동보조기기" />
+      <div class="ad-title">홈트레이닝 & 혈압 관리</div>
     </div>
 
+    <!-- ✅ 우측: 종합진단 결과 -->
     <div class="right">
-      <h2>추천 서비스</h2>
-      <div class="ads">
-        <h3>건강 맞춤 영양제</h3>
-        <p>AI가 분석한 건강 상태에 맞는 추천 영양제를 확인하세요.</p>
-        <a href="https://www.coupang.com/" target="_blank">👉 제휴 상품 보기</a>
+      <div id="topic" class="section-title"></div>
+      <div id="risk" class="risk"></div>
+
+      <div class="summary">
+        <div class="section-title">종합 요약</div>
+        <ul id="summary-list"></ul>
       </div>
-      <div class="ads">
-        <h3>시니어 전용 보험 비교</h3>
-        <p>60세 이상 어르신을 위한 실속형 보험을 AI가 비교합니다.</p>
-        <a href="https://www.naver.com" target="_blank">👉 제휴 보험 확인</a>
+
+      <div class="detail">
+        <div class="section-title">세부 진단</div>
+        <ul id="detail-list"></ul>
       </div>
-      <div class="ads">
-        <h3>자동차 견적 비교</h3>
-        <p>렌트, 리스, 할부 중 최적 조건을 자동으로 비교합니다.</p>
-        <a href="https://www.kbcapital.co.kr" target="_blank">👉 견적 바로보기</a>
+
+      <div class="opinion">
+        <div class="section-title">AI 전문가 의견</div>
+        <ul id="opinion-list"></ul>
       </div>
     </div>
   </div>
-  <div class="footer">© 2025 노을빛하루 | AI 건강·생활 진단</div>
+
+  <div class="footer">
+    © 2025 노을빛하루 | AI 건강 진단 서비스
+  </div>
 
   <script>
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const payloadParam = urlParams.get("payload");
-      let data;
+    function openLink(url) {
+      window.open(url, "_blank");
+    }
 
-      if (payloadParam) {
-        data = JSON.parse(decodeURIComponent(payloadParam));
-      } else {
-        data = JSON.parse(localStorage.getItem("aiResult"));
+    (function() {
+      const qs = new URLSearchParams(location.search);
+      const payload = qs.get("payload");
+      let data = null;
+
+      try {
+        data = payload ? JSON.parse(decodeURIComponent(payload)) : JSON.parse(localStorage.getItem("aiResult"));
+      } catch (e) {
+        console.error("❌ 데이터 파싱 오류:", e);
       }
 
       if (!data || !data.success) {
-        document.querySelector(".container").innerHTML =
-          "<div style='text-align:center;padding:60px;font-size:18px;'>❌ 결과 데이터를 불러오지 못했습니다.<br>처음으로 돌아가 주세요.</div>";
-      } else {
-        document.getElementById("risk").innerText =
-          `위험도 지수: ${data.risk}% | 주제: ${data.topic}`;
-        document.getElementById("detail").innerHTML =
-          data.detail.map(d => `<li>${d}</li>`).join("");
-        document.getElementById("summary").innerHTML =
-          data.summary.map(s => `<li>${s}</li>`).join("");
-        document.getElementById("opinion").innerHTML =
-          data.opinion.map(o => `<li>${o}</li>`).join("");
+        document.body.innerHTML = "<div style='padding:40px;text-align:center;'>결과 데이터를 불러올 수 없습니다.<br>처음으로 돌아가세요.</div>";
+        return;
       }
-    } catch (err) {
-      console.error("결과 표시 오류:", err);
-      document.querySelector(".container").innerHTML =
-        "<div style='text-align:center;padding:60px;font-size:18px;'>💥 데이터 처리 중 오류가 발생했습니다.</div>";
-    }
+
+      document.getElementById("topic").textContent = `📋 ${data.topic} 결과`;
+      document.getElementById("risk").textContent = `위험도: ${data.risk}%`;
+
+      const summaryList = document.getElementById("summary-list");
+      const detailList = document.getElementById("detail-list");
+      const opinionList = document.getElementById("opinion-list");
+
+      (data.summary || []).forEach(i => {
+        const li = document.createElement("li");
+        li.textContent = i;
+        summaryList.appendChild(li);
+      });
+
+      (data.detail || []).forEach(i => {
+        const li = document.createElement("li");
+        li.textContent = i;
+        detailList.appendChild(li);
+      });
+
+      (data.opinion || []).forEach(i => {
+        const li = document.createElement("li");
+        li.textContent = i;
+        opinionList.appendChild(li);
+      });
+    })();
   </script>
 </body>
 </html>
