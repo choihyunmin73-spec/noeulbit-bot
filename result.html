@@ -1,208 +1,184 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>노을빛하루 AI 진단 결과</title>
-<style>
-  body {
-    font-family: "Pretendard", system-ui, -apple-system, sans-serif;
-    background-color: #0d0f14;
-    color: #e8ecf3;
-    margin: 0;
-    padding: 0;
-  }
-
-  header {
-    text-align: center;
-    padding: 48px 20px 20px;
-  }
-
-  header h1 {
-    font-size: 26px;
-    font-weight: 700;
-  }
-
-  .container {
-    display: grid;
-    grid-template-columns: 1.4fr 0.9fr;
-    gap: 24px;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 20px 60px;
-  }
-
-  .card {
-    background: #151922;
-    border: 1px solid #2a2f3a;
-    border-radius: 14px;
-    padding: 28px;
-    box-shadow: 0 0 14px rgba(0,0,0,0.3);
-  }
-
-  .title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    color: #9aa0b1;
-    margin-top: 10px;
-  }
-
-  .progress-bar {
-    height: 10px;
-    background: #2a2f3a;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 8px;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: #4c8dff;
-    width: 0%;
-    transition: width 1s ease;
-  }
-
-  .section {
-    margin-top: 26px;
-  }
-
-  .section h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-
-  ul {
-    list-style: disc;
-    margin-left: 20px;
-    color: #cdd2de;
-  }
-
-  .product-card, .insurance-card {
-    background: #1b2130;
-    border: 1px solid #2a2f3a;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 14px;
-    cursor: pointer;
-    transition: all .25s ease;
-  }
-
-  .product-card:hover, .insurance-card:hover {
-    border-color: #4c8dff;
-    background: #232a3a;
-  }
-
-  .product-card img, .insurance-card img {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-
-  @media(max-width:900px){
-    .container { grid-template-columns:1fr; }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>노을빛하루 AI 진단 결과</title>
+  <style>
+    body {
+      font-family: "Pretendard", sans-serif;
+      background-color: #0b0f1a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #91b4ff;
+      margin-top: 30px;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 25px;
+      padding: 40px;
+      flex-wrap: wrap;
+    }
+    .panel {
+      background-color: #161b26;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 0 10px #111827;
+    }
+    .left-panel {
+      flex: 1 1 600px;
+      max-width: 700px;
+    }
+    .right-panel {
+      flex: 1 1 350px;
+      max-width: 400px;
+    }
+    .section-title {
+      font-size: 1.1em;
+      color: #ffffff;
+      margin-top: 25px;
+      margin-bottom: 10px;
+      border-left: 4px solid #3b82f6;
+      padding-left: 10px;
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #1f2937;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .progress {
+      height: 10px;
+      background-color: #3b82f6;
+      border-radius: 5px;
+      width: 0%;
+      transition: width 1s ease-in-out;
+    }
+    .affiliate-item, .insurance-item {
+      background-color: #1f2532;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .affiliate-item img, .insurance-item img {
+      width: 55px;
+      height: 55px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+    .affiliate-item a, .insurance-item a {
+      color: #93c5fd;
+      font-size: 0.9em;
+      text-decoration: none;
+    }
+    .affiliate-item a:hover, .insurance-item a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-<header>
   <h1>노을빛하루 AI 진단 결과</h1>
-</header>
+  <div class="container">
+    <!-- Left Panel -->
+    <div class="panel left-panel" id="resultPanel">
+      <h2 id="topicTitle">주제명 불러오는 중...</h2>
+      <p id="severity">진단 단계: -</p>
+      <div class="progress-bar"><div class="progress" id="riskProgress"></div></div>
+      <p id="riskScore">위험도 지표: -</p>
 
-<div class="container">
-  <!-- 좌측 결과 -->
-  <div class="card">
-    <div class="title" id="topicTitle">진단명</div>
-    <div class="progress-label">
-      <span id="riskLevel"></span>
-      <span>진행 단계</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="progress-label"><span id="riskValue"></span></div>
+      <div class="section-title">상세 진단</div>
+      <p id="detail"></p>
 
-    <div class="section">
-      <h3>상세 진단</h3>
-      <p id="detailText"></p>
-    </div>
+      <div class="section-title">요약</div>
+      <p id="summary"></p>
 
-    <div class="section">
-      <h3>요약</h3>
-      <ul id="summaryList"></ul>
+      <div class="section-title">전문가 의견</div>
+      <p id="expert"></p>
     </div>
 
-    <div class="section">
-      <h3>전문가 의견</h3>
-      <ul id="adviceList"></ul>
-    </div>
-  </div>
+    <!-- Right Panel -->
+    <div class="panel right-panel">
+      <div class="section-title">제휴상품 (필요하신 영양제)</div>
+      <div id="affiliateList"></div>
 
-  <!-- 우측 제휴정보 -->
-  <div class="card">
-    <h2>제휴업체 (필요하신 영양제)</h2>
-    <div id="supplementList"></div>
-
-    <h2 style="margin-top:28px;">제휴보험 (체크해 보세요)</h2>
-    <div class="insurance-card" onclick="window.open('https://insurance-link-example.com','_blank')">
-      <img src="https://via.placeholder.com/300x160.png?text=%EC%8B%9C%EB%8B%88%EC%96%B4+%EB%B3%B4%ED%97%98" alt="보험">
-      <h4>시니어 실손보험</h4>
-      <p>치매·혈압·당뇨 보장 중심 상품</p>
+      <div class="section-title">제휴보험 (체크해 보세요)</div>
+      <div id="insuranceList"></div>
     </div>
   </div>
-</div>
 
-<script>
-async function loadResult() {
-  const topic = new URLSearchParams(window.location.search).get("topic") || "건강 진단";
-  const answers = JSON.parse(localStorage.getItem("answers") || "[]");
+  <script>
+    const topic = localStorage.getItem("selectedTopic") || "혈압 관리";
 
-  const res = await fetch("/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic, checks: answers })
-  });
-  const data = await res.json();
+    async function loadResult() {
+      try {
+        const [analysisRes, affiliateRes] = await Promise.all([
+          fetch("analysis.json"),
+          fetch("affiliate.json")
+        ]);
+        const analysisData = await analysisRes.json();
+        const affiliateData = await affiliateRes.json();
 
-  document.getElementById("topicTitle").textContent = data.topic;
-  document.getElementById("riskLevel").textContent = data.level;
-  document.getElementById("riskValue").textContent = `위험도 지표: ${data.riskPercent}/100`;
-  document.getElementById("detailText").textContent = data.detail;
+        const data = analysisData[topic];
+        if (!data) {
+          document.getElementById("resultPanel").innerHTML =
+            "<p>결과 데이터를 찾을 수 없습니다.</p>";
+          return;
+        }
 
-  document.getElementById("progressFill").style.width = `${data.riskPercent}%`;
+        // 좌측 데이터
+        document.getElementById("topicTitle").textContent = topic;
+        document.getElementById("severity").textContent = `${data.stage || "경미함"} 단계`;
+        document.getElementById("riskScore").textContent = `위험도 지표: ${data.risk || "0"}/100`;
+        document.getElementById("detail").textContent = data.detail || "상세 진단 데이터 없음";
+        document.getElementById("summary").textContent = data.summary || "요약 데이터 없음";
+        document.getElementById("expert").textContent = data.expert || "전문가 의견 데이터 없음";
+        document.getElementById("riskProgress").style.width = `${data.risk || 0}%`;
 
-  const summaryList = document.getElementById("summaryList");
-  data.summary.forEach(s => {
-    const li = document.createElement("li");
-    li.textContent = s;
-    summaryList.appendChild(li);
-  });
+        // 우측 제휴상품
+        const affiliateList = affiliateData[topic]?.products || [];
+        const affiliateContainer = document.getElementById("affiliateList");
+        affiliateList.slice(0, 3).forEach(p => {
+          const div = document.createElement("div");
+          div.className = "affiliate-item";
+          div.innerHTML = `
+            <img src="${p.image}" alt="${p.name}">
+            <div>
+              <strong>${p.name}</strong><br>
+              <a href="${p.link}" target="_blank">${p.desc}</a>
+            </div>`;
+          affiliateContainer.appendChild(div);
+        });
 
-  const adviceList = document.getElementById("adviceList");
-  data.advice.forEach(s => {
-    const li = document.createElement("li");
-    li.textContent = s;
-    adviceList.appendChild(li);
-  });
+        // 우측 제휴보험
+        const insuranceList = affiliateData[topic]?.insurance || [];
+        const insuranceContainer = document.getElementById("insuranceList");
+        insuranceList.slice(0, 2).forEach(i => {
+          const div = document.createElement("div");
+          div.className = "insurance-item";
+          div.innerHTML = `
+            <img src="${i.image}" alt="${i.name}">
+            <div>
+              <strong>${i.name}</strong><br>
+              <a href="${i.link}" target="_blank">${i.desc}</a>
+            </div>`;
+          insuranceContainer.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        document.getElementById("resultPanel").innerHTML = "<p>데이터 로드 중 오류가 발생했습니다.</p>";
+      }
+    }
 
-  const supplementList = document.getElementById("supplementList");
-  data.supplements.forEach(s => {
-    const div = document.createElement("div");
-    div.className = "product-card";
-    div.innerHTML = `
-      <img src="https://via.placeholder.com/300x160.png?text=${s}" alt="${s}">
-      <h4>${s}</h4>
-      <p>${s} 관련 건강기능식품 바로가기</p>
-    `;
-    div.onclick = () => window.open('https://www.coupang.com/np/search?component=&q=' + encodeURIComponent(s));
-    supplementList.appendChild(div);
-  });
-}
-loadResult();
-</script>
+    loadResult();
+  </script>
 </body>
 </html>
