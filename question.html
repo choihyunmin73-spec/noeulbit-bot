@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>노을빛하루 AI 진단 질문</title>
+  <title>노을빛하루 AI 건강 진단</title>
   <style>
     body {
       font-family: "Pretendard", "Noto Sans KR", sans-serif;
-      background-color: #0d1420;
+      background-color: #0b1320;
       color: #fff;
       margin: 0;
       padding: 0;
@@ -18,10 +18,9 @@
       min-height: 100vh;
     }
     h2 {
-      color: #6ba7ff;
+      color: #6aa8ff;
       margin-top: 40px;
       font-size: 1.8em;
-      font-weight: 700;
     }
     #question-box {
       background: #182539;
@@ -29,9 +28,9 @@
       border: 1px solid #294e80;
       padding: 30px;
       width: 85%;
-      max-width: 700px;
+      max-width: 720px;
       margin-top: 40px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
     }
     #question-text {
       font-size: 1.2em;
@@ -45,7 +44,7 @@
       border-radius: 10px;
       padding: 15px;
       margin: 10px 0;
-      transition: 0.2s;
+      transition: all 0.2s;
       cursor: pointer;
       font-size: 1.05em;
       color: #cfe2ff;
@@ -60,19 +59,29 @@
       font-size: 0.95em;
       color: #a4b6d6;
     }
-    #bar {
-      height: 6px;
-      border-radius: 3px;
-      background: #253553;
-      margin-top: 8px;
+    #progress-bar {
+      width: 80%;
+      height: 8px;
+      background-color: #22324b;
+      border-radius: 4px;
+      margin: 8px auto 0;
       overflow: hidden;
     }
-    #bar span {
-      display: block;
+    #progress-fill {
       height: 100%;
-      width: 0;
-      background: #6ba7ff;
+      background-color: #5b8cff;
+      width: 0%;
       transition: width 0.3s ease;
+    }
+    #back-btn {
+      margin-top: 30px;
+      color: #a7b8d8;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+    #back-btn:hover {
+      text-decoration: underline;
+      color: #ffffff;
     }
   </style>
 </head>
@@ -80,21 +89,24 @@
   <h2 id="topic-title">AI 건강 진단</h2>
 
   <div id="question-box">
-    <div id="question-text">질문을 불러오는 중입니다...</div>
+    <div id="question-text">문항을 불러오는 중입니다...</div>
     <div id="options"></div>
     <div id="progress"></div>
-    <div id="bar"><span></span></div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
+
+  <div id="back-btn" onclick="goBack()">← 처음으로 돌아가기</div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const topic = urlParams.get("topic");
+    const topic = urlParams.get("topic") || "종합 건강 체크";
     document.getElementById("topic-title").innerText = `주제: ${topic}`;
 
     let surveyData = {};
     let currentIndex = 0;
     let answers = [];
 
+    // ✅ 설문 데이터 로드
     fetch("survey.json")
       .then((response) => response.json())
       .then((data) => {
@@ -105,17 +117,21 @@
         }
         showQuestion();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("설문 로드 오류:", err);
         document.getElementById("question-text").innerText = "문항 데이터를 불러오지 못했습니다.";
       });
 
+    // ✅ 질문 표시 함수
     function showQuestion() {
-      const q = surveyData[topic][currentIndex];
-      document.getElementById("question-text").innerText = q.question;
+      const questions = surveyData[topic];
+      const questionData = questions[currentIndex];
+
+      document.getElementById("question-text").innerText = questionData.question;
 
       const optionsDiv = document.getElementById("options");
       optionsDiv.innerHTML = "";
-      q.choices.forEach((choice) => {
+      questionData.choices.forEach((choice) => {
         const btn = document.createElement("div");
         btn.className = "option";
         btn.innerText = choice;
@@ -123,15 +139,14 @@
         optionsDiv.appendChild(btn);
       });
 
-      updateProgress();
+      const progressText = `질문 ${currentIndex + 1} / ${questions.length}`;
+      document.getElementById("progress").innerText = progressText;
+
+      const fillWidth = ((currentIndex + 1) / questions.length) * 100;
+      document.getElementById("progress-fill").style.width = fillWidth + "%";
     }
 
-    function updateProgress() {
-      const total = surveyData[topic].length;
-      document.getElementById("progress").innerText = `질문 ${currentIndex + 1} / ${total}`;
-      document.querySelector("#bar span").style.width = `${((currentIndex + 1) / total) * 100}%`;
-    }
-
+    // ✅ 선택 시
     function selectOption(choice) {
       answers.push(choice);
       currentIndex++;
@@ -139,23 +154,16 @@
       if (currentIndex < surveyData[topic].length) {
         showQuestion();
       } else {
-        // ✅ POST 방식으로 서버에 분석 요청
-        fetch("/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic, answers }),
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.ok && data.result) {
-            localStorage.setItem("aiResult", JSON.stringify(data.result));
-            window.location.href = "result.html";
-          } else {
-            alert("분석 처리 중 오류가 발생했습니다.");
-          }
-        })
-        .catch(() => alert("서버 연결에 실패했습니다."));
+        // ✅ 로컬 스토리지 저장 후 결과 페이지 이동
+        localStorage.setItem("aiAnswers", JSON.stringify(answers));
+        localStorage.setItem("aiTopic", topic);
+        window.location.href = "result.html";
       }
+    }
+
+    // ✅ 처음으로 돌아가기
+    function goBack() {
+      window.location.href = "index.html";
     }
   </script>
 </body>
