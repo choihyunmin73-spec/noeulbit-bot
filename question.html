@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>노을빛하루 AI 진단 - 질문</title>
+<title>노을빛하루 AI 문항</title>
 <style>
   body {
     font-family: "Pretendard", system-ui, -apple-system, sans-serif;
@@ -15,166 +15,146 @@
 
   header {
     text-align: center;
-    padding: 40px 20px 20px;
+    padding: 40px 20px 10px;
   }
 
   header h1 {
-    font-size: 26px;
-    margin-bottom: 6px;
-    color: #e8ecf3;
+    font-size: 24px;
+    font-weight: 700;
   }
 
   header p {
+    font-size: 14px;
     color: #9aa0b1;
-    font-size: 15px;
   }
 
-  .question-box {
-    max-width: 800px;
+  .progress {
+    height: 6px;
+    width: 80%;
+    background: #2a2f3a;
+    border-radius: 10px;
+    margin: 30px auto;
+    overflow: hidden;
+  }
+  .fill {
+    height: 100%;
+    width: 0%;
+    background: #4c8dff;
+    transition: width 0.5s ease;
+  }
+
+  .card {
     background: #151922;
     border: 1px solid #2a2f3a;
-    border-radius: 16px;
-    padding: 30px 24px;
-    margin: 40px auto;
+    border-radius: 14px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
     box-shadow: 0 0 14px rgba(0,0,0,0.3);
   }
 
-  .question-text {
-    font-size: 20px;
+  .question {
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 24px;
-    color: #e8ecf3;
+    margin-bottom: 20px;
   }
 
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  button.option {
+  .option {
+    display: block;
     background: #1b2130;
-    color: #e8ecf3;
     border: 1px solid #2a2f3a;
     border-radius: 10px;
-    padding: 14px;
-    font-size: 16px;
+    padding: 12px 14px;
+    margin: 10px 0;
     cursor: pointer;
-    transition: all .25s ease;
+    transition: all 0.25s ease;
+    text-align: center;
   }
 
-  button.option:hover {
+  .option:hover {
     background: #232a3a;
     border-color: #4c8dff;
-    color: #4c8dff;
   }
 
-  .progress-container {
-    max-width: 800px;
-    margin: 20px auto 10px;
-    padding: 0 24px;
-  }
-
-  .progress-bar {
-    height: 8px;
-    background: #2a2f3a;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    width: 0%;
-    height: 100%;
-    background: #4c8dff;
-    transition: width .4s ease;
-  }
-
-  footer {
+  .footer {
     text-align: center;
-    color: #666;
-    font-size: 13px;
-    padding: 30px 0 20px;
-    border-top: 1px solid #2a2f3a;
-    margin-top: 50px;
-  }
-
-  @media(max-width:600px){
-    .question-text { font-size:18px; }
+    font-size: 14px;
+    color: #707783;
+    margin-top: 40px;
   }
 </style>
 </head>
 <body>
-
 <header>
   <h1 id="topicTitle">AI 진단</h1>
-  <p>문항에 답해주세요. 마지막에 결과가 자동으로 분석됩니다.</p>
+  <p>문항에 답해주세요. 마지막 문항 후 결과가 자동 분석됩니다.</p>
 </header>
 
-<div class="progress-container">
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress"></div>
-  </div>
+<div class="progress"><div class="fill" id="progressBar"></div></div>
+
+<div class="card">
+  <div class="question" id="questionText">문항이 불러오는 중입니다...</div>
+  <div id="options"></div>
 </div>
 
-<div class="question-box">
-  <div class="question-text" id="questionText"></div>
-  <div class="options" id="options"></div>
+<div class="footer">
+  노을빛하루 AI 종합 진단 시스템
 </div>
-
-<footer>© 2025 노을빛하루 AI 진단 시스템</footer>
 
 <script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const topic = urlParams.get("topic") || "건강 진단";
-  document.getElementById("topicTitle").textContent = topic;
+let topic = new URLSearchParams(window.location.search).get("topic");
+let surveyData = {};
+let currentIndex = 0;
+let selectedAnswers = [];
 
-  // 예시 문항 구조 (필요 시 topic별로 교체 가능)
-  const questions = [
-    { text: "최근 들어 해당 부위에 불편함을 느낀 적이 있나요?", options: ["거의 없음", "가끔 있음", "자주 있음"] },
-    { text: "증상이 일상생활에 영향을 주나요?", options: ["전혀 없음", "조금 있음", "많이 있음"] },
-    { text: "최근 1주일 내 관련 증상이 악화된 적이 있나요?", options: ["아니오", "약간", "예"] },
-    { text: "관련 질환 이력이 있나요?", options: ["없음", "있음", "확진받음"] },
-    { text: "생활습관(식사, 수면, 운동)에 변화가 있었나요?", options: ["없음", "조금 있음", "많이 있음"] },
-    { text: "최근 피로감이나 집중력 저하가 느껴지나요?", options: ["없음", "약간", "심함"] },
-    { text: "병원 진료나 검사를 받은 적이 있나요?", options: ["없음", "예, 1회", "예, 지속적으로"] },
-    { text: "현재 해당 증상으로 불안감을 느끼시나요?", options: ["없음", "약간 있음", "심하게 있음"] }
-  ];
+async function loadSurvey() {
+  const res = await fetch("survey.json");
+  surveyData = await res.json();
 
-  let current = 0;
-  const answers = [];
-
-  const qText = document.getElementById("questionText");
-  const qOpts = document.getElementById("options");
-  const progress = document.getElementById("progress");
-
-  function renderQuestion() {
-    const q = questions[current];
-    qText.textContent = `${current + 1}. ${q.text}`;
-    qOpts.innerHTML = "";
-    q.options.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.className = "option";
-      btn.textContent = opt;
-      btn.onclick = () => handleAnswer(opt);
-      qOpts.appendChild(btn);
-    });
-    progress.style.width = `${((current)/questions.length)*100}%`;
+  if (!surveyData[topic]) {
+    document.getElementById("questionText").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
+    return;
   }
 
-  function handleAnswer(answer) {
-    answers.push(answer);
-    current++;
-    if (current < questions.length) {
-      renderQuestion();
-    } else {
-      progress.style.width = "100%";
-      // 결과 페이지로 이동
-      localStorage.setItem("answers", JSON.stringify(answers));
-      window.location.href = `result.html?topic=${encodeURIComponent(topic)}`;
-    }
-  }
+  document.getElementById("topicTitle").innerText = topic;
+  showQuestion();
+}
 
-  renderQuestion();
+function showQuestion() {
+  const topicSet = surveyData[topic];
+  const total = topicSet.count;
+  const seeds = topicSet.seeds;
+  const pool = topicSet.option_pool;
+  const randomSeed = seeds[currentIndex % seeds.length];
+  const randomOptions = pool.slice(0, topicSet.min_options);
+
+  document.getElementById("progressBar").style.width = `${(currentIndex / total) * 100}%`;
+  document.getElementById("questionText").innerText = `${currentIndex + 1}. ${randomSeed}`;
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  randomOptions.forEach(opt => {
+    const btn = document.createElement("div");
+    btn.className = "option";
+    btn.innerText = opt;
+    btn.onclick = () => selectOption(opt);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function selectOption(opt) {
+  selectedAnswers.push(opt);
+  const topicSet = surveyData[topic];
+  if (currentIndex + 1 >= topicSet.count) {
+    localStorage.setItem("answers", JSON.stringify(selectedAnswers));
+    window.location.href = `result.html?topic=${encodeURIComponent(topic)}`;
+  } else {
+    currentIndex++;
+    showQuestion();
+  }
+}
+
+loadSurvey();
 </script>
 </body>
 </html>
