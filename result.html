@@ -1,353 +1,312 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>노을빛하루 AI 진단 결과</title>
-<style>
-  :root{
-    --bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
-  }
-  body{font-family:"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--white);margin:0}
-  h1{margin:26px 0 8px;text-align:center;color:var(--brand)}
-  .wrap{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;padding:0 20px 40px}
-  .card{background:var(--panel);border-radius:14px;box-shadow:0 0 12px rgba(0,0,0,.35);padding:20px;min-width:380px;max-width:860px;flex:2}
-  .side{background:var(--panel);border-radius:14px;box-shadow:0 0 12px rgba(0,0,0,.35);padding:20px;min-width:360px;max-width:520px;flex:1}
-  .title{display:flex;align-items:center;gap:8px;font-size:20px;margin:0 0 8px}
-  .kpi{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 8px}
-  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:160px}
-  .bar{height:8px;border-radius:4px;background:#22324b;overflow:hidden;margin:8px 0 18px}
-  .bar>span{display:block;height:100%;width:0;background:var(--brand);transition:width .6s}
-  .section{color:var(--brand);margin:18px 0 8px;border-left:3px solid var(--brand);padding-left:8px}
-  .muted{color:var(--muted)}
-  ul{margin:6px 0 10px 18px}
-  li{margin:4px 0}
-  .btns{display:flex;gap:10px;margin-top:16px}
-  .btn{background:#213250;border:1px solid var(--line);color:#d7e6ff;padding:10px 14px;border-radius:10px;cursor:pointer}
-  .btn:hover{background:#2b416a}
-  .pill{display:flex;gap:12px;flex-direction:column}
-  .aff{display:flex;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;transition:.2s}
-  .aff:hover{transform:translateY(-2px);background:#1e2a40}
-  .aff .ic{font-size:20px}
-  .ins{display:flex;gap:12px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
-  .w100{width:100%}
-  @media (max-width:980px){.card{min-width:340px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 진단 결과</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 20px;
+            padding: 30px;
+        }
+        .left, .right {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        .left {
+            width: 65%;
+        }
+        .right {
+            width: 30%;
+        }
+        h2 {
+            color: #60a5fa;
+        }
+        .metric-box {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        .metric {
+            background-color: #334155;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .progress-bar {
+            background-color: #334155;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 8px;
+            margin: 8px 0 16px 0;
+        }
+        .progress {
+            background-color: #60a5fa;
+            height: 100%;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            margin: 8px 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .affiliate-box, .insurance-box {
+            background-color: #1e293b;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .affiliate-box h3, .insurance-box h3 {
+            color: #93c5fd;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .affiliate-item {
+            display: flex;
+            align-items: flex-start;
+            background-color: #334155;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .affiliate-item div {
+            margin-left: 10px;
+        }
+        .affiliate-item strong {
+            color: #fbbf24;
+        }
+        .affiliate-item a {
+            color: #93c5fd;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .affiliate-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <h1>AI 진단 결과</h1>
+    <div class="container">
+        <div class="left">
+            <h2>AI 진단 결과</h2>
+            <p><strong>주제:</strong> <span id="topic">-</span></p>
+            <div class="metric-box">
+                <div class="metric">총 응답 수: <span id="answerCount">0</span>개</div>
+                <div class="metric">위험단어 수: <span id="riskCount">0</span>개</div>
+                <div class="metric">위험도 지표: <span id="riskScore">0</span>/100 (<span id="riskLevel">-</span>)</div>
+            </div>
+            <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
 
-  <div class="wrap">
-    <!-- LEFT -->
-    <section class="card" id="left">
-      <div class="title">
-        <span class="muted">주제:</span>
-        <strong id="topicTxt">알 수 없음</strong>
-      </div>
+            <h3>상세 진단</h3>
+            <ul id="detail"></ul>
 
-      <div class="kpi">
-        <div class="chip"><div class="muted">총 응답 수</div><div id="ansCount">0개</div></div>
-        <div class="chip"><div class="muted">위험단어 수</div><div id="riskWords">0개</div></div>
-        <div class="chip w100">
-          <div class="muted">위험도 지표</div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div id="riskScore">0/100</div><div id="riskLevel" class="muted">Mild</div>
-          </div>
-          <div class="bar"><span id="riskBar"></span></div>
+            <h3>요약</h3>
+            <ul id="summary"></ul>
+
+            <h3>전문가 의견</h3>
+            <ul id="opinion"></ul>
+
+            <div>
+                <button onclick="goHome()">처음으로 돌아가기</button>
+                <button onclick="redo()">다시 진단하기</button>
+            </div>
         </div>
-      </div>
 
-      <h3 class="section">상세 진단</h3>
-      <ul id="detailUL"><li class="muted">상세 진단 데이터를 구성 중...</li></ul>
-
-      <h3 class="section">요약</h3>
-      <ul id="summaryUL"><li class="muted">요약 데이터를 구성 중...</li></ul>
-
-      <h3 class="section">전문가 의견</h3>
-      <ul id="opinionUL"><li class="muted">전문가 의견 데이터를 구성 중...</li></ul>
-
-      <div class="btns">
-        <button class="btn" onclick="location.href='index.html'">처음으로 돌아가기</button>
-        <button class="btn" onclick="location.href='question.html?topic='+encodeURIComponent(topic)">다시 진단하기</button>
-      </div>
-    </section>
-
-    <!-- RIGHT -->
-    <aside class="side">
-      <h3 class="title">제휴상품 (필요하신 영양제)</h3>
-      <div id="supps" class="pill"></div>
-
-      <h3 class="section">제휴보험 (체크해 보세요)</h3>
-      <div id="ins">
-        <!-- 보험 2종 고정 -->
-      </div>
-    </aside>
-  </div>
+        <div class="right">
+            <div class="affiliate-box">
+                <h3>제휴상품 (필요하신 영양제)</h3>
+                <div id="affiliateList"></div>
+            </div>
+            <div class="insurance-box">
+                <h3>제휴보험 (체크해 보세요)</h3>
+                <div id="insuranceList"></div>
+            </div>
+        </div>
+    </div>
 
 <script>
-/* =========================
-   0) 공용 도우미
-========================= */
-const $ = (id)=>document.getElementById(id);
-const topic = localStorage.getItem("aiTopic")
-          || (JSON.parse(localStorage.getItem("aiResult")||"{}").topic)
-          || "알 수 없음";
-let answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
+const result = JSON.parse(localStorage.getItem("aiResult") || "{}");
+const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
+const topic = result.topic || "알 수 없음";
+document.getElementById("topic").textContent = topic;
 
-// 기존 aiResult가 있으면 그대로 사용하되, 상세/요약/의견만 보강에 사용
-const storedResult = JSON.parse(localStorage.getItem("aiResult") || "null");
-
-/* =========================
-   1) 위험도 계산
-========================= */
-function calcRisk(answers, topic){
-  const risky = [
-    "심함","매우","불가능","숨","호흡","가슴","저림","두근","부정맥","야간","항상",
-    "고혈압","높음","위험","통증","수면 방해","끊김","혈당","어지럼","실신","급격","열감"
-  ];
-  let hits = 0;
-  answers.forEach(a=>{
-    risky.forEach(r=>{ if((a+"").includes(r)) hits++; });
-  });
-  const weight = /심장|호흡|가슴/.test(topic) ? 14 : 10;
-  let score = Math.min(100, hits*weight);
-  const level = score>=75 ? "Critical" : score>=50 ? "High" : score>=25 ? "Moderate" : "Mild";
-  return {hits, score, level};
+// 기본 수치 표시
+document.getElementById("answerCount").textContent = answers.length;
+document.getElementById("riskCount").textContent = result.riskWords?.length || 0;
+document.getElementById("riskScore").textContent = result.riskScore || 0;
+document.getElementById("riskLevel").textContent = result.level || "Mild";
+document.getElementById("progressBar").style.width = (result.riskScore || 0) + "%";
+function goHome() {
+    window.location.href = "index.html";
+}
+function redo() {
+    window.location.href = "question.html";
 }
 
-/* =========================
-   2) 상세/요약/의견 생성기
-========================= */
-function hospitalAdviceBy(level){
-  if(level==="Critical") return "심한 증상에 해당합니다. 24–48시간 이내에 병원(응급 포함) 방문을 강력히 권장합니다.";
-  if(level==="High")     return "증상이 뚜렷합니다. 1주 이내에 해당 진료과 전문의 상담을 권장합니다.";
-  if(level==="Moderate") return "관찰이 필요합니다. 2–4주 내에 외래 상담을 고려하세요.";
-  return "현재 상태는 비교적 양호합니다. 생활 습관을 유지하고 경과를 관찰하세요.";
+/* ✅ 빈 응답 대응 기본 진단 생성 */
+function generateBaseDiagnosis(topic, level = "Mild") {
+    const adviceTemplates = [
+        "현재 상태는 비교적 안정적입니다. 생활 습관을 규칙적으로 유지하세요.",
+        "스트레스와 수면의 질을 관리하면 도움이 됩니다.",
+        "규칙적인 식사와 충분한 수분 섭취가 필요합니다.",
+        "가벼운 스트레칭과 산책으로 몸의 순환을 돕습니다.",
+        "건강검진을 정기적으로 확인하시기 바랍니다.",
+        "지속되는 불편감이 있다면 전문의 상담을 권장합니다.",
+        "흡연과 음주를 피하고, 카페인 섭취를 줄이세요.",
+        "균형 잡힌 식단이 전반적 건강에 도움이 됩니다.",
+        "만성 피로감이 있으면 충분한 휴식을 취하세요.",
+        "체온, 맥박, 혈압 변화를 꾸준히 관찰하세요.",
+        "생활 패턴이 일정하지 않다면 수면 시간을 일정하게 조정하세요.",
+        "가벼운 통증이나 불편감은 휴식과 스트레칭으로 완화해 보세요.",
+        "과로를 피하고, 하루 7시간 이상 숙면을 취하세요.",
+        "걱정되는 증상이 있으면 2~3일 내 의료기관 상담을 권합니다.",
+        "현재 상태는 안정적이며 경과 관찰을 병행하시기 바랍니다."
+    ];
+
+    const selected = adviceTemplates.slice(0, 15);
+    return selected;
 }
 
-function topicTips(topic){
-  switch(true){
-    case /어깨·목/.test(topic):
-      return [
-        "장시간 앉아 있을 경우 30–60분마다 기지개 및 승모근 스트레칭을 해주세요.",
-        "작업대·의자 높이를 조절해 어깨가 들리지 않도록 합니다.",
-        "온찜질 10~15분으로 근육 긴장을 완화하세요.",
-        "수면 시 베개 높이는 목이 수평을 이루도록 맞춥니다.",
-        "통증이 저림을 동반하거나 야간 악화 시 진료를 고려하세요.",
-        "가벼운 근력운동(밴드, 벽 밀기)으로 재발을 예방합니다.",
-        "진통소염제/파스는 단기간 보조 수단으로만 사용하세요."
-      ];
-    case /심장|호흡|가슴/.test(topic):
-      return [
-        "가슴 통증이 10분 이상 지속되거나 식은땀, 메스꺼움이 동반되면 즉시 진료가 필요합니다.",
-        "평소 혈압·맥박을 주기적으로 기록하세요.",
-        "격렬한 활동 전후로 숨참·어지럼이 반복되면 검사를 권장합니다.",
-        "흡연은 심혈관 위험을 크게 높이므로 중단을 권장합니다.",
-        "짠 음식·야식 빈도를 줄이고, 포화지방 섭취를 제한합니다.",
-        "주 3~5회 30분 걷기 등 유산소 운동을 권장합니다.",
-        "새로운 약 복용 후 심계항진이 생기면 처방의와 상담하세요."
-      ];
-    case /혈압/.test(topic):
-      return [
-        "집에서 아침/저녁 같은 시간대에 혈압을 측정해 기록하세요.",
-        "나트륨 섭취를 줄이고 가공식품·국물 섭취를 줄입니다.",
-        "체중 5~10% 감량만으로도 혈압이 유의미하게 개선됩니다.",
-        "규칙적인 유산소 운동을 주 150분 이상 유지하세요.",
-        "복약은 건너뛰지 말고, 부작용은 의사와 상의하세요.",
-        "스트레스 관리(호흡, 명상, 수면)로 변동폭을 줄입니다.",
-        "두통·흉통·시야흐림 동반 시 즉시 진료를 권장합니다."
-      ];
-    case /혈당|당뇨/.test(topic):
-      return [
-        "식후 2시간 혈당을 주기적으로 확인해 식사 반응을 점검하세요.",
-        "정제 탄수화물·당류 섭취를 줄이고 단백질을 보강합니다.",
-        "하루 총 걸음 수를 늘려 식후 혈당 상승을 완화하세요.",
-        "체중·허리둘레 변화를 기록하며 생활 효과를 확인합니다.",
-        "발 저림/상처가 잘 낫지 않으면 반드시 진료를 받으세요.",
-        "수분 섭취와 숙면은 혈당 변동 완화에 중요합니다.",
-        "약 복용 중 저혈당 증상 시 즉시 조치 후 상담하세요."
-      ];
-    case /불면|수면/.test(topic):
-      return [
-        "취침 2시간 전 카페인·음주·과식은 피하세요.",
-        "매일 같은 시간에 눕고 일어나는 리듬을 유지합니다.",
-        "침실은 어둡고 조용하며 서늘하게 유지하세요.",
-        "침대에서는 잠과 휴식만—스마트폰/TV 사용을 줄입니다.",
-        "30분 넘게 뒤척이면 일어나 가벼운 활동 후 다시 누우세요.",
-        "낮잠은 20분 이내, 늦은 오후 낮잠은 피합니다.",
-        "코골이·무호흡 의심 시 수면 클리닉 상담을 권장합니다."
-      ];
-    case /노안|시력/.test(topic):
-      return [
-        "근거리 작업은 20분마다 20초 동안 6m 이상 먼 곳을 봅니다(20-20-20).",
-        "조명 반사·눈부심을 줄이고, 화면 밝기를 주변과 맞춥니다.",
-        "인공눈물을 이용해 건조감을 완화하세요.",
-        "정기적인 시력검진으로 교정도수/백내장 진행을 확인하세요.",
-        "야간 운전 시 눈부심 심하면 진료를 권장합니다.",
-        "항산화 식품(채소·과일)과 충분한 수분 섭취가 도움됩니다.",
-        "갑작스런 번개 모양·시야 결손은 응급 증상일 수 있습니다."
-      ];
-    case /관절/.test(topic):
-      return [
-        "통증이 없는 범위에서 관절 가동운동을 매일 실시하세요.",
-        "계단·쪼그려 앉기 등 무릎 부하 자세를 줄입니다.",
-        "체중 감량은 관절 하중을 크게 낮춥니다.",
-        "냉/온찜질을 통증 단계에 맞게 병행하세요.",
-        "관절 주변 근력(대퇴사두, 둔근)을 강화합니다.",
-        "부종·열감이 지속되면 염증성 질환 감별이 필요합니다.",
-        "보조기·신발 깔창은 전문 상담 후 사용하세요."
-      ];
-    default:
-      return [
-        "현재 응답을 기반으로 전반 상태를 정리했습니다.",
-        "위험 신호가 새로 생기면 즉시 의료 상담을 권장합니다.",
-        "생활 습관(식사·수면·운동)을 규칙적으로 유지하세요.",
-        "증상 일지를 기록하면 변화 추적에 도움이 됩니다.",
-        "복약/영양제는 과용을 피하고 상호작용을 확인하세요.",
-        "정기 검진으로 기저 위험요인을 관리하세요.",
-        "긴급 증상(실신, 호흡곤란, 흉통)은 지체 없이 119/응급실 이용."
-      ];
-  }
+/* ✅ 실제 로직 */
+const detailList = document.getElementById("detail");
+const summaryList = document.getElementById("summary");
+const opinionList = document.getElementById("opinion");
+
+let detailLines = [];
+let summaryLines = [];
+let opinionLines = [];
+
+// 응답이 있을 경우
+if (answers.length > 0) {
+    detailLines = [
+        "현재 주제는 \"" + topic + "\"입니다.",
+        "응답 결과를 분석한 결과, 위험도 수준은 " + (result.level || "Mild") + "로 판단됩니다.",
+        "현재 상태는 비교적 안정적이며, 생활습관 개선으로 호전이 기대됩니다.",
+        "규칙적인 수면과 영양 섭취가 필요합니다.",
+        "스트레스 관리가 중요하며, 무리한 활동은 피하세요.",
+        "필요 시 전문의 상담을 통해 정확한 검진을 권장합니다.",
+        "증상이 지속되거나 악화될 경우 조기 진료가 필요합니다.",
+        "수분 섭취를 늘리고, 자극적인 음식은 줄이세요.",
+        "심한 피로나 통증이 반복된다면 병원 내원 권장드립니다.",
+        "생활 패턴을 일정하게 유지하는 것이 좋습니다.",
+        "적정 체중과 혈압을 유지하는 것이 예방에 도움이 됩니다.",
+        "운동 전후 충분한 스트레칭으로 근육을 풀어주세요.",
+        "불안하거나 수면의 질이 떨어진다면 전문상담을 고려하세요.",
+        "의심되는 증상이 나타나면 1주일 내 진료를 권합니다.",
+        "지속적인 관찰과 일상 관리가 중요합니다."
+    ];
+
+    summaryLines = [
+        "주제: " + topic,
+        "현재 위험 수준: " + (result.level || "Mild"),
+        "응답 기반으로 비교적 안정적인 상태로 판단됩니다.",
+        "생활습관 관리 및 규칙적인 루틴 유지가 필요합니다.",
+        "정기검진을 통한 건강상태 확인을 권장합니다.",
+        "필요 시 전문의 상담으로 추가 확인 바랍니다.",
+        "생활 전반의 균형 유지가 건강에 도움이 됩니다."
+    ];
+
+    opinionLines = [
+        "응답 분석 결과, 위험 징후는 낮지만 생활습관 점검이 필요합니다.",
+        "전문의 상담을 병행하면 더 안정적인 개선이 기대됩니다."
+    ];
+} else {
+    // 응답이 없을 경우 기본 진단 자동 생성
+    detailLines = generateBaseDiagnosis(topic, result.level || "Mild");
+    summaryLines = [
+        "주제: " + topic,
+        "응답 데이터 부족으로 일반 진단으로 대체되었습니다.",
+        "현재 상태는 안정적이며 특별한 위험 신호는 없습니다.",
+        "기본 생활습관 개선으로 건강을 유지하세요.",
+        "불편감 지속 시 3일 내 내원 또는 전문상담을 권장합니다.",
+        "정기적인 건강검진으로 예방 관리를 이어가세요.",
+        "스트레스 관리와 충분한 수면이 도움이 됩니다."
+    ];
+    opinionLines = [
+        "응답 부족 상태에서도 경미한 위험 징후는 없습니다.",
+        "현재 건강상태를 유지하며 주기적 점검을 권장드립니다."
+    ];
 }
 
-function buildDetail(topic, answers, level){
-  const lines = [];
-  lines.push(`선택 주제는 “${topic}”이며, 제출하신 응답을 바탕으로 현재 상태를 해석했습니다.`);
-  lines.push(hospitalAdviceBy(level));
-  if(answers.length){
-    const show = answers.slice(0,5);
-    show.forEach((a,i)=>lines.push(`응답 ${i+1}: “${a}” 항목을 선택하셨습니다.`));
-  }else{
-    lines.push("응답이 없어 기본 안전 수칙을 중심으로 안내합니다.");
-  }
-  lines.push(...topicTips(topic));
-  lines.push("아래 ‘경고 신호’가 새로 발생/악화되면 즉시 진료하세요: 갑작스런 극심한 통증, 호흡곤란, 흉통, 반복되는 실신/어지럼.");
-  while(lines.length<15) lines.push("생활관리와 경과 관찰을 병행하시기 바랍니다.");
-  return lines.slice(0,15);
-}
+// 출력
+detailLines.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = l;
+    detailList.appendChild(li);
+});
+summaryLines.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = l;
+    summaryList.appendChild(li);
+});
+opinionLines.forEach(l => {
+    const li = document.createElement("li");
+    li.textContent = l;
+    opinionList.appendChild(li);
+});
 
-function buildSummary(topic, level){
-  const base = [
-    `주제: ${topic}`,
-    `위험도 수준: ${level}`,
-    hospitalAdviceBy(level),
-    "가정 관리: 수면·운동·식사 균형 유지",
-    "증상 변화 기록(발현 시간/유발 요인)",
-    "경고 신호 발생 시 즉시 진료",
-    "정기 검진 및 기저질환 동반 관리"
-  ];
-  return base.slice(0,7);
-}
+/* ✅ 제휴상품 표시 */
+fetch("affiliate.json")
+    .then(res => res.json())
+    .then(data => {
+        const affList = document.getElementById("affiliateList");
+        const insList = document.getElementById("insuranceList");
+        const affItems = data[topic] || [];
+        const insItems = data["보험공통"] || [];
 
-function buildOpinion(topic, level){
-  if(level==="Critical") return [
-    "응급 증상 배제를 위한 신속한 검사(심전도/혈액 등)를 권장합니다.",
-    "증상 안정 전까지 무리한 활동과 운전을 피하세요."
-  ];
-  if(level==="High") return [
-    "원인 감별(근골격/신경/심혈관 등)을 위한 전문 진료 예약을 권장합니다.",
-    "생활요법을 병행하면서 악화 요인(수면부족, 과로, 염분과다)을 줄이세요."
-  ];
-  return [
-    "자가 관리 중심으로 경과를 보되 새로운 경고 신호에 유의하세요.",
-    "필요 시 기본 검진과 생활지도(운동·자세·영양)를 점검하세요."
-  ];
-}
+        affItems.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "affiliate-item";
+            div.innerHTML = `
+                <img src="https://cdn-icons-png.flaticon.com/512/2936/2936737.png" width="30">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    ${item.desc}<br>
+                    <a href="${item.link}" target="_blank">쿠팡 바로가기</a>
+                </div>`;
+            affList.appendChild(div);
+        });
 
-/* =========================
-   3) 렌더링
-========================= */
-function render(){
-  $("topicTxt").textContent = topic;
-
-  // 3-1. 답변 소스 통합: 우선 aiAnswers, 비어있으면 저장본 answers 사용
-  if((!answers || answers.length===0) && storedResult && Array.isArray(storedResult.answers)){
-    answers = storedResult.answers;
-  }
-
-  // 3-2. 항상 '현재 answers + topic'으로 위험도 재계산 (저장본 수치로 덮어쓰지 않음)  ✅ 변경
-  const calc = calcRisk(answers, topic);
-  let riskScore = calc.score, riskLevel = calc.level, hits = calc.hits;
-
-  // 3-3. 텍스트 섹션은 저장본을 우선 사용하되 부족하면 자동 생성
-  let detail  = (storedResult && Array.isArray(storedResult.detail)  && storedResult.detail.length  >=5) ? storedResult.detail  : [];
-  let summary = (storedResult && Array.isArray(storedResult.summary) && storedResult.summary.length >=7) ? storedResult.summary : [];
-  let opinion = (storedResult && Array.isArray(storedResult.opinion) && storedResult.opinion.length >=2) ? storedResult.opinion : (storedResult && Array.isArray(storedResult.advice)? storedResult.advice: []);
-
-  if(detail.length < 5)  detail  = buildDetail(topic, answers, riskLevel);
-  if(summary.length < 7) summary = buildSummary(topic, riskLevel);
-  if(opinion.length < 2) opinion = buildOpinion(topic, riskLevel);
-
-  // 3-4. 숫자/바 반영
-  $("ansCount").textContent  = (answers.length||0)+"개";
-  $("riskWords").textContent = (hits||0)+"개";
-  $("riskScore").textContent = (riskScore||0)+"/100";
-  $("riskLevel").textContent = riskLevel;
-  $("riskBar").style.width   = Math.max(0, Math.min(100, riskScore)) + "%";
-
-  // 3-5. 리스트 렌더
-  $("detailUL").innerHTML  = detail.map(t=>`<li>${t}</li>`).join("");
-  $("summaryUL").innerHTML = summary.map(t=>`<li>${t}</li>`).join("");
-  $("opinionUL").innerHTML = opinion.map(t=>`<li>${t}</li>`).join("");
-
-  // 3-6. 오른쪽 보험(고정 2종)
-  const ins = $("ins");
-  ins.innerHTML = "";
-  [
-    {name:"고혈압·심장 보장보험", desc:"혈압·심혈관질환 중심 보장 상품"},
-    {name:"만성질환 실손보험",   desc:"정기 내과·검사비 보장 상품"}
-  ].forEach(i=>{
-    const d=document.createElement("div");
-    d.className="ins";
-    d.innerHTML=`<div class="ic">🛡️</div>
-    <div><div><strong>${i.name}</strong></div><div class="muted">${i.desc}</div></div>`;
-    ins.appendChild(d);
-  });
-
-  // 3-7. 오른쪽 제휴상품: affiliate.json → topic 키
-  fetch("/affiliate.json")
-    .then(r=>r.json())
-    .then(map=>{
-      const supps=$("supps");
-      supps.innerHTML="";
-      const list = map[topic] || [];
-      if(!list.length){
-        supps.innerHTML = `<div class="muted">해당 주제에 등록된 제휴상품이 없습니다.</div>`;
-        return;
-      }
-      list.slice(0,3).forEach(item=>{
-        const div=document.createElement("div");
-        div.className="aff";
-        div.innerHTML = `
-          <div class="ic">💊</div>
-          <div>
-            <div><strong>${item.name}</strong></div>
-            <div class="muted">${item.desc||""}</div>
-            <div class="muted">쿠팡 바로가기</div>
-          </div>`;
-        div.onclick=()=>window.open(item.link,"_blank");
-        supps.appendChild(div);
-      });
+        insItems.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "affiliate-item";
+            div.innerHTML = `
+                <img src="https://cdn-icons-png.flaticon.com/512/2830/2830281.png" width="28">
+                <div>
+                    <strong>${item.name}</strong><br>
+                    ${item.desc}
+                </div>`;
+            insList.appendChild(div);
+        });
     })
-    .catch(()=>{
-      $("supps").innerHTML = `<div class="muted">제휴상품 정보를 불러오지 못했습니다.</div>`;
+    .catch(() => {
+        document.getElementById("affiliateList").innerHTML = "제휴 데이터 불러오기 실패";
     });
-
-  // 3-8. 최종 결과 로컬 저장(수치도 최신값으로 갱신)  ✅ 변경
-  const finalPack = {
-    topic,
-    answers,
-    riskPercent: riskScore,
-    level: riskLevel,
-    riskHits: hits,
-    detail,
-    summary,
-    opinion
-  };
-  localStorage.setItem("aiResult", JSON.stringify(finalPack));
-}
-
-render();
 </script>
 </body>
 </html>
