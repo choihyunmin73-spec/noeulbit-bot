@@ -101,10 +101,8 @@
   <div class="wrapper">
     <div class="box">
       <h2 id="title">AI 문항 자동 생성</h2>
-      <p id="desc">선택한 주제에 따라 맞춤 문항이 자동 생성됩니다.</p>
-
+      <p id="desc">선택한 주제에 맞는 문항이 자동 생성됩니다.</p>
       <div id="questionList"></div>
-
       <button id="submitBtn">결과 보기</button>
       <div id="errorBox" class="error"></div>
     </div>
@@ -130,46 +128,75 @@
     title.textContent = `${topic} 진단`;
     desc.textContent = `현재 "${topic}"에 대한 맞춤 문항을 자동 생성 중입니다.`;
 
-    // ✅ AI 문항 자동 생성 (임시 AI 모사)
+    // ✅ 주제별 문항 자동 생성
     const generateQuestions = (topic) => {
-      const base = [
-        "불편하거나 자주 겪는 증상은 무엇인가요?",
-        "이 문제가 언제부터 있었나요?",
-        "하루 중 증상이 가장 심한 시간대는?",
-        "생활습관 중 영향을 주는 요소가 있나요?",
-        "통증 또는 불편감의 강도는 어느 정도인가요?",
-        "스트레스나 피로가 관련되어 있나요?",
-        "증상이 일상생활에 얼마나 영향을 주나요?",
-        "최근 복용 중인 약물 또는 치료가 있나요?",
-        "휴식 후 증상 변화가 있나요?",
-        "병원 진료나 검사 이력이 있나요?"
-      ];
-      const shuffled = base.sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, 8 + Math.floor(Math.random() * 3));
+      if (topic.includes("보험")) {
+        return [
+          "현재 가입한 보험이 몇 개 있나요?",
+          "보험료가 부담스럽다고 느끼시나요?",
+          "최근 보험 리모델링을 고려한 적이 있나요?",
+          "갱신형 보험을 보유하고 계신가요?",
+          "보험금 청구 경험이 있으신가요?",
+          "필요 없는 특약이 있다고 느끼시나요?",
+          "가족 구성원의 보험도 함께 관리 중인가요?",
+          "보험 보장 범위를 정확히 알고 계신가요?"
+        ];
+      } else if (topic.includes("자동차") || topic.includes("견적")) {
+        return [
+          "현재 차량을 보유 중이신가요?",
+          "구매 방식은 어떤 것을 선호하시나요?",
+          "월 차량 예산은 어느 정도인가요?",
+          "선호하는 차량 브랜드가 있나요?",
+          "차량 구매 또는 교체 시기는 언제인가요?",
+          "보험료나 유지비에 대한 부담이 있나요?",
+          "전기차나 하이브리드 차량에 관심이 있나요?",
+          "차량 구매 시 가장 중요하게 보는 요소는 무엇인가요?"
+        ];
+      } else {
+        // 건강/일상 주제
+        const base = [
+          "불편하거나 자주 겪는 증상은 무엇인가요?",
+          "이 문제가 언제부터 있었나요?",
+          "하루 중 증상이 가장 심한 시간대는?",
+          "생활습관 중 영향을 주는 요소가 있나요?",
+          "통증 또는 불편감의 강도는 어느 정도인가요?",
+          "스트레스나 피로가 관련되어 있나요?",
+          "증상이 일상생활에 얼마나 영향을 주나요?",
+          "최근 복용 중인 약물 또는 치료가 있나요?",
+          "휴식 후 증상 변화가 있나요?",
+          "병원 진료나 검사 이력이 있나요?"
+        ];
+        return base.slice(0, 8 + Math.floor(Math.random() * 3));
+      }
     };
 
-    const generateOptions = (questionIndex) => {
-      const sample = [
-        ["없음", "가끔", "자주", "매우 자주", "심함", "매우 심함"],
-        ["1주 이내", "1개월 이내", "3개월 이상", "6개월 이상", "1년 이상", "모름"],
-        ["오전", "오후", "저녁", "밤", "하루 종일", "불규칙"],
-        ["없음", "운동 부족", "흡연", "수면 부족", "스트레스", "카페인 섭취"],
-        ["거의 없음", "약간 있음", "보통", "심함", "매우 심함", "모름"],
-        ["아니오", "약간 관련 있음", "보통", "많이 관련 있음", "매우 관련 있음", "모름"],
-      ];
-      return sample[questionIndex % sample.length];
+    // ✅ 주제별 선택지 자동 생성
+    const generateOptions = (topic, index) => {
+      if (topic.includes("보험")) {
+        return ["예", "아니오", "모름", "변경 예정", "유지 예정", "상담 원함"];
+      } else if (topic.includes("자동차") || topic.includes("견적")) {
+        return ["예", "아니오", "렌트", "할부", "리스", "기타"];
+      } else {
+        const common = [
+          ["없음", "가끔", "자주", "매우 자주", "심함", "매우 심함"],
+          ["1주 이내", "1개월 이내", "3개월 이상", "6개월 이상", "1년 이상", "모름"],
+          ["오전", "오후", "저녁", "밤", "하루 종일", "불규칙"],
+          ["없음", "운동 부족", "흡연", "수면 부족", "스트레스", "카페인 섭취"]
+        ];
+        return common[index % common.length];
+      }
     };
 
+    // ✅ 화면 생성
     const questions = generateQuestions(topic);
     questions.forEach((q, i) => {
       const qDiv = document.createElement("div");
       qDiv.classList.add("question");
       qDiv.innerHTML = `<h3>문항 ${i + 1}. ${q}</h3>`;
-
       const optionsDiv = document.createElement("div");
       optionsDiv.classList.add("options");
 
-      const opts = generateOptions(i);
+      const opts = generateOptions(topic, i);
       opts.forEach(opt => {
         const o = document.createElement("div");
         o.classList.add("option");
@@ -193,7 +220,6 @@
         errorBox.style.display = "block";
         return;
       }
-
       try {
         const response = await fetch("https://noeulbitharu.onrender.com/api/analyze", {
           method: "POST",
