@@ -1,260 +1,181 @@
 {
-  "관절 통증": {
-    "products": [
-      {
-        "name": "글루코사민 프리미엄",
-        "desc": "관절 연골 건강에 도움을 주는 글루코사민 보충제",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320355.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "MSM 관절영양",
-        "desc": "염증 완화와 연골 보호를 돕는 MSM 포뮬러",
-        "image": "https://cdn-icons-png.flaticon.com/512/2927/2927347.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "콜라겐 플러스",
-        "desc": "관절 및 인대 탄력 유지에 도움",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784443.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "실손의료보험",
-        "desc": "관절 통증 진료 및 MRI 검사 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/883/883407.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "골절·수술 특약",
-        "desc": "골절 및 수술 시 추가 보상 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/1995/1995574.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  },
+  "관절 통증": [
+    {
+      "name": "글루코사민",
+      "desc": "연골 보호와 관절 움직임 개선에 도움",
+      "link": "https://link.coupang.com/a/c2RH71"
+    },
+    {
+      "name": "MSM 관절영양",
+      "desc": "근육과 관절의 피로 완화 및 염증 완화에 도움",
+      "link": "https://link.coupang.com/a/c2RKZl"
+    },
+    {
+      "name": "콜라겐 플러스",
+      "desc": "관절 조직의 탄력과 회복력 강화",
+      "link": "https://link.coupang.com/a/c2RNHD"
+    }
+  ],
 
-  "혈압 관리": {
-    "products": [
-      {
-        "name": "오메가3 트리플케어",
-        "desc": "혈압 및 혈중 중성지방 개선 도움",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320319.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "마그네슘 밸런스",
-        "desc": "혈관 이완 및 스트레스 완화 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784386.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "코엔자임Q10 플러스",
-        "desc": "심혈관 에너지 개선 및 피로 회복",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320341.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "고혈압·심장 보장보험",
-        "desc": "혈압·심혈관질환 보장 강화형 상품",
-        "image": "https://cdn-icons-png.flaticon.com/512/1256/1256651.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "만성질환 관리형 실손",
-        "desc": "정기 내과 진료 및 검사비 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/883/883439.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  },
+  "혈압 관리": [
+    {
+      "name": "오메가3 트리플케어",
+      "desc": "혈압 조절과 혈중 중성지방 감소에 도움",
+      "link": "https://link.coupang.com/a/c2RQAG"
+    },
+    {
+      "name": "마그네슘 밸런스",
+      "desc": "혈관 이완과 심장 기능 안정화 지원",
+      "link": "https://link.coupang.com/a/c2RTRr"
+    },
+    {
+      "name": "코엔자임Q10 플러스",
+      "desc": "심장 에너지 생산과 피로 회복 도움",
+      "link": "https://link.coupang.com/a/c2RWlM"
+    }
+  ],
 
-  "혈당·당뇨": {
-    "products": [
-      {
-        "name": "알파리포산 600",
-        "desc": "혈당 안정과 항산화 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/4319/4319878.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "크롬 포뮬러",
-        "desc": "당대사 균형 및 식후 피로 개선",
-        "image": "https://cdn-icons-png.flaticon.com/512/4319/4319873.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "오메가3 밸런스",
-        "desc": "혈중 지방 및 인슐린 민감도 개선",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784440.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "당뇨·합병증 보험",
-        "desc": "당뇨 합병증 치료비 전용 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/1995/1995527.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "건강검진 패키지 보험",
-        "desc": "정기 혈당검사 및 내과검진 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/883/883421.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  },
+  "혈당·당뇨": [
+    {
+      "name": "알파리포산 600",
+      "desc": "혈당 조절 및 항산화 작용 강화",
+      "link": "https://link.coupang.com/a/c2RXDT"
+    },
+    {
+      "name": "크롬 포뮬러",
+      "desc": "인슐린 민감도 향상과 체중 관리에 도움",
+      "link": "https://link.coupang.com/a/c2RZ7S"
+    },
+    {
+      "name": "오메가3 밸런스",
+      "desc": "혈당 안정 및 중성지방 조절에 도움",
+      "link": "https://link.coupang.com/a/c2R1hr"
+    }
+  ],
 
-  "불면증·수면장애": {
-    "products": [
-      {
-        "name": "테아닌 릴렉스",
-        "desc": "긴장 완화와 숙면 유도",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320332.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "마그네슘 나이트",
-        "desc": "근육 이완 및 수면 질 개선",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320360.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "GABA 컴플렉스",
-        "desc": "불면 해소 및 신경 안정 효과",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784395.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "정신건강 특약보험",
-        "desc": "불면·우울·불안 관련 진료비 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/1256/1256659.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "수면장애 검사비 지원보험",
-        "desc": "수면검사 및 신경과 상담비 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320322.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  },
+  "불면증·수면장애": [
+    {
+      "name": "테아닌 릴렉스",
+      "desc": "긴장 완화와 수면의 질 개선",
+      "link": "https://link.coupang.com/a/c2R26o"
+    },
+    {
+      "name": "마그네슘 나이트",
+      "desc": "근육 이완 및 숙면 유도",
+      "link": "https://link.coupang.com/a/c2R5lm"
+    },
+    {
+      "name": "GABA 컴플렉스",
+      "desc": "긴장 완화 및 심신 안정 보조",
+      "link": "https://link.coupang.com/a/c2R9RO"
+    }
+  ],
 
-  "어깨·목 통증": {
-    "products": [
-      {
-        "name": "MSM 관절근육 포뮬러",
-        "desc": "근육 뻐근함 완화에 도움",
-        "image": "https://cdn-icons-png.flaticon.com/512/4319/4319903.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "마그네슘 이지업",
-        "desc": "근육 긴장 완화 및 피로 회복",
-        "image": "https://cdn-icons-png.flaticon.com/512/4319/4319874.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "비타민B 컴플렉스",
-        "desc": "신경통 완화 및 피로 개선",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784398.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "근골격계 치료 보장보험",
-        "desc": "물리치료·도수치료 진료비 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/1995/1995507.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "MRI 검사비 특약",
-        "desc": "경추·어깨·허리 MRI 비용 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/883/883413.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  },
+  "어깨·목 통증": [
+    {
+      "name": "MSM 관절근육 포뮬러",
+      "desc": "근육 피로 완화 및 염증 완화에 도움",
+      "link": "https://link.coupang.com/a/c2SdN1"
+    },
+    {
+      "name": "마그네슘 이지업",
+      "desc": "근육 긴장 완화 및 피로 개선",
+      "link": "https://link.coupang.com/a/c2SeX4"
+    },
+    {
+      "name": "비타민B 컴플렉스",
+      "desc": "신경 안정과 피로 회복에 도움",
+      "link": "https://link.coupang.com/a/c2SgkD"
+    }
+  ],
 
-  "심장·호흡·가슴통증": {
-    "products": [
-      {
-        "name": "코엔자임Q10 하트케어",
-        "desc": "심장 에너지와 혈류 개선 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320364.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "오메가3 심혈관 포뮬러",
-        "desc": "혈액순환 및 심근 보호 도움",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320319.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "폴리코사놀 10",
-        "desc": "콜레스테롤 관리용 건강기능식품",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784378.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "심혈관 질환 보장보험",
-        "desc": "협심증·심근경색 집중 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/1995/1995510.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "응급의료비 특약",
-        "desc": "응급실 내원 및 검사비 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/883/883425.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  },
+  "심장·호흡·가슴통증": [
+    {
+      "name": "코엔자임Q10 하트케어",
+      "desc": "심근 에너지 강화 및 피로 회복",
+      "link": "https://link.coupang.com/a/c2SnFt"
+    },
+    {
+      "name": "오메가3 심혈관 포뮬러",
+      "desc": "심혈관 건강 및 혈류 개선에 도움",
+      "link": "https://link.coupang.com/a/c2So9Q"
+    },
+    {
+      "name": "폴리코사놀 10",
+      "desc": "혈중 콜레스테롤 개선 및 혈류 강화",
+      "link": "https://link.coupang.com/a/c2SrCT"
+    }
+  ],
 
-  "노안·시력저하": {
-    "products": [
-      {
-        "name": "루테인 지아잔틴",
-        "desc": "눈 피로 및 시력 저하 예방",
-        "image": "https://cdn-icons-png.flaticon.com/512/2784/2784381.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "비타민A 아이케어",
-        "desc": "시세포 기능 유지 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/4319/4319884.png",
-        "link": "https://www.coupang.com/"
-      },
-      {
-        "name": "아스타잔틴 비전",
-        "desc": "망막산화 보호 및 눈 건강",
-        "image": "https://cdn-icons-png.flaticon.com/512/4319/4319859.png",
-        "link": "https://www.coupang.com/"
-      }
-    ],
-    "insurance": [
-      {
-        "name": "안과 수술비 보장보험",
-        "desc": "백내장·망막질환 수술비 지원",
-        "image": "https://cdn-icons-png.flaticon.com/512/4320/4320375.png",
-        "link": "https://www.naver.com/"
-      },
-      {
-        "name": "시력검사 지원형 보험",
-        "desc": "연 1회 시력검사비 보장",
-        "image": "https://cdn-icons-png.flaticon.com/512/883/883444.png",
-        "link": "https://www.naver.com/"
-      }
-    ]
-  }
+  "노안·시력저하": [
+    {
+      "name": "루테인 지아잔틴",
+      "desc": "황반 색소 보호와 시력 개선",
+      "link": "https://link.coupang.com/a/c2StF3"
+    },
+    {
+      "name": "비타민A 아이케어",
+      "desc": "시각 기능 유지와 야맹증 개선",
+      "link": "https://link.coupang.com/a/c2Svgp"
+    },
+    {
+      "name": "아스타잔틴 비전",
+      "desc": "눈의 피로 완화 및 항산화 보호",
+      "link": "https://link.coupang.com/a/c2SwxO"
+    }
+  ],
+
+  "치매·기억력 문제": [
+    {
+      "name": "오메가3",
+      "desc": "두뇌 기능 및 기억력 개선",
+      "link": "https://link.coupang.com/a/c2SxOq"
+    },
+    {
+      "name": "포스파티딜세린",
+      "desc": "기억력 향상과 집중력 유지에 도움",
+      "link": "https://link.coupang.com/a/c2SzKf"
+    },
+    {
+      "name": "은행잎추출물",
+      "desc": "뇌혈류 개선 및 인지 기능 유지",
+      "link": "https://link.coupang.com/a/c2SBSY"
+    }
+  ],
+
+  "전립선·배뇨 문제": [
+    {
+      "name": "아연",
+      "desc": "면역력 향상 및 남성 건강 유지",
+      "link": "https://link.coupang.com/a/c2SC9E"
+    },
+    {
+      "name": "쏘팔메토",
+      "desc": "전립선 기능 개선 및 배뇨 완화",
+      "link": "https://link.coupang.com/a/c2SH2O"
+    },
+    {
+      "name": "비타민E",
+      "desc": "항산화 작용 및 혈류 개선",
+      "link": "https://link.coupang.com/a/c2SJVq"
+    }
+  ],
+
+  "종합 건강 체크": [
+    {
+      "name": "멀티비타민",
+      "desc": "필수 영양소 보충으로 전반적 건강 유지",
+      "link": "https://link.coupang.com/a/c2SKDt"
+    },
+    {
+      "name": "유산균",
+      "desc": "장 건강 개선 및 면역력 강화",
+      "link": "https://link.coupang.com/a/c2SLLs"
+    },
+    {
+      "name": "오메가3",
+      "desc": "혈액순환 및 심혈관 건강 유지",
+      "link": "https://link.coupang.com/a/c2SxOq"
+    }
+  ]
 }
