@@ -1,88 +1,65 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>노을빛하루 AI 종합 진단</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>노을빛하루 AI 종합 진단 — 주제 선택</title>
 <style>
-  body {
-    margin: 0;
-    background: #f5f7fb;
-    font-family: "Noto Sans KR", system-ui;
-  }
-  .wrap {
-    max-width: 1040px;
-    margin: 40px auto;
-    padding: 0 16px;
-  }
-  h1 {
-    font-size: 22px;
-    color: #0f172a;
-    margin: 0 0 18px;
-  }
-  .sub {
-    color: #475569;
-    margin-bottom: 18px;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  .btn {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 18px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
-    transition: 0.15s;
-  }
-  .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-  }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; background:#f6f7f9; }
+  header { padding:24px; background:#0e1116; color:#fff; }
+  .wrap { max-width:1100px; margin:24px auto; padding:0 16px; }
+  .grid { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
+  .card { background:#fff; border-radius:16px; padding:20px; box-shadow:0 6px 16px rgba(0,0,0,.08); transition:.2s; }
+  .card:hover { transform: translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.1);}
+  .title { font-weight:700; font-size:18px; margin-bottom:8px;}
+  .desc { color:#555; font-size:14px; margin-bottom:16px;}
+  .btn { display:inline-block; padding:10px 14px; border-radius:10px; background:#0e1116; color:#fff; text-decoration:none; font-weight:600; }
+  @media (max-width:900px){ .grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:640px){ .grid{ grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>필요한 건강·생활 주제를 선택하세요</h1>
-    <div class="sub">주제 클릭 → 문항이 자동 생성됩니다. (질문별 6개 선택지)</div>
-    <div class="grid" id="grid"></div>
-  </div>
+<header>
+  <h1>노을빛하루 AI 종합 진단</h1>
+  <div>원하는 주제를 선택해 간단 설문 후 결과를 확인하세요.</div>
+</header>
 
-  <script>
-    const topics = [
-      "관절 통증",
-      "혈압 관리",
-      "혈당·당뇨",
-      "불면증·수면장애",
-      "어깨·목 통증",
-      "심장·호흡·가슴통증",
-      "노안·시력저하",
-      "치매·기억력 문제",
-      "전립선·배뇨 문제",
-      "종합 건강 체크",
-      "보험비용 종합점검",
-      "최저가 자동차 견적 비교"
-    ];
+<div class="wrap">
+  <div class="grid" id="grid"></div>
+</div>
 
-    const grid = document.getElementById("grid");
+<script>
+const topics = [
+  "관절 통증","혈압 관리","혈당·당뇨","불면증·수면장애","어깨·목 통증","심장·호흡·가슴통증",
+  "노안·시력저하","치매·기억력 문제","전립선·배뇨 문제","종합 건강 체크","보험비용 종합점검","최저가 자동차 견적 비교"
+];
 
-    topics.forEach((t) => {
-      const d = document.createElement("div");
-      d.className = "btn";
-      d.textContent = t;
+const descMap = {
+  "관절 통증":"무릎·허리·손가락 통증 상태를 점검합니다.",
+  "혈압 관리":"수치 변동과 생활습관 위험을 파악합니다.",
+  "혈당·당뇨":"식후·공복 혈당 패턴과 합병증 신호 확인.",
+  "불면증·수면장애":"잠드는 시간, 각성, 코골이 등 종합 평가.",
+  "어깨·목 통증":"자세·근긴장·신경 증상 여부 확인.",
+  "심장·호흡·가슴통증":"가슴통증·호흡곤란 등 응급신호 판별.",
+  "노안·시력저하":"근거리 시력저하, 건조감, 비문증 체크.",
+  "치매·기억력 문제":"단기기억·집중·일상실수 패턴 점검.",
+  "전립선·배뇨 문제":"빈뇨·잔뇨감·야간뇨 등 상태 평가.",
+  "종합 건강 체크":"전반 컨디션과 생활습관 리스크 종합.",
+  "보험비용 종합점검":"보장 공백·중복·보험료 과다 여부 확인.",
+  "최저가 자동차 견적 비교":"차량·옵션·보험료까지 한 번에 비교."
+};
 
-      // ✅ Render 환경 절대경로 이동 적용
-      d.onclick = () => {
-        const baseUrl = window.location.origin;
-        window.location.href = `${baseUrl}/question.html?topic=${encodeURIComponent(t)}`;
-      };
-
-      grid.appendChild(d);
-    });
-  </script>
+const grid = document.getElementById("grid");
+topics.forEach(t=>{
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `
+    <div class="title">${t}</div>
+    <div class="desc">${descMap[t]||"주제 설명"}</div>
+    <a class="btn" href="question.html?topic=${encodeURIComponent(t)}">진단 시작</a>
+  `;
+  grid.appendChild(div);
+});
+</script>
 </body>
 </html>
