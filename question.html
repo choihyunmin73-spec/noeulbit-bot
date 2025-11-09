@@ -94,6 +94,7 @@
     let currentIndex = 0;
     let answers = [];
 
+    // ✅ 설문 데이터 로드
     fetch("survey.json")
       .then((response) => response.json())
       .then((data) => {
@@ -104,20 +105,18 @@
         }
         showQuestion();
       })
-      .catch((err) => {
-        console.error("설문 로드 오류:", err);
+      .catch(() => {
         document.getElementById("question-text").innerText = "문항 데이터를 불러오지 못했습니다.";
       });
 
     function showQuestion() {
       const questions = surveyData[topic];
-      const questionData = questions[currentIndex];
-
-      document.getElementById("question-text").innerText = questionData.question;
+      const q = questions[currentIndex];
+      document.getElementById("question-text").innerText = q.question;
 
       const optionsDiv = document.getElementById("options");
       optionsDiv.innerHTML = "";
-      questionData.choices.forEach((choice) => {
+      q.choices.forEach((choice) => {
         const btn = document.createElement("div");
         btn.className = "option";
         btn.innerText = choice;
@@ -125,12 +124,14 @@
         optionsDiv.appendChild(btn);
       });
 
+      // ✅ 진행률 표시
       const progressText = `질문 ${currentIndex + 1} / ${questions.length}`;
       document.getElementById("progress").innerText = progressText;
       const fillWidth = ((currentIndex + 1) / questions.length) * 100;
       document.getElementById("progress-fill").style.width = fillWidth + "%";
     }
 
+    // ✅ 선택 시 데이터 저장
     function selectOption(choice) {
       answers.push(choice);
       currentIndex++;
@@ -138,28 +139,33 @@
       if (currentIndex < surveyData[topic].length) {
         showQuestion();
       } else {
-        // ✅ 위험도 감지 및 결과 생성
-        const riskWords = ["심함", "악화", "불편", "통증", "저림", "위험", "갑자기", "숨", "가슴"];
-        const riskCount = answers.filter(a => riskWords.some(w => a.includes(w))).length;
-        const riskPercent = Math.min(100, riskCount * 12.5);
+        // ✅ 위험단어 분석 (심플 버전)
+        const riskWords = ["심함", "악화", "통증", "위험", "저림", "숨", "갑자기", "가슴", "이상"];
+        let detected = [];
+        answers.forEach(a => {
+          riskWords.forEach(r => {
+            if (a.includes(r)) detected.push(r);
+          });
+        });
 
-        const resultData = {
+        const riskScore = Math.min(100, detected.length * 10);
+        let level = "Mild";
+        if (riskScore >= 70) level = "Severe";
+        else if (riskScore >= 40) level = "Moderate";
+
+        const aiResult = {
           topic,
-          totalAnswers: answers.length,
-          riskCount,
-          riskPercent,
-          message:
-            riskPercent >= 60
-              ? "현재 건강 상태에 주의가 필요합니다. 가까운 병원에서 전문 진단을 받아보세요."
-              : "현재 상태는 비교적 양호합니다. 규칙적인 생활습관을 유지하세요.",
-          product: {
-            title: "MSM 관절근육 포뮬러",
-            desc: "근육 피로 완화 및 염증 완화에 도움",
-            link: "https://www.coupang.com/vp/products/6714055083"
-          }
+          answers,
+          riskWords: detected,
+          riskScore,
+          level
         };
 
-        localStorage.setItem("aiResult", JSON.stringify(resultData));
+        // ✅ 로컬 저장 (result.html로 전달)
+        localStorage.setItem("aiAnswers", JSON.stringify(answers));
+        localStorage.setItem("aiResult", JSON.stringify(aiResult));
+
+        // ✅ 결과 페이지 이동
         window.location.href = "result.html";
       }
     }
