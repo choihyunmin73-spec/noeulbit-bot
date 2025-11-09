@@ -1,239 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI 종합 결과</title>
-  <style>
-    :root{
-      --bg:#f6f8fb; --card:#fff; --text:#0f172a; --muted:#64748b;
-      --primary:#2563eb; --primary-2:#1e40af; --border:#e2e8f0;
-      --danger:#ef4444; --ok:#16a34a; --shadow:0 8px 24px rgba(2,8,23,.06);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);font-family:Inter,"Noto Sans KR",system-ui,AppleSDGothicNeo,Malgun Gothic,sans-serif;color:var(--text)}
-    .wrap{max-width:1200px;margin:28px auto;padding:0 16px}
-    .grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
-    @media(max-width:980px){.grid{grid-template-columns:1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
-    .h1{font-size:22px;font-weight:800;margin:4px 0 10px}
-    .sub{font-size:13px;color:var(--muted)}
-    .badge{display:inline-flex;align-items:center;gap:8px;margin-top:6px;color:#111}
-    .bar{height:120px;background:#f1f5f9;border-radius:10px;position:relative;overflow:hidden}
-    .bar>div{position:absolute;left:0;bottom:0;height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);width:0%}
-    .bar-legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
-    h3{font-size:16px;margin:18px 0 10px}
-    ul{margin:0;padding-left:18px}
-    li{margin:6px 0;line-height:1.55}
-    .btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
-    .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;font-weight:700;cursor:pointer}
-    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-    .btn.primary:hover{background:var(--primary-2)}
-    .aside-title{font-weight:800;margin-bottom:10px}
-    .item{display:flex;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;margin-bottom:12px}
-    .thumb{width:48px;height:48px;border-radius:10px;background:#e2e8f0;flex:0 0 48px;object-fit:cover}
-    .it-title{font-weight:700}
-    .it-desc{font-size:12px;color:var(--muted);margin-top:4px}
-    .go{margin-top:8px}
-    .go .btn{padding:8px 10px;font-size:13px}
-    .empty{font-size:14px;color:var(--muted)}
-    .err{background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:12px;border-radius:10px}
-    .ok{color:var(--ok);font-weight:800}
-    .muted{color:var(--muted)}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>노을빛하루 AI 진단 결과</title>
+<style>
+  body { font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin:0; background:#0d1016; color:#e6e9ef;}
+  header { background:#0e1116; padding:20px; text-align:center; border-bottom:1px solid #1c212b;}
+  .wrap { max-width:1200px; margin:30px auto; padding:0 16px; }
+  .cols { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+  .card { background:#11161d; border:1px solid #1c212b; border-radius:16px; padding:24px; }
+  h2 { margin:0 0 12px; }
+  .bar-bg { width:100%; height:14px; background:#1f2530; border-radius:10px; overflow:hidden; margin:8px 0 12px; }
+  .bar { height:100%; width:0%; background:#6aa3ff; transition:width .6s; }
+  .pill { display:inline-block; padding:5px 10px; border-radius:999px; font-size:13px; background:#222b3b; margin-right:6px;}
+  .sec { margin-top:16px; }
+  .aff li { margin:6px 0; }
+  .aff a { color:#9cc3ff; text-decoration:none; }
+  .muted { color:#aab4c3; font-size:13px; }
+  @media(max-width:900px){ .cols{ grid-template-columns:1fr; } }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="error" class="err" style="display:none"></div>
+<header>
+  <h1>노을빛하루 AI 진단 결과</h1>
+</header>
 
-    <div class="grid" id="resultGrid" style="display:none">
-      <!-- LEFT: 그래프 + 상세진단 + 요약 + 의견 -->
-      <section class="card" id="mainCard">
-        <div class="h1" id="title">[주제] AI 종합 결과</div>
-        <div class="badge">
-          <span id="riskText">위험도: -%</span>
-          <span class="muted">•</span>
-          <span id="levelText">단계: -</span>
-        </div>
+<div class="wrap">
+  <div class="cols">
+    <div class="card">
+      <h2 id="topic">주제</h2>
+      <div><span class="pill" id="sev"></span><span class="pill" id="risk"></span></div>
+      <div class="bar-bg"><div class="bar" id="bar"></div></div>
+      <div class="muted" id="score"></div>
+      <div class="sec"><h3>상세 진단</h3><div id="detail"></div></div>
+      <div class="sec"><h3>요약</h3><div id="summary"></div></div>
+      <div class="sec"><h3>전문가 의견</h3><div id="opinion"></div></div>
+    </div>
 
-        <div style="margin-top:14px">
-          <div class="bar" aria-label="위험도 그래프">
-            <div id="barFill"></div>
-          </div>
-          <div class="bar-legend"><span>0%</span><span>50%</span><span>100%</span></div>
-        </div>
-
-        <h3>상세 진단</h3>
-        <ul id="detailList"></ul>
-
-        <h3>요약</h3>
-        <ul id="summaryList"></ul>
-
-        <h3>의견</h3>
-        <ul id="opinionList"></ul>
-
-        <h3>추가 권고(방문 시점 포함)</h3>
-        <ul id="adviceList"></ul>
-
-        <div class="btns">
-          <button class="btn primary" id="goService">관련 서비스 바로가기</button>
-          <button class="btn" onclick="location.href='index.html'">처음으로 돌아가기</button>
-        </div>
-      </section>
-
-      <!-- RIGHT: 제휴상품 + 제휴보험 -->
-      <aside class="card">
-        <div class="aside-title">추천 제휴상품</div>
-        <div id="affList"></div>
-
-        <div class="aside-title" style="margin-top:18px">제휴 보험</div>
-        <div id="insList"></div>
-      </aside>
+    <div class="card">
+      <h2>추천 제휴상품 / 보험</h2>
+      <div class="sec"><h3>제휴 상품</h3><ul id="prod" class="aff"></ul></div>
+      <div class="sec"><h3>제휴 보험</h3><ul id="ins" class="aff"></ul></div>
+      <div class="sec muted">※ 진단 결과를 기반으로 자동 추천됩니다.</div>
     </div>
   </div>
+</div>
 
-  <script>
-    // --- 유틸 ---
-    const levelKo = l => ({mild:"경미", moderate:"중등도", severe:"중증"}[l] || l);
-    const $ = sel => document.querySelector(sel);
+<script>
+const data = JSON.parse(sessionStorage.getItem("latestResult")||"null");
+if(!data){
+  document.getElementById("topic").textContent = "결과 데이터가 없습니다.";
+}else{
+  document.getElementById("topic").textContent = data.topic;
+  document.getElementById("sev").textContent =
+    data.severity==="mild"?"경도(mild)":data.severity==="moderate"?"중등도(moderate)":"중증(severe)";
+  document.getElementById("risk").textContent = data.risk;
+  document.getElementById("detail").textContent = data.detail;
+  document.getElementById("summary").textContent = data.summary;
+  document.getElementById("opinion").textContent = data.opinion;
 
-    function renderList(el, arr){
-      el.innerHTML = "";
-      (arr||[]).forEach(t=>{
-        const li = document.createElement("li");
-        li.textContent = t;
-        el.appendChild(li);
-      });
-    }
+  const pct = Math.min(100, Math.max(0, data.graph?.riskScore||0));
+  requestAnimationFrame(()=>{ document.getElementById("bar").style.width = pct+"%"; });
+  document.getElementById("score").textContent = `위험도 지표: ${pct}/100`;
 
-    function makeAdvice(topic, level, risk){
-      // 최소 10줄 이상 권고 + 방문 시점 표기
-      const visit = level==="severe" ? "즉시 내원"
-                  : level==="moderate" ? "1개월 내 내원"
-                  : "2주 후 재평가";
-      const base = [
-        `현재 주제: ${topic} • 권장 방문 시점: ${visit}.`,
-        "증상이 악화·지속되면 즉시 전문의 상담을 권장합니다.",
-        "수면·스트레스·식이·활동 루틴을 일정하게 유지하세요.",
-        "기록(증상/복용/운동/혈압·혈당 등)을 남겨 추이를 확인하세요.",
-        "주당 150분 내외의 가벼운 유산소 + 근력운동을 병행하세요.",
-        "카페인·알코올·가공식품 섭취를 줄이고 수분을 충분히 섭취하세요.",
-        "필요 시 보조제·약물은 의료진 상담 하에 시작하세요.",
-        "정기 검사/모니터링(가정용 기기 또는 병원)을 권장합니다.",
-        "일상 기능에 불편이 생기면 가족·지인과 함께 관리 계획을 세우세요.",
-        "응급 증상(심한 통증, 호흡곤란, 실신 등) 발생 시 즉시 119/응급실 방문."
-      ];
-      if(level==="severe"){
-        base.splice(1,0,"단기 악화 가능성이 높아 안전을 우선하세요.");
-      }
-      return base;
-    }
-
-    function setBar(percent){
-      const el = $("#barFill");
-      requestAnimationFrame(()=>{
-        el.style.width = Math.max(0, Math.min(100, percent)) + "%";
-      });
-    }
-
-    // --- 메인 렌더 ---
-    (function init(){
-      const raw = localStorage.getItem("aiResult");
-      if(!raw){
-        const msg = "결과 데이터가 없습니다. 설문을 완료한 뒤 다시 확인해주세요.";
-        $("#error").style.display="block"; $("#error").textContent = msg;
-        return;
-      }
-      let data;
-      try{ data = JSON.parse(raw); }catch(e){
-        $("#error").style.display="block"; $("#error").textContent = "결과 데이터 해석 중 오류가 발생했습니다.";
-        return;
-      }
-
-      const topic = data.topic || "분류 없음";
-      const risk  = Number(data.risk ?? 0);
-      const level = data.level || "mild";
-
-      $("#title").textContent = `[${topic}] AI 종합 결과`;
-      $("#riskText").textContent = `위험도: ${risk}%`;
-      $("#levelText").textContent = `단계: ${levelKo(level)}`;
-
-      setBar(risk);
-      renderList($("#detailList"),  data.detail);
-      renderList($("#summaryList"), data.summary);
-      renderList($("#opinionList"), data.opinion);
-      renderList($("#adviceList"),  makeAdvice(topic, level, risk));
-
-      // 서비스 버튼 (주제 기반 라우팅 예시)
-      $("#goService").addEventListener("click", ()=>{
-        if(topic.includes("자동차")) {
-          window.location.href = "https://www.google.com/search?q=%EC%B0%A8%EB%9F%89+%EC%B2%AD%EA%B0%80+%EA%B2%AC%EC%A0%81";
-        } else if(topic.includes("보험")) {
-          window.location.href = "https://www.google.com/search?q=%EB%B3%B4%ED%97%98+%EB%B9%84%EA%B5%90";
-        } else {
-          window.location.href = "index.html";
-        }
-      });
-
-      // 제휴 리스트 로드
-      loadAffiliate(topic);
-
-      $("#resultGrid").style.display = "grid";
-    })();
-
-    async function loadAffiliate(topic){
-      const affBox = $("#affList");
-      const insBox = $("#insList");
-      affBox.innerHTML = '<div class="empty">로딩 중…</div>';
-      insBox.innerHTML = '<div class="empty">로딩 중…</div>';
-      try{
-        const res = await fetch("affiliate.json",{cache:"no-store"});
-        if(!res.ok) throw new Error(res.status);
-        const all = await res.json();
-
-        const isMatch = (item)=> {
-          if(!item) return false;
-          if(item.topic && topic && item.topic===topic) return true;
-          if(Array.isArray(item.tags)) return item.tags.some(t=> topic?.includes(t));
-          return false;
-        };
-
-        const prods = (all.products||[]).filter(isMatch).slice(0,6);
-        const ins   = (all.insurance||[]).filter(isMatch).slice(0,6);
-
-        renderItems(affBox, prods, "상품이 없습니다.");
-        renderItems(insBox, ins, "보험 항목이 없습니다.");
-      }catch(e){
-        affBox.innerHTML = '<div class="empty">제휴 데이터를 불러오지 못했습니다.</div>';
-        insBox.innerHTML = '<div class="empty">제휴 데이터를 불러오지 못했습니다.</div>';
-      }
-    }
-
-    function renderItems(container, items, emptyText){
-      if(!items.length){
-        container.innerHTML = `<div class="empty">${emptyText}</div>`;
-        return;
-      }
-      container.innerHTML = "";
-      items.forEach(it=>{
-        const box = document.createElement("div");
-        box.className = "item";
-        const img = document.createElement("img");
-        img.className = "thumb";
-        img.src = it.image || "";
-        img.alt = it.title || "이미지";
-        const body = document.createElement("div");
-        const t = document.createElement("div"); t.className="it-title"; t.textContent = it.title || "제목 없음";
-        const d = document.createElement("div"); d.className="it-desc"; d.textContent = it.desc || "";
-        const go = document.createElement("div"); go.className="go";
-        const a  = document.createElement("a");
-        a.className="btn"; a.textContent="보러가기"; a.href = it.link || "#"; a.target="_blank" rel="noopener";
-        go.appendChild(a);
-        body.appendChild(t); body.appendChild(d); body.appendChild(go);
-        box.appendChild(img); box.appendChild(body);
-        container.appendChild(box);
-      });
-    }
-  </script>
+  const prod = document.getElementById("prod");
+  const ins = document.getElementById("ins");
+  (data.affiliates?.products||[]).forEach(p=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<a href="${p.url}" target="_blank">${p.name}</a> <span class="muted">— ${p.note||""}</span>`;
+    prod.appendChild(li);
+  });
+  (data.affiliates?.insurance||[]).forEach(p=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<a href="${p.url}" target="_blank">${p.name}</a> <span class="muted">— ${p.note||""}</span>`;
+    ins.appendChild(li);
+  });
+}
+</script>
 </body>
 </html>
