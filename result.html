@@ -1,184 +1,225 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>노을빛하루 AI 진단 결과</title>
   <style>
     body {
-      font-family: "Pretendard", sans-serif;
-      background-color: #0b0f1a;
-      color: #e5e7eb;
+      font-family: 'Pretendard', sans-serif;
+      background-color: #0e1117;
+      color: #fff;
       margin: 0;
       padding: 0;
     }
     h1 {
       text-align: center;
-      color: #91b4ff;
-      margin-top: 30px;
+      margin-top: 40px;
+      color: #bcd4ff;
+      font-weight: 700;
     }
     .container {
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 25px;
-      padding: 40px;
       flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 40px;
     }
-    .panel {
-      background-color: #161b26;
-      border-radius: 10px;
+    .card {
+      background-color: #1c1f26;
+      border-radius: 12px;
       padding: 25px;
-      box-shadow: 0 0 10px #111827;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+      flex: 1;
+      min-width: 380px;
+      max-width: 600px;
     }
-    .left-panel {
-      flex: 1 1 600px;
-      max-width: 700px;
-    }
-    .right-panel {
-      flex: 1 1 350px;
-      max-width: 400px;
-    }
-    .section-title {
-      font-size: 1.1em;
-      color: #ffffff;
-      margin-top: 25px;
-      margin-bottom: 10px;
-      border-left: 4px solid #3b82f6;
+    .card h2 {
+      font-size: 20px;
+      color: #fff;
+      border-left: 4px solid #4685ff;
       padding-left: 10px;
+      margin-bottom: 15px;
     }
-    .progress-bar {
-      height: 10px;
-      background-color: #1f2937;
-      border-radius: 5px;
+    .card h3 {
+      color: #a2b5ff;
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+    .bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background-color: #2f3542;
+      margin: 10px 0 20px;
+    }
+    .bar-inner {
+      height: 100%;
+      border-radius: 4px;
+      background-color: #4685ff;
+      width: 0;
+      transition: width 1s ease;
+    }
+    ul {
       margin: 10px 0;
+      padding-left: 18px;
+      color: #d0d3da;
     }
-    .progress {
-      height: 10px;
-      background-color: #3b82f6;
-      border-radius: 5px;
-      width: 0%;
-      transition: width 1s ease-in-out;
+    li { margin-bottom: 4px; }
+
+    .supplement-card {
+      background-color: #232731;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
     }
-    .affiliate-item, .insurance-item {
-      background-color: #1f2532;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .supplement-card:hover {
+      transform: translateY(-3px);
+      background-color: #2d3240;
     }
-    .affiliate-item img, .insurance-item img {
-      width: 55px;
-      height: 55px;
-      border-radius: 6px;
-      object-fit: cover;
+    .supplement-card strong {
+      font-size: 16px;
+      color: #fff;
     }
-    .affiliate-item a, .insurance-item a {
-      color: #93c5fd;
-      font-size: 0.9em;
-      text-decoration: none;
-    }
-    .affiliate-item a:hover, .insurance-item a:hover {
-      text-decoration: underline;
+    .supplement-card small {
+      color: #9aa3b7;
     }
   </style>
 </head>
 <body>
   <h1>노을빛하루 AI 진단 결과</h1>
+
   <div class="container">
-    <!-- Left Panel -->
-    <div class="panel left-panel" id="resultPanel">
-      <h2 id="topicTitle">주제명 불러오는 중...</h2>
-      <p id="severity">진단 단계: -</p>
-      <div class="progress-bar"><div class="progress" id="riskProgress"></div></div>
-      <p id="riskScore">위험도 지표: -</p>
+    <!-- 왼쪽 -->
+    <div class="card">
+      <h2 id="topic">주제</h2>
+      <h3 id="level">진단 단계</h3>
+      <div class="bar"><div class="bar-inner" id="riskBar"></div></div>
+      <div><strong>위험도 지표:</strong> <span id="riskPercent">0</span>/100</div>
 
-      <div class="section-title">상세 진단</div>
-      <p id="detail"></p>
+      <h3>상세 진단</h3>
+      <p id="detail">데이터 불러오는 중...</p>
 
-      <div class="section-title">요약</div>
-      <p id="summary"></p>
+      <h3>요약</h3>
+      <ul id="summary"></ul>
 
-      <div class="section-title">전문가 의견</div>
-      <p id="expert"></p>
+      <h3>전문가 의견</h3>
+      <ul id="opinion"></ul>
     </div>
 
-    <!-- Right Panel -->
-    <div class="panel right-panel">
-      <div class="section-title">제휴상품 (필요하신 영양제)</div>
-      <div id="affiliateList"></div>
+    <!-- 오른쪽 -->
+    <div class="card">
+      <h2>제휴상품 (필요하신 영양제)</h2>
+      <div id="supplementList"></div>
 
-      <div class="section-title">제휴보험 (체크해 보세요)</div>
+      <h2>제휴보험 (체크해 보세요)</h2>
       <div id="insuranceList"></div>
     </div>
   </div>
 
   <script>
-    const topic = localStorage.getItem("selectedTopic") || "혈압 관리";
+    // ✅ 결과 데이터 불러오기
+    const result = JSON.parse(localStorage.getItem("aiResult"));
+    if (!result) {
+      document.getElementById("detail").textContent = "결과 데이터를 불러올 수 없습니다.";
+    } else {
+      document.getElementById("topic").textContent = result.topic || "진단 결과";
+      document.getElementById("level").textContent = result.level || "단계 정보 없음";
+      document.getElementById("riskPercent").textContent = result.riskPercent || 0;
+      document.getElementById("detail").textContent = result.detail || "상세 진단 데이터 없음";
+      document.getElementById("riskBar").style.width = `${result.riskPercent || 0}%`;
 
-    async function loadResult() {
-      try {
-        const [analysisRes, affiliateRes] = await Promise.all([
-          fetch("analysis.json"),
-          fetch("affiliate.json")
-        ]);
-        const analysisData = await analysisRes.json();
-        const affiliateData = await affiliateRes.json();
+      // 요약
+      document.getElementById("summary").innerHTML =
+        (result.summary || []).length
+          ? result.summary.map(i => `<li>${i}</li>`).join("")
+          : "<li>요약 데이터 없음</li>";
 
-        const data = analysisData[topic];
-        if (!data) {
-          document.getElementById("resultPanel").innerHTML =
-            "<p>결과 데이터를 찾을 수 없습니다.</p>";
-          return;
-        }
-
-        // 좌측 데이터
-        document.getElementById("topicTitle").textContent = topic;
-        document.getElementById("severity").textContent = `${data.stage || "경미함"} 단계`;
-        document.getElementById("riskScore").textContent = `위험도 지표: ${data.risk || "0"}/100`;
-        document.getElementById("detail").textContent = data.detail || "상세 진단 데이터 없음";
-        document.getElementById("summary").textContent = data.summary || "요약 데이터 없음";
-        document.getElementById("expert").textContent = data.expert || "전문가 의견 데이터 없음";
-        document.getElementById("riskProgress").style.width = `${data.risk || 0}%`;
-
-        // 우측 제휴상품
-        const affiliateList = affiliateData[topic]?.products || [];
-        const affiliateContainer = document.getElementById("affiliateList");
-        affiliateList.slice(0, 3).forEach(p => {
-          const div = document.createElement("div");
-          div.className = "affiliate-item";
-          div.innerHTML = `
-            <img src="${p.image}" alt="${p.name}">
-            <div>
-              <strong>${p.name}</strong><br>
-              <a href="${p.link}" target="_blank">${p.desc}</a>
-            </div>`;
-          affiliateContainer.appendChild(div);
-        });
-
-        // 우측 제휴보험
-        const insuranceList = affiliateData[topic]?.insurance || [];
-        const insuranceContainer = document.getElementById("insuranceList");
-        insuranceList.slice(0, 2).forEach(i => {
-          const div = document.createElement("div");
-          div.className = "insurance-item";
-          div.innerHTML = `
-            <img src="${i.image}" alt="${i.name}">
-            <div>
-              <strong>${i.name}</strong><br>
-              <a href="${i.link}" target="_blank">${i.desc}</a>
-            </div>`;
-          insuranceContainer.appendChild(div);
-        });
-      } catch (err) {
-        console.error(err);
-        document.getElementById("resultPanel").innerHTML = "<p>데이터 로드 중 오류가 발생했습니다.</p>";
-      }
+      // 전문가 의견
+      document.getElementById("opinion").innerHTML =
+        (result.opinion || result.advice || []).length
+          ? (result.opinion || result.advice).map(i => `<li>${i}</li>`).join("")
+          : "<li>전문가 의견 데이터 없음</li>";
     }
 
-    loadResult();
+    // ✅ 제휴상품 링크 매핑
+    const linkMap = {
+      "관절 통증": [
+        { name: "글루코사민", url: "https://link.coupang.com/a/c2RH71" },
+        { name: "MSM 관절영양", url: "https://link.coupang.com/a/c2RKZl" },
+        { name: "콜라겐 플러스", url: "https://link.coupang.com/a/c2RNHD" }
+      ],
+      "혈압 관리": [
+        { name: "오메가3 트리플케어", url: "https://link.coupang.com/a/c2RQAG" },
+        { name: "마그네슘 밸런스", url: "https://link.coupang.com/a/c2RTRr" },
+        { name: "코엔자임Q10 플러스", url: "https://link.coupang.com/a/c2RWlM" }
+      ],
+      "혈당·당뇨": [
+        { name: "알파리포산 600", url: "https://link.coupang.com/a/c2RXDT" },
+        { name: "크롬 포뮬러", url: "https://link.coupang.com/a/c2RZ7S" },
+        { name: "오메가3 밸런스", url: "https://link.coupang.com/a/c2R1hr" }
+      ],
+      "불면증·수면장애": [
+        { name: "테아닌 릴렉스", url: "https://link.coupang.com/a/c2R26o" },
+        { name: "마그네슘 나이트", url: "https://link.coupang.com/a/c2R5lm" },
+        { name: "GABA 컴플렉스", url: "https://link.coupang.com/a/c2R9RO" }
+      ],
+      "어깨·목 통증": [
+        { name: "MSM 관절근육 포뮬러", url: "https://link.coupang.com/a/c2SdN1" },
+        { name: "마그네슘 이지업", url: "https://link.coupang.com/a/c2SeX4" },
+        { name: "비타민B 컴플렉스", url: "https://link.coupang.com/a/c2SgkD" }
+      ],
+      "심장·호흡·가슴통증": [
+        { name: "코엔자임Q10 하트케어", url: "https://link.coupang.com/a/c2SnFt" },
+        { name: "오메가3 심혈관 포뮬러", url: "https://link.coupang.com/a/c2So9Q" },
+        { name: "폴리코사놀 10", url: "https://link.coupang.com/a/c2SrCT" }
+      ],
+      "노안·시력저하": [
+        { name: "루테인 지아잔틴", url: "https://link.coupang.com/a/c2StF3" },
+        { name: "비타민A 아이케어", url: "https://link.coupang.com/a/c2Svgp" },
+        { name: "아스타잔틴 비전", url: "https://link.coupang.com/a/c2SwxO" }
+      ],
+      "치매·기억력 문제": [
+        { name: "오메가3", url: "https://link.coupang.com/a/c2SxOq" },
+        { name: "포스파티딜세린", url: "https://link.coupang.com/a/c2SzKf" },
+        { name: "은행잎추출물", url: "https://link.coupang.com/a/c2SBSY" }
+      ],
+      "전립선·배뇨 문제": [
+        { name: "아연", url: "https://link.coupang.com/a/c2SC9E" },
+        { name: "쏘팔메토", url: "https://link.coupang.com/a/c2SH2O" },
+        { name: "비타민E", url: "https://link.coupang.com/a/c2SJVq" }
+      ],
+      "종합 건강 체크": [
+        { name: "멀티비타민", url: "https://link.coupang.com/a/c2SKDt" },
+        { name: "유산균", url: "https://link.coupang.com/a/c2SLLs" },
+        { name: "오메가3", url: "https://link.coupang.com/a/c2SxOq" }
+      ]
+    };
+
+    const supplementList = document.getElementById("supplementList");
+    if (result && linkMap[result.topic]) {
+      linkMap[result.topic].forEach(item => {
+        const div = document.createElement("div");
+        div.className = "supplement-card";
+        div.innerHTML = `<strong>${item.name}</strong><br><small>쿠팡 바로가기</small>`;
+        div.onclick = () => window.open(item.url, "_blank");
+        supplementList.appendChild(div);
+      });
+    }
+
+    const insuranceList = document.getElementById("insuranceList");
+    [
+      { name: "고혈압·심장 보장보험", desc: "혈압·심혈관질환 중심 보장 상품" },
+      { name: "만성질환 실손보험", desc: "정기 내과·검사비 보장 상품" }
+    ].forEach(item => {
+      const div = document.createElement("div");
+      div.className = "supplement-card";
+      div.innerHTML = `<strong>${item.name}</strong><br><small>${item.desc}</small>`;
+      insuranceList.appendChild(div);
+    });
   </script>
 </body>
 </html>
