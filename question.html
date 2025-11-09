@@ -3,127 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>노을빛하루 AI 자동 진단</title>
+  <title>AI 문항 자동 생성</title>
   <style>
     body {
-      background-color: #f8fafc;
+      background-color: #f5f7fb;
       font-family: "Noto Sans KR", sans-serif;
       margin: 0;
       padding: 0;
     }
-    .container {
-      max-width: 640px;
-      margin: 60px auto;
-      background: white;
+    .wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: #fff;
+      padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.08);
-      padding: 30px 40px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      text-align: center;
+      width: 400px;
     }
     h2 {
-      font-size: 22px;
       color: #1e293b;
+      font-size: 20px;
+      font-weight: 700;
       margin-bottom: 10px;
     }
     p {
       color: #64748b;
-      font-size: 15px;
-      margin-bottom: 25px;
+      font-size: 14px;
+      margin-bottom: 30px;
     }
-    .question {
-      background: #f1f5f9;
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      color: #334155;
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #475569;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      outline: none;
     }
     button {
+      width: 100%;
+      padding: 12px;
       background-color: #2563eb;
       color: white;
-      font-weight: 600;
       border: none;
-      padding: 14px;
       border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
       font-size: 15px;
-      margin-top: 20px;
+      cursor: pointer;
+      font-weight: 600;
     }
     button:hover {
-      background-color: #1d4ed8;
+      background-color: #1e40af;
     }
-    .loading {
-      text-align: center;
-      color: #475569;
-      margin-top: 25px;
+    .error {
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 10px;
       display: none;
+      background: #fee2e2;
+      border-radius: 6px;
+      padding: 8px;
+    }
+    .progress {
+      color: #475569;
+      font-size: 13px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2 id="topicTitle">AI 자동 진단 중...</h2>
-    <p>AI가 주제별 맞춤 문항을 자동 생성하고 있습니다.</p>
+  <div class="wrapper">
+    <div class="box">
+      <h2 id="title">AI 문항 자동 생성</h2>
+      <p id="desc">선택한 주제에 따라 맞춤 문항이 자동으로 생성됩니다.</p>
 
-    <div id="questionList"></div>
-    <button id="analyzeBtn" style="display:none;">AI 자동 분석 시작</button>
-    <div id="loading" class="loading">AI가 결과를 분석 중입니다...</div>
+      <label>응답 입력 (쉼표로 구분)</label>
+      <input type="text" id="answers" placeholder="예: 피로, 두통, 어깨결림, 불면" />
+
+      <button id="submitBtn">결과 보기</button>
+      <div id="progress" class="progress"></div>
+      <div id="errorBox" class="error"></div>
+    </div>
   </div>
 
   <script>
-    const topic = localStorage.getItem("selectedTopic");
-    const title = document.getElementById("topicTitle");
-    const questionList = document.getElementById("questionList");
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const loading = document.getElementById("loading");
+    // ✅ URL에서 topic 파라미터 읽기
+    const params = new URLSearchParams(window.location.search);
+    const topic = params.get("topic");
+
+    const title = document.getElementById("title");
+    const desc = document.getElementById("desc");
 
     if (!topic) {
-      title.textContent = "❌ 주제가 선택되지 않았습니다.";
-    } else {
-      title.textContent = `[ ${topic} ] 진단 문항`;
-      loadSurvey(topic);
+      document.body.innerHTML = `
+        <div style="text-align:center;margin-top:100px;color:#dc2626;font-family:'Noto Sans KR',sans-serif">
+          <h3>❌ 주제가 선택되지 않았습니다.</h3>
+          <p style="color:#64748b;">AI가 주제별 맞춤 문항을 자동 생성 중입니다.</p>
+        </div>`;
+      throw new Error("topic missing");
     }
 
-    // ✅ 문항 자동 불러오기
-    async function loadSurvey(topic) {
-      try {
-        const res = await fetch(`/api/survey/${encodeURIComponent(topic)}`);
-        const data = await res.json();
-        if (!data.questions) {
-          questionList.innerHTML = "<p>문항을 불러올 수 없습니다.</p>";
-          return;
-        }
-        data.questions.forEach((q, i) => {
-          const div = document.createElement("div");
-          div.className = "question";
-          div.textContent = `${i + 1}. ${q}`;
-          questionList.appendChild(div);
-        });
-        analyzeBtn.style.display = "block";
-      } catch (err) {
-        console.error("문항 불러오기 오류:", err);
-        questionList.innerHTML = "<p>⚠️ AI 문항 불러오기 실패</p>";
+    title.textContent = `${topic} 진단`;
+    desc.textContent = `현재 "${topic}"에 대한 맞춤 문항을 생성 중입니다.`;
+
+    // ✅ 버튼 클릭 시 서버로 분석 요청
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const answersText = document.getElementById("answers").value.trim();
+      const progress = document.getElementById("progress");
+      const errorBox = document.getElementById("errorBox");
+
+      errorBox.style.display = "none";
+      progress.textContent = "";
+
+      if (!answersText) {
+        errorBox.textContent = "응답 내용을 입력해주세요.";
+        errorBox.style.display = "block";
+        return;
       }
-    }
 
-    // ✅ AI 자동 분석 버튼 클릭
-    analyzeBtn.addEventListener("click", async () => {
-      analyzeBtn.style.display = "none";
-      loading.style.display = "block";
+      const answers = answersText.split(",").map(a => a.trim());
+      progress.textContent = "문항 분석 중입니다...";
 
       try {
-        const res = await fetch("/api/analyze", {
+        // ✅ 실제 API 경로로 수정
+        const response = await fetch("https://noeulbitharu.onrender.com/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic })
+          body: JSON.stringify({ topic, answers })
         });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || "결과 생성 실패");
+
+        if (!response.ok) throw new Error("서버 응답 오류: " + response.status);
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || "결과 분석 실패");
 
         localStorage.setItem("aiResult", JSON.stringify(data));
         window.location.href = "result.html";
       } catch (err) {
-        console.error("AI 분석 오류:", err);
-        loading.textContent = "⚠️ 분석 실패. 다시 시도해주세요.";
+        console.error("❌ 전송 오류:", err);
+        errorBox.textContent = "결과 전송에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.";
+        errorBox.style.display = "block";
+      } finally {
+        progress.textContent = "";
       }
     });
   </script>
