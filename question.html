@@ -2,108 +2,182 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
+  <title>문항 선택 | 노을빛하루 AI 진단</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>노을빛하루 AI 종합 진단</title>
   <style>
-    body { background-color:#f5f7fb; font-family:"Noto Sans KR",sans-serif; margin:0; padding:0; }
-    .wrapper { display:flex; justify-content:center; align-items:center; height:100vh; }
-    .box { background:#fff; padding:40px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08); text-align:center; width:400px; }
-    h2 { color:#1e293b; font-size:20px; font-weight:700; margin-bottom:25px; }
-    label { display:block; text-align:left; margin-bottom:6px; font-size:14px; color:#475569; }
-    select,input { width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; margin-bottom:20px; outline:none; }
-    button { width:100%; padding:12px; background-color:#2563eb; color:#fff; border:none; border-radius:8px; font-size:15px; cursor:pointer; font-weight:600; }
-    button:hover { background-color:#1e40af; }
-    .error { color:#dc2626; font-size:14px; margin-top:10px; display:none; background:#fee2e2; border-radius:6px; padding:8px; }
-    .progress { color:#475569; font-size:13px; margin-top:10px; }
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      background: #f3f6fb;
+      margin: 0;
+    }
+    .header {
+      background: #0f4fff;
+      color: #fff;
+      text-align: center;
+      padding: 22px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .wrap {
+      max-width: 650px;
+      margin: 35px auto;
+      background: #fff;
+      padding: 28px;
+      border-radius: 15px;
+      box-shadow: 0 5px 18px rgba(0,0,0,.12);
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.45;
+      color: #0f4fff;
+    }
+    .option {
+      padding: 16px;
+      background: #eef3ff;
+      margin: 12px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: .25s;
+      border: 2px solid transparent;
+    }
+    .option:hover {
+      background: #dce7ff;
+      border-color: #0f4fff;
+    }
+    .progress {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #5b6472;
+    }
+    .pill {
+      display: inline-block;
+      background: #eef2ff;
+      color: #3742b1;
+      padding: 5px 10px;
+      border-radius: 999px;
+      margin: 2px;
+      font-size: 12px;
+    }
+    .error {
+      padding: 16px;
+      background: #fff1f1;
+      color: #b40000;
+      border-radius: 10px;
+    }
+    @media (max-width:480px){
+      .header {font-size:20px;padding:18px}
+      .wrap {margin:15px;padding:20px}
+      .title {font-size:19px}
+      .option {font-size:17px;padding:16px}
+    }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <div class="box">
-      <h2>노을빛하루 AI 종합 진단</h2>
-
-      <label>주제 선택</label>
-      <select id="topic">
-        <option value="">-- 주제를 선택하세요 --</option>
-        <option value="관절 통증">관절 통증</option>
-        <option value="혈압 관리">혈압 관리</option>
-        <option value="혈당·당뇨">혈당·당뇨</option>
-        <option value="불면증·수면장애">불면증·수면장애</option>
-        <option value="어깨·목 통증">어깨·목 통증</option>
-        <option value="심장·호흡·가슴통증">심장·호흡·가슴통증</option>
-        <option value="노안·시력저하">노안·시력저하</option>
-        <option value="치매·기억력 문제">치매·기억력 문제</option>
-        <option value="전립선·배뇨 문제">전립선·배뇨 문제</option>
-        <option value="보이스피싱·복지 안전">보이스피싱·복지 안전</option>
-      </select>
-
-      <label>응답 입력 (쉼표로 구분)</label>
-      <input type="text" id="answers" placeholder="예: 피로, 두통, 어깨결림, 불면" />
-
-      <button id="submitBtn">결과 보기</button>
-      <div id="progress" class="progress"></div>
-      <div id="errorBox" class="error"></div>
+  <div class="header">문항 선택</div>
+  <div class="wrap">
+    <div id="head">
+      <div id="topic-pill" class="pill"></div>
     </div>
+    <div id="question-block" style="margin-top:8px">
+      <div id="question-text" class="title"></div>
+      <div id="options"></div>
+      <div id="progress" class="progress"></div>
+    </div>
+    <div id="error-box" class="error" style="display:none"></div>
   </div>
 
   <script>
-    async function healthCheck() {
-      try {
-        const r = await fetch("/health", { cache: "no-store" });
-        if (!r.ok) throw new Error("health not ok");
-        return true;
-      } catch {
-        return false;
-      }
-    }
+    (async function(){
+      const qs = new URLSearchParams(location.search);
+      const topic = qs.get("topic");
+      const topicPill = document.getElementById("topic-pill");
+      const qText = document.getElementById("question-text");
+      const optBox = document.getElementById("options");
+      const prog = document.getElementById("progress");
+      const err = document.getElementById("error-box");
+      const qBlock = document.getElementById("question-block");
 
-    document.getElementById("submitBtn").addEventListener("click", async () => {
-      const topic = document.getElementById("topic").value.trim();
-      const answersText = document.getElementById("answers").value.trim();
-      const progress = document.getElementById("progress");
-      const errorBox = document.getElementById("errorBox");
-      errorBox.style.display = "none";
-      progress.textContent = "";
+      topicPill.textContent = topic ? `주제: ${topic}` : "주제 미선택";
 
-      if (!topic || !answersText) {
-        errorBox.textContent = "주제와 답변을 모두 입력해주세요.";
-        errorBox.style.display = "block";
+      if(!topic){
+        qBlock.style.display="none";
+        err.style.display="block";
+        err.textContent="주제가 선택되지 않았습니다. 첫 화면으로 돌아가주세요.";
         return;
       }
 
-      // 서버 살아있는지 먼저 확인 (디자인 영향 없음)
-      if (!(await healthCheck())) {
-        errorBox.textContent = "서버 연결이 불안정합니다. 잠시 후 다시 시도해주세요.";
-        errorBox.style.display = "block";
+      let survey;
+      try{
+        const res = await fetch("/survey.json",{cache:"no-store"});
+        if(!res.ok) throw new Error("설문 로드 실패");
+        survey = await res.json();
+      }catch(e){
+        qBlock.style.display="none";
+        err.style.display="block";
+        err.textContent="설문 데이터를 불러오지 못했습니다.";
+        console.error(e);
         return;
       }
 
-      const answers = answersText.split(",").map(a => a.trim()).filter(Boolean);
-      progress.textContent = "문항 8 / 8 — 분석 중입니다...";
+      const questions = survey[topic];
+      if(!Array.isArray(questions) || questions.length===0){
+        qBlock.style.display="none";
+        err.style.display="block";
+        err.textContent="해당 주제의 문항이 없습니다.";
+        return;
+      }
 
-      try {
-        // ✅ 같은 도메인으로 전송 (CORS/혼합콘텐츠 이슈 제거)
-        const response = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ topic, answers })
+      let idx=0;
+      const answers=[];
+
+      function renderQuestion(){
+        const item = questions[idx];
+        const q = item.q || item.question || "";
+        const options = item.opt || item.options || [];
+        qText.textContent = `${idx+1}. ${q}`;
+        optBox.innerHTML = "";
+        options.forEach(label=>{
+          const div=document.createElement("div");
+          div.className="option";
+          div.textContent=label;
+          div.onclick=()=>{
+            answers.push(label);
+            idx++;
+            if(idx<questions.length){
+              renderQuestion();
+            }else{
+              submit();
+            }
+          };
+          optBox.appendChild(div);
         });
-
-        if (!response.ok) throw new Error("서버 응답 오류: " + response.status);
-
-        const data = await response.json();
-        if (!data.success) throw new Error(data.error || "결과 분석 실패");
-
-        localStorage.setItem("aiResult", JSON.stringify(data));
-        window.location.href = "result.html";
-      } catch (err) {
-        console.error("❌ 전송 오류:", err);
-        errorBox.textContent = "결과 전송에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.";
-        errorBox.style.display = "block";
-      } finally {
-        progress.textContent = "";
+        prog.textContent=`문항 ${idx+1} / ${questions.length}`;
       }
-    });
+
+      async function submit(){
+        try{
+          const res=await fetch("/api/analyze",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({topic,answers})
+          });
+          if(!res.ok) throw new Error("서버 오류");
+          const data=await res.json();
+          if(!data.success) throw new Error(data.error||"분석 실패");
+          location.href=`/result.html?payload=${encodeURIComponent(JSON.stringify(data))}`;
+        }catch(e){
+          err.style.display="block";
+          err.textContent="결과 전송에 실패했습니다. 네트워크 상태를 확인해주세요.";
+          console.error("❌ 전송 오류:",e);
+        }
+      }
+
+      renderQuestion();
+    })();
   </script>
 </body>
 </html>
