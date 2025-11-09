@@ -1,212 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>문항 진행</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>노을빛하루 AI 건강진단 설문</title>
 <style>
-  body{margin:0;background:#f5f7fb;font-family:"Noto Sans KR",system-ui}
-  .wrap{max-width:760px;margin:40px auto;padding:0 16px}
-  h1{font-size:22px;color:#0f172a;margin:0 0 8px}
-  .sub{color:#475569;margin-bottom:18px}
-  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(15,23,42,.05)}
-  .q{font-weight:700;margin:0 0 14px;color:#0f172a}
-  .opt{display:block;width:100%;text-align:center;padding:14px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;margin:10px 0;cursor:pointer;transition:.12s}
-  .opt:hover{transform:translateY(-1px);background:#eef2ff}
-  .foot{margin-top:8px;color:#64748b;font-size:13px;text-align:center}
-  .err{margin-top:14px;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;padding:10px;display:none}
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    margin: 0;
+    background: #f6f7f9;
+  }
+  header {
+    background: #0e1116;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  .container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+    padding: 24px;
+  }
+  h2 {
+    margin: 0 0 20px;
+    text-align: center;
+    font-size: 22px;
+  }
+  .q {
+    border-bottom: 1px solid #eee;
+    padding: 16px 0;
+  }
+  .q:last-child {
+    border-bottom: none;
+  }
+  .q strong {
+    color: #111;
+  }
+  .opts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  label {
+    background: #f2f4f6;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all .2s;
+  }
+  label:hover {
+    background: #dde3ea;
+  }
+  input[type="radio"] {
+    margin-right: 6px;
+  }
+  .submit {
+    text-align: center;
+    margin-top: 24px;
+  }
+  button {
+    background: #0e1116;
+    color: #fff;
+    font-weight: 700;
+    border: 0;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .info {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  @media (max-width:680px){
+    .opts { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1 id="ttl">진단</h1>
-  <div class="sub" id="desc"></div>
-  <div class="card">
-    <p class="q" id="qtext">문항 로딩 중…</p>
-    <div id="opts"></div>
-    <div class="foot" id="prog"></div>
-    <div class="err" id="errBox"></div>
+<header>
+  <h1>노을빛하루 AI 건강진단</h1>
+</header>
+
+<div class="container">
+  <div class="info" id="info"></div>
+  <h2 id="title">설문을 불러오는 중입니다...</h2>
+  <form id="form"></form>
+  <div class="submit">
+    <button id="go">진단 결과 보기</button>
   </div>
 </div>
 
 <script>
-(function(){
-  const qs = new URLSearchParams(location.search);
-  const topicFromURL = qs.get("topic");
-  const topic = topicFromURL || localStorage.getItem("selectedTopic");
-  const ttl = document.getElementById("ttl");
-  const desc = document.getElementById("desc");
-  const qtext = document.getElementById("qtext");
-  const opts = document.getElementById("opts");
-  const prog = document.getElementById("prog");
-  const errBox = document.getElementById("errBox");
+// ===============================
+// URL 파라미터로 주제(topic) 받기
+// ===============================
+const params = new URLSearchParams(location.search);
+const topic = params.get("topic");
+const infoBox = document.getElementById("info");
+const title = document.getElementById("title");
+const form = document.getElementById("form");
 
-  if(!topic){
-    // 주제 미지정 시 안전하게 처음 화면으로
-    location.replace("index.html");
+// ===============================
+// 설문 로드 함수
+// ===============================
+async function loadSurvey() {
+  if (!topic) {
+    title.textContent = "주제를 선택해주세요.";
     return;
   }
-  localStorage.setItem("selectedTopic", topic);
-  ttl.textContent = topic + " 진단";
-  desc.textContent = `현재 "${topic}"에 대한 맞춤 문항을 생성 중입니다…`;
 
-  let questions = [];
-  let step = 0;
-  const answers = [];
+  infoBox.textContent = `${topic} 진단 문항을 준비 중입니다. 잠시만 기다려주세요...`;
+  title.textContent = `${topic} 진단`;
 
-  // ----- 선택지 자동생성 규칙 -----
-  const banks = {
-    commonFreq: ["없음","가끔","자주","심함","모름","상담필요"],
-    yesNo: ["예","아니오","가끔 그렇다","자주 그렇다","모름","상담필요"],
-    painPlace: ["무릎","어깨","손가락","허리","발목","기타"],
-    timeOfDay: ["아침","오후","저녁","밤/수면 중","활동 후","불규칙"],
-    shoulder: ["컴퓨터 오래 사용","스마트폰 오래 사용","팔 올릴 때 통증","두통 동반","저림/뻣뻣함","없음"],
-    bpDiet: ["짜게 먹음","보통","싱겁게 먹음","무염 식단","모름","상담필요"],
-    sugarSnack: ["자주 먹음","가끔 먹음","거의 안 먹음","단 음료 자주","과일 과다","모름"],
-    sleep: ["잠드는데 오래 걸림","중간에 자주 깸","아침 피로","낮 졸림","카페인 과다","없음"],
-    eye: ["근거리 흐림","건조/이물감","야간 운전 어려움","눈앞 흐림/번짐","루테인 복용중","정기검진 안함"],
-    heart: ["가슴 답답/조임","운동 후 흉통","계단 오를 때 호흡곤란","스트레스 시 악화","가족력 있음","없음"],
-    prostate: ["야간뇨","소변 줄기 약함","잔뇨감","배뇨통","카페인/술 자주","없음"],
-    brandKR: ["현대","기아","쌍용","르노코리아","쉐보레","상관없음"],
-    brandIM: ["벤츠","BMW","아우디","폭스바겐","도요타/렉서스","상관없음"],
-    carBudget: ["30만원 이하","30~50만원","50~80만원","80~100만원","100만원 이상","일시불"],
-    carMode: ["현금 일시불","할부","장기렌트","리스","중고 포함 비교","아직 미정"],
-    carFuel: ["가솔린","디젤","하이브리드","전기","LPG","상관없음"],
-    insurancePay: ["월 10만↓","10~20만","20~30만","30~40만","40만↑","모름"],
-    insuranceHave: ["2개 이하","3~4개","5~6개","7개 이상","모름","정리 예정"]
-  };
+  try {
+    const res = await fetch(`/api/survey?topic=${encodeURIComponent(topic)}`);
+    if (!res.ok) throw new Error("설문을 불러오지 못했습니다.");
+    const data = await res.json();
 
-  function choicesFor(topic, q){
-    const t = topic;
-    const k = q;
+    // 문항 표시 초기화
+    form.innerHTML = "";
+    infoBox.textContent = `총 ${data.questions.length}문항이 준비되었습니다.`;
 
-    // 자동차 특수 문항
-    if(t==="최저가 자동차 견적 비교"){
-      if(/예산|월.*한도|월 납입|월.*예산/.test(k)) return banks.carBudget;
-      if(/구매 방식|방식|결제|어떤 것을 선호/.test(k)) return banks.carMode;
-      if(/브랜드.*국산/.test(k)) return banks.brandKR;
-      if(/브랜드.*수입|수입차/.test(k)) return banks.brandIM;
-      if(/연료|유종|전기차|하이브리드/.test(k)) return banks.carFuel;
-      if(/보유/.test(k)) return ["소유 중","없음","가족 차량 이용","회사 차량","곧 처분 예정","모름"];
-      return ["가격","연비","디자인","브랜드","안전성","유지비"];
-    }
+    data.questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "q";
 
-    // 보험 특수 문항
-    if(t==="보험비용 종합점검"){
-      if(/보험.*몇 개/.test(k)) return banks.insuranceHave;
-      if(/보험료|부담/.test(k)) return banks.insurancePay;
-      if(/중복 보장|보장 내역/.test(k)) return ["중복 많음","중복 약간","중복 없음","보장 부족","모름","상담필요"];
-      if(/실비|갱신/.test(k)) return ["최근 크게 올랐음","조금 올랐음","변동 없음","내림","모름","무보험"];
-      if(/암|심장|뇌/.test(k)) return ["모두 있음","일부만 있음","없음","모름","추가 예정","상담필요"];
-      return ["자동차보험 보유","운전자보험 보유","연금/저축 보유","실손 보유","치아/실손 추가","모름"];
-    }
+      // ✅ 문항 텍스트 정상 표시
+      div.innerHTML = `<div><strong>문항 ${i + 1}.</strong> ${q.text}</div>`;
 
-    // 건강 공통: 키워드 기반
-    if(t==="관절 통증"){
-      if(/부위|어느/.test(k)) return banks.painPlace;
-      if(/언제|시간대/.test(k)) return banks.timeOfDay;
-      return banks.commonFreq;
-    }
-    if(t==="혈압 관리"){
-      if(/짠|염분|식단/.test(k)) return banks.bpDiet;
-      return banks.yesNo;
-    }
-    if(t==="혈당·당뇨"){
-      if(/단|음료|과일|간식/.test(k)) return banks.sugarSnack;
-      return banks.yesNo;
-    }
-    if(t==="불면증·수면장애"){
-      return banks.sleep;
-    }
-    if(t==="어깨·목 통증"){
-      if(/증상이 가장 불편한 시간|시간대/.test(k)) return banks.timeOfDay;
-      return banks.shoulder;
-    }
-    if(t==="심장·호흡·가슴통증"){
-      return banks.heart;
-    }
-    if(t==="노안·시력저하"){
-      return banks.eye;
-    }
-    if(t==="치매·기억력 문제"){
-      return ["물건 자주 분실","단어 기억 곤란","집안일 순서 혼동","집중력 저하","가족력 있음","없음"];
-    }
-    if(t==="전립선·배뇨 문제"){
-      return banks.prostate;
-    }
-    if(t==="종합 건강 체크"){
-      return ["운동 부족","수면 부족","체중 증가","스트레스 큼","식단 불규칙","특이없음"];
-    }
-    if(t==="소화불량"){
-      return ["식후 더부룩","트림/신물","야간 불편","기름진 음식 잦음","소화제 복용","없음"];
-    }
-    // fallback
-    return banks.yesNo;
-  }
+      const opts = document.createElement("div");
+      opts.className = "opts";
 
-  // ----- 문항 로드 -----
-  fetch("survey.json?v="+Date.now())
-    .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(data => {
-      questions = (data[topic] || []).slice(); // 배열 복제
-      // 문항이 8개 미만이면 안전하게 채우기
-      while(questions.length < 8) questions.push("현재 증상에 가장 가까운 항목을 골라주세요.");
-      desc.textContent = `총 ${questions.length}문항이 준비되었습니다. 클릭하면 다음 문항으로 진행됩니다.`;
-      render();
-    })
-    .catch(err => {
-      errBox.style.display="block";
-      errBox.textContent = "문항을 불러오지 못했습니다. (survey.json 경로/권한 확인)";
-      console.error(err);
+      // ✅ 보기별 출력 (6개 이상 자동)
+      q.options.forEach((op, idx) => {
+        const id = `${q.id}_${idx}`;
+        opts.innerHTML += `
+          <label>
+            <input type="radio" name="${q.id}" value="${op}" required>
+            ${op}
+          </label>
+        `;
+      });
+
+      div.appendChild(opts);
+      form.appendChild(div);
     });
 
-  function render(){
-    if(step >= questions.length){
-      submit();
-      return;
-    }
-    const q = questions[step];
-    qtext.textContent = `문항 ${step+1}. ${q}`;
-    prog.textContent = `문항 ${step+1} / ${questions.length}`;
-    opts.innerHTML = "";
-    const items = choicesFor(topic, q);
-    items.forEach(txt=>{
-      const b = document.createElement("button");
-      b.className = "opt";
-      b.type = "button";
-      b.textContent = txt;
-      b.onclick = () => {
-        answers.push({ q, a: txt });
-        step++;
-        render();
-      };
-      opts.appendChild(b);
-    });
-  }
+    // ✅ 결과 페이지 이동 로직
+    document.getElementById("go").onclick = async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const answers = data.questions.map(q => fd.get(q.id));
 
-  function submit(){
-    qtext.textContent = "마지막 확인 중…";
-    opts.innerHTML = "";
-    prog.textContent = `문항 ${questions.length} / ${questions.length}`;
+      const resp = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, answers })
+      });
 
-    fetch("/api/analyze",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ topic, answers })
-    })
-    .then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(data=>{
-      if(!data.success) throw new Error(data.error||"분석 실패");
-      localStorage.setItem("aiResult", JSON.stringify(data));
-      location.replace("result.html");
-    })
-    .catch(err=>{
-      errBox.style.display="block";
-      errBox.textContent = "결과 전송 실패. 서버 상태를 확인 후 다시 시도해주세요.";
-      console.error(err);
-    });
+      if (!resp.ok) {
+        alert("결과 분석에 실패했습니다.");
+        return;
+      }
+
+      const result = await resp.json();
+      sessionStorage.setItem("latestResult", JSON.stringify(result));
+      location.href = `result.html?topic=${encodeURIComponent(topic)}`;
+    };
+
+  } catch (err) {
+    console.error(err);
+    title.textContent = "설문 로드 중 오류가 발생했습니다.";
   }
-})();
+}
+
+// ===============================
+// 로드 실행
+// ===============================
+loadSurvey();
 </script>
 </body>
 </html>
