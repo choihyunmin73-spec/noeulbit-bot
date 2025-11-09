@@ -3,192 +3,196 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI 종합 진단 결과 | 노을빛하루</title>
+  <title>노을빛하루 AI 결과</title>
   <style>
     body {
+      background-color: #f1f5f9;
       font-family: "Noto Sans KR", sans-serif;
-      background: #f3f6fb;
       margin: 0;
       padding: 0;
+      color: #1e293b;
     }
-    .header {
-      background: #0f4fff;
-      color: #fff;
-      text-align: center;
-      padding: 22px;
-      font-size: 22px;
-      font-weight: 700;
-    }
-    .container {
+    .layout {
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
       gap: 20px;
-      padding: 25px;
+      justify-content: center;
+      padding: 30px;
     }
     .left, .right {
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      padding: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      padding: 25px 30px;
+      box-sizing: border-box;
     }
     .left {
-      flex: 1;
-      min-width: 300px;
-      max-width: 340px;
+      flex: 1 1 340px;
+      max-width: 380px;
     }
     .right {
-      flex: 2;
-      min-width: 340px;
+      flex: 1 1 500px;
       max-width: 600px;
     }
-    .section-title {
-      font-size: 18px;
-      color: #0f4fff;
-      font-weight: 700;
-      border-bottom: 2px solid #dbe3ff;
-      padding-bottom: 6px;
-      margin-bottom: 14px;
+    h2 {
+      font-size: 20px;
+      color: #0f172a;
+      margin-bottom: 15px;
     }
-    .summary, .opinion, .detail {
+    .summary {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 15px;
       margin-bottom: 20px;
     }
-    .summary li, .opinion li, .detail li {
-      margin: 6px 0;
-      color: #333;
+    .detail {
+      font-size: 14px;
+      color: #334155;
       line-height: 1.6;
+      margin-bottom: 25px;
     }
-    .risk {
-      background: #e8edff;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      color: #0f4fff;
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 18px;
-    }
-    .partner-img {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 14px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: 0.25s;
-    }
-    .partner-img:hover {
-      border-color: #0f4fff;
-    }
-    .ad-title {
-      color: #1e293b;
-      font-size: 16px;
+    .highlight {
+      color: #2563eb;
       font-weight: 600;
-      margin-bottom: 8px;
     }
-    .footer {
-      text-align: center;
-      color: #64748b;
+    .product-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+      transition: 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .product-card:hover {
+      background: #e2e8f0;
+      transform: scale(1.01);
+    }
+    .product-card img {
+      width: 70px;
+      height: 70px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+    .product-card div {
+      flex: 1;
+    }
+    .product-card strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+    .product-card span {
       font-size: 13px;
-      margin: 25px 0;
+      color: #475569;
     }
-    @media (max-width: 768px) {
-      .container { flex-direction: column; align-items: center; }
-      .left, .right { width: 100%; max-width: 650px; }
+    .insurance-box {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 25px;
+      border: 1px solid #e2e8f0;
+    }
+    .insurance-box a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .btn-home {
+      display: inline-block;
+      margin-top: 25px;
+      background: #2563eb;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .btn-home:hover {
+      background: #1d4ed8;
     }
   </style>
 </head>
 <body>
-  <div class="header">AI 종합 진단 결과</div>
-  <div class="container">
-    
-    <!-- ✅ 좌측: 제휴상품 -->
+  <div class="layout">
     <div class="left">
-      <div class="section-title">추천 제휴상품</div>
-      <img src="https://cdn-icons-png.flaticon.com/512/4319/4319103.png"
-           class="partner-img"
-           onclick="openLink('https://www.coupang.com/vp/products/6714055083')"
-           alt="영양제 추천" />
-      <div class="ad-title">AI 추천 건강 영양제</div>
-
-      <img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png"
-           class="partner-img"
-           onclick="openLink('https://www.coupang.com/vp/products/7042438821')"
-           alt="운동보조기기" />
-      <div class="ad-title">홈트레이닝 & 혈압 관리</div>
+      <h2>추천 제휴상품</h2>
+      <div id="productList"></div>
     </div>
 
-    <!-- ✅ 우측: 종합진단 결과 -->
     <div class="right">
-      <div id="topic" class="section-title"></div>
-      <div id="risk" class="risk"></div>
+      <h2>AI 종합 분석 결과</h2>
+      <div id="summaryBox" class="summary"></div>
+      <div id="detailBox" class="detail"></div>
+      <div id="opinionBox" class="detail"></div>
 
-      <div class="summary">
-        <div class="section-title">종합 요약</div>
-        <ul id="summary-list"></ul>
+      <div class="insurance-box">
+        <strong>보험비용 절감 & 건강보장 비교</strong>
+        <p>현재 보험료를 AI가 자동 분석하고, 더 저렴한 맞춤 플랜을 찾아드립니다.</p>
+        <a href="https://www.coupang.com/np/search?q=%EB%B3%B4%ED%97%98" target="_blank">👉 보험 비교 바로가기</a>
       </div>
 
-      <div class="detail">
-        <div class="section-title">세부 진단</div>
-        <ul id="detail-list"></ul>
-      </div>
-
-      <div class="opinion">
-        <div class="section-title">AI 전문가 의견</div>
-        <ul id="opinion-list"></ul>
-      </div>
+      <a href="index.html" class="btn-home">← 처음으로 돌아가기</a>
     </div>
-  </div>
-
-  <div class="footer">
-    © 2025 노을빛하루 | AI 건강 진단 서비스
   </div>
 
   <script>
-    function openLink(url) {
-      window.open(url, "_blank");
+    const data = JSON.parse(localStorage.getItem("aiResult") || "{}");
+
+    const summaryBox = document.getElementById("summaryBox");
+    const detailBox = document.getElementById("detailBox");
+    const opinionBox = document.getElementById("opinionBox");
+    const productList = document.getElementById("productList");
+
+    if (!data || !data.success) {
+      summaryBox.textContent = "⚠️ 분석 데이터를 불러올 수 없습니다.";
+    } else {
+      summaryBox.innerHTML = `<strong>[${data.topic}]</strong> ${data.summary || "요약 정보 없음"}`;
+      detailBox.innerHTML = data.detail || "세부 내용 없음";
+      opinionBox.innerHTML = `<span class="highlight">AI 의견:</span> ${data.opinion || "분석 의견 없음"}`;
     }
 
-    (function() {
-      const qs = new URLSearchParams(location.search);
-      const payload = qs.get("payload");
-      let data = null;
-
-      try {
-        data = payload ? JSON.parse(decodeURIComponent(payload)) : JSON.parse(localStorage.getItem("aiResult"));
-      } catch (e) {
-        console.error("❌ 데이터 파싱 오류:", e);
+    // ✅ 제휴상품 자동 표시
+    const sampleProducts = [
+      {
+        name: "혈압·혈당 관리 영양제",
+        desc: "혈압과 혈당 조절에 도움을 주는 복합 포뮬라",
+        img: "https://img.coupangcdn.com/image/vendor_inventory/0f8b/abc123.jpg",
+        link: "https://www.coupang.com/np/search?q=%ED%98%88%EC%95%95%EC%98%81%EC%96%91%EC%A0%9C"
+      },
+      {
+        name: "관절·뼈 건강 보충제",
+        desc: "MSM, 보스웰리아, 비타민D로 구성된 관절케어",
+        img: "https://img.coupangcdn.com/image/vendor_inventory/2a3f/jointcare.jpg",
+        link: "https://www.coupang.com/np/search?q=%EA%B4%80%EC%A0%88%EC%98%81%EC%96%91%EC%A0%9C"
+      },
+      {
+        name: "눈 건강 루테인",
+        desc: "루테인 + 아스타잔틴 복합 포뮬러",
+        img: "https://img.coupangcdn.com/image/vendor_inventory/1b9d/lutein.jpg",
+        link: "https://www.coupang.com/np/search?q=%EB%A3%A8%ED%85%8C%EC%9D%B8"
       }
+    ];
 
-      if (!data || !data.success) {
-        document.body.innerHTML = "<div style='padding:40px;text-align:center;'>결과 데이터를 불러올 수 없습니다.<br>처음으로 돌아가세요.</div>";
-        return;
-      }
-
-      document.getElementById("topic").textContent = `📋 ${data.topic} 결과`;
-      document.getElementById("risk").textContent = `위험도: ${data.risk}%`;
-
-      const summaryList = document.getElementById("summary-list");
-      const detailList = document.getElementById("detail-list");
-      const opinionList = document.getElementById("opinion-list");
-
-      (data.summary || []).forEach(i => {
-        const li = document.createElement("li");
-        li.textContent = i;
-        summaryList.appendChild(li);
-      });
-
-      (data.detail || []).forEach(i => {
-        const li = document.createElement("li");
-        li.textContent = i;
-        detailList.appendChild(li);
-      });
-
-      (data.opinion || []).forEach(i => {
-        const li = document.createElement("li");
-        li.textContent = i;
-        opinionList.appendChild(li);
-      });
-    })();
+    sampleProducts.forEach(p => {
+      const a = document.createElement("a");
+      a.href = p.link;
+      a.target = "_blank";
+      a.className = "product-card";
+      a.innerHTML = `
+        <img src="${p.img}" alt="${p.name}" />
+        <div>
+          <strong>${p.name}</strong>
+          <span>${p.desc}</span>
+        </div>`;
+      productList.appendChild(a);
+    });
   </script>
 </body>
 </html>
