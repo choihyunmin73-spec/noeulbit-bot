@@ -20,7 +20,8 @@
     h2 {
       color: #6ba7ff;
       margin-top: 40px;
-      font-size: 1.7em;
+      font-size: 1.8em;
+      font-weight: 700;
     }
     #question-box {
       background: #182539;
@@ -59,6 +60,20 @@
       font-size: 0.95em;
       color: #a4b6d6;
     }
+    #bar {
+      height: 6px;
+      border-radius: 3px;
+      background: #253553;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    #bar span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: #6ba7ff;
+      transition: width 0.3s ease;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +83,7 @@
     <div id="question-text">질문을 불러오는 중입니다...</div>
     <div id="options"></div>
     <div id="progress"></div>
+    <div id="bar"><span></span></div>
   </div>
 
   <script>
@@ -94,12 +110,12 @@
       });
 
     function showQuestion() {
-      const questionData = surveyData[topic][currentIndex];
-      document.getElementById("question-text").innerText = questionData.question;
+      const q = surveyData[topic][currentIndex];
+      document.getElementById("question-text").innerText = q.question;
 
       const optionsDiv = document.getElementById("options");
       optionsDiv.innerHTML = "";
-      questionData.choices.forEach((choice) => {
+      q.choices.forEach((choice) => {
         const btn = document.createElement("div");
         btn.className = "option";
         btn.innerText = choice;
@@ -107,7 +123,13 @@
         optionsDiv.appendChild(btn);
       });
 
-      document.getElementById("progress").innerText = `질문 ${currentIndex + 1} / ${surveyData[topic].length}`;
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const total = surveyData[topic].length;
+      document.getElementById("progress").innerText = `질문 ${currentIndex + 1} / ${total}`;
+      document.querySelector("#bar span").style.width = `${((currentIndex + 1) / total) * 100}%`;
     }
 
     function selectOption(choice) {
@@ -117,8 +139,22 @@
       if (currentIndex < surveyData[topic].length) {
         showQuestion();
       } else {
-        const query = `result.html?topic=${encodeURIComponent(topic)}&answers=${encodeURIComponent(JSON.stringify(answers))}`;
-        window.location.href = query;
+        // ✅ POST 방식으로 서버에 분석 요청
+        fetch("/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, answers }),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok && data.result) {
+            localStorage.setItem("aiResult", JSON.stringify(data.result));
+            window.location.href = "result.html";
+          } else {
+            alert("분석 처리 중 오류가 발생했습니다.");
+          }
+        })
+        .catch(() => alert("서버 연결에 실패했습니다."));
       }
     }
   </script>
