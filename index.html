@@ -23,24 +23,27 @@
   </div>
 
 <script>
-const topics = [
-  "관절 통증","혈압 관리","혈당·당뇨","불면증·수면장애","어깨·목 통증","심장·호흡·가슴통증",
-  "노안·시력저하","치매·기억력 문제","전립선·배뇨 문제","종합 건강 체크",
-  "보험비용 종합점검","최저가 자동차 견적 비교"
-];
+document.addEventListener("DOMContentLoaded", () => {
+  const topics = [
+    "관절 통증","혈압 관리","혈당·당뇨","불면증·수면장애","어깨·목 통증","심장·호흡·가슴통증",
+    "노안·시력저하","치매·기억력 문제","전립선·배뇨 문제","종합 건강 체크",
+    "보험비용 종합점검","최저가 자동차 견적 비교"
+  ];
 
-const grid = document.getElementById('grid');
-topics.forEach(t => {
-  const d = document.createElement('div');
-  d.className = 'btn';
-  d.textContent = t;
-  d.onclick = () => {
-    // ✅ localStorage에 주제 저장
-    localStorage.setItem("topic", t);
-    // ✅ 페이지 이동
-    location.href = "question.html";
-  };
-  grid.appendChild(d);
+  const grid = document.getElementById('grid');
+
+  topics.forEach(topic => {
+    const btn = document.createElement('div');
+    btn.className = 'btn';
+    btn.textContent = topic;
+
+    btn.addEventListener("click", () => {
+      localStorage.setItem("topic", topic);
+      window.location.href = "question.html";
+    });
+
+    grid.appendChild(btn);
+  });
 });
 </script>
 </body>
