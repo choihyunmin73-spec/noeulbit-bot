@@ -2,55 +2,93 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>질문 선택</title>
-  <link rel="stylesheet" href="style.css">
+  <title>AI 건강 진단</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
+    h2 { margin-bottom: 20px; }
+    .option-button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #f5f5f5;
+      transition: background-color 0.2s;
+    }
+    .option-button:hover { background-color: #e0e0e0; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>AI 건강 진단 - 문항 선택</h1>
-    <div id="question-container"></div>
-    <button id="submit-button">결과 보기</button>
-  </div>
+
+  <div id="question-container">Loading questions...</div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const topic = urlParams.get('topic');
-    if (topic) localStorage.setItem('topic', topic);
+    let surveyData = {};
+    let topics = [];
+    let currentTopicIndex = 0;
+    let currentQuestionIndex = 0;
+    let totalScore = 0;
 
+    // survey.json 불러오기
     fetch('survey.json')
       .then(response => response.json())
       .then(data => {
-        const questions = data[topic];
-        const container = document.getElementById('question-container');
-
-        questions.forEach((q, i) => {
-          const section = document.createElement('div');
-          section.innerHTML = `<h3>Q${i + 1}. ${q.question}</h3>`;
-          q.options.forEach(option => {
-            const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" name="q${i}" value="${option.score}"> ${option.text}`;
-            section.appendChild(label);
-            section.appendChild(document.createElement('br'));
-          });
-          container.appendChild(section);
-        });
+        surveyData = data;
+        topics = Object.keys(data);
+        renderQuestion();
+      })
+      .catch(err => {
+        document.getElementById('question-container').textContent = '질문 로드 실패';
+        console.error(err);
       });
 
-    document.getElementById('submit-button').addEventListener('click', () => {
-      let total = 0;
-      for (let i = 0; i < 8; i++) {
-        const selected = document.querySelectorAll(`input[name="q${i}"]:checked`);
-        selected.forEach(el => total += parseInt(el.value));
+    function renderQuestion() {
+      if (currentTopicIndex >= topics.length) {
+        // 모든 질문 끝 → 결과 페이지로 이동
+        localStorage.setItem('totalScore', totalScore);
+        window.location.href = 'result.html';
+        return;
       }
 
-      let severity = 'mild';
-      if (total >= 15 && total < 30) severity = 'moderate';
-      else if (total >= 30) severity = 'severe';
+      const topic = topics[currentTopicIndex];
+      const questionObj = surveyData[topic][currentQuestionIndex];
 
-      localStorage.setItem('severity', severity);
-      window.location.href = 'result.html';
-    });
+      const questionContainer = document.getElementById('question-container');
+      questionContainer.innerHTML = '';
+
+      // 질문 텍스트
+      const qText = document.createElement('h2');
+      qText.textContent = questionObj.question;
+      questionContainer.appendChild(qText);
+
+      // 옵션 버튼 생성
+      questionObj.options.forEach((opt) => {
+        const button = document.createElement('button');
+        button.textContent = opt.text;
+        button.className = 'option-button';
+        button.addEventListener('click', () => selectOption(opt.score));
+        questionContainer.appendChild(button);
+      });
+    }
+
+    function selectOption(score) {
+      totalScore += score;
+      const topic = topics[currentTopicIndex];
+
+      currentQuestionIndex++;
+
+      // 해당 주제 질문 끝나면 다음 주제로 이동
+      if (currentQuestionIndex >= surveyData[topic].length) {
+        currentTopicIndex++;
+        currentQuestionIndex = 0;
+      }
+
+      renderQuestion();
+    }
   </script>
+
 </body>
 </html>
