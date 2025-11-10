@@ -1,80 +1,248 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>노을빛하루 AI 진단 - 결과</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>노을빛하루 AI 진단 결과</title>
 <style>
-    body {
-        margin: 0;
-        font-family: 'Noto Sans KR', sans-serif;
-        background-color: #0f172a;
-        color: #ffffff;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding-top: 3rem;
-        min-height: 100vh;
-    }
-    .container {
-        width: 90%;
-        max-width: 600px;
-        text-align: center;
-    }
-    h1 {
-        margin-bottom: 1rem;
-        font-size: 1.8rem;
-    }
-    .result-box {
-        background-color: #1e293b;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        text-align: left;
-        line-height: 1.6;
-    }
-    .score {
-        font-weight: bold;
-        color: #facc15;
-    }
+  body {
+    font-family: "Pretendard","Noto Sans KR",sans-serif;
+    background:#0d1420;
+    color:#fff;
+    margin:0;
+  }
+  h1 {
+    text-align:center;
+    color:#bcd4ff;
+    margin:32px 0 20px;
+  }
+  .wrap {
+    display:flex;
+    justify-content:center;
+    gap:24px;
+    flex-wrap:wrap;
+    max-width:1200px;
+    margin:0 auto;
+    padding:0 56px 40px;
+    box-sizing:border-box;
+  }
+  .card {
+    background:#161a22;
+    border-radius:14px;
+    box-shadow:0 0 12px rgba(0,0,0,.4);
+    padding:22px 28px;
+    min-width:380px;
+    flex:1;
+    box-sizing:border-box;
+  }
+  .hl {
+    border-left:4px solid #5b8cff;
+    padding-left:10px;
+    margin:0 0 14px 0;
+  }
+  .level {
+    color:#cdd8ff;
+    margin:4px 0 10px;
+  }
+  .bar {
+    height:6px;
+    background:#2a3140;
+    border-radius:4px;
+    overflow:hidden;
+    margin:8px 0 14px;
+  }
+  .bar span {
+    display:block;
+    height:100%;
+    background:#5b8cff;
+    width:0;
+    transition:width .8s;
+  }
+  .section {
+    color:#9eb2ff;
+    margin:18px 0 6px;
+    border-left:3px solid #5b8cff;
+    padding-left:8px;
+  }
+  ul {
+    margin:6px 0 10px 18px;
+    color:#d5d7de;
+  }
+  li {margin:4px 0;}
+  p {color:#cfd7e4;line-height:1.6em;margin:0 0 10px;}
+  .pill {display:flex;flex-direction:column;gap:12px;}
+  .aff {
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    background:#1f2531;
+    border:1px solid #283142;
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+    transition:0.2s;
+  }
+  .aff:hover {background:#232c3d;transform:translateY(-2px);}
+  .aff img {width:28px;height:28px;}
+  .muted {color:#98a0b3;}
+  footer {
+    text-align:center;
+    font-size:0.85em;
+    color:#7d8aa5;
+    margin-top:24px;
+  }
 </style>
 </head>
 <body>
-<div class="container">
-    <h1>AI 맞춤 건강 진단 결과</h1>
-    <div class="result-box" id="result-container">
-        분석 중...
-    </div>
+<h1>노을빛하루 AI 진단 결과</h1>
+
+<div class="wrap">
+  <!-- LEFT -->
+  <section class="card">
+    <h2 class="hl" id="topic">주제</h2>
+    <div class="level" id="level">Mild</div>
+    <div class="bar"><span id="riskBar"></span></div>
+    <div><strong>위험도 지표:</strong> <span id="risk">0</span>/100</div>
+    <div><strong>총 응답 수:</strong> <span id="respCount">0</span>개</div>
+    <div><strong>위험 단어 수:</strong> <span id="riskWordCount">0</span>개</div>
+
+    <h3 class="section">상세 진단</h3>
+    <div id="detail"></div>
+
+    <h3 class="section">요약</h3>
+    <ul id="summary"></ul>
+
+    <h3 class="section">전문가 의견</h3>
+    <ul id="opinion"></ul>
+  </section>
+  <!-- RIGHT -->
+  <aside class="card">
+    <h2 class="hl">제휴상품 (필요하신 영양제)</h2>
+    <div id="supps" class="pill"></div>
+
+    <h2 class="section">제휴보험 (체크해 보세요)</h2>
+    <div id="ins" class="pill"></div>
+
+    <footer>본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</footer>
+  </aside>
 </div>
 
 <script>
-const selectedTopic = localStorage.getItem('selectedTopic');
-const answers = JSON.parse(localStorage.getItem('answers') || '[]');
-const resultContainer = document.getElementById('result-container');
+(function(){
+  const resTopic = localStorage.getItem("aiTopic") || "진단 결과";
+  const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
 
-if (!selectedTopic || answers.length === 0) {
-    resultContainer.textContent = '올바른 주제를 선택하고 설문을 완료해주세요.';
-} else {
-    const totalScore = answers.reduce((sum, val) => sum + val, 0);
+  const $ = id => document.getElementById(id);
+  $("topic").textContent = resTopic;
 
-    // AI 맞춤 결과 예시: 점수 기반 간단 분석
-    let interpretation = '';
-    if (totalScore >= answers.length * 4) {
-        interpretation = '높은 위험군: 적극적인 관리가 필요합니다.';
-    } else if (totalScore >= answers.length * 2) {
-        interpretation = '중간 위험군: 생활습관 개선과 정기검진이 권장됩니다.';
-    } else {
-        interpretation = '낮은 위험군: 현재 건강 상태가 양호합니다.';
-    }
+  // 응답 및 위험 단어 계산
+  const riskWords = ["통증","저림","가슴","숨","위험","심함","악화","갑자기","호흡","이상"];
+  let riskCount = 0;
+  let matchWords = 0;
 
-    resultContainer.innerHTML = `
-        <p>선택한 주제: <span class="score">${selectedTopic}</span></p>
-        <p>총 점수: <span class="score">${totalScore}</span></p>
-        <p>AI 분석 결과:</p>
-        <p>${interpretation}</p>
-    `;
-}
+  answers.forEach(a=>{
+    riskWords.forEach(r=>{ if(a.includes(r)) matchWords++; });
+  });
+
+  riskCount = matchWords;
+  const total = answers.length;
+  const riskScore = Math.min(100, Math.round((riskCount/Math.max(total,1))*100));
+  const level = riskScore > 60 ? "High" : riskScore > 30 ? "Moderate" : "Mild";
+
+  $("respCount").textContent = total;
+  $("riskWordCount").textContent = riskCount;
+  $("risk").textContent = riskScore;
+  $("level").textContent = level;
+  $("riskBar").style.width = riskScore + "%";
+
+  // 상세 진단 (15줄)
+  const detailTexts = [];
+  if(total===0){
+    detailTexts.push("응답이 없어 기본 안전 수칙을 중심으로 안내합니다.");
+    detailTexts.push("현재 상태는 비교적 안정적입니다.");
+    detailTexts.push("규칙적인 수면과 충분한 수분 섭취를 권장합니다.");
+    detailTexts.push("가벼운 스트레칭과 산책으로 순환을 돕습니다.");
+    detailTexts.push("과로를 피하고 휴식을 자주 취하세요.");
+    detailTexts.push("스트레스를 완화할 수 있는 취미를 가지세요.");
+    detailTexts.push("균형 잡힌 식단으로 면역력을 높이세요.");
+    detailTexts.push("증상이 지속되면 의료 상담을 받으세요.");
+  } else {
+    detailTexts.push(`현재 주제는 '${resTopic}'이며, 위험도는 ${level} 수준으로 평가되었습니다.`);
+    detailTexts.push("응답 데이터를 기반으로 AI가 상태를 분석했습니다.");
+    detailTexts.push("위험 단어가 감지되었으며, 주의가 필요합니다.");
+    detailTexts.push("현재 상태는 비교적 안정적이나 일부 개선이 필요합니다.");
+    detailTexts.push("수면, 스트레스, 식습관을 함께 점검해 보세요.");
+    detailTexts.push("하루 30분 이내의 가벼운 운동이 도움이 됩니다.");
+    detailTexts.push("카페인, 알코올, 흡연을 줄이는 것이 좋습니다.");
+    detailTexts.push("충분한 수분 섭취와 균형 잡힌 영양이 필요합니다.");
+    detailTexts.push("심리적 안정이 신체 회복에 긍정적 영향을 줍니다.");
+    detailTexts.push("통증이나 불편감이 반복된다면 진료를 권장합니다.");
+    detailTexts.push("필요 시 전문의 상담을 통해 정확한 진단을 받으세요.");
+    detailTexts.push("생활습관을 기록해 두면 개선 경과를 확인하기 좋습니다.");
+    detailTexts.push("가벼운 통증이라도 3일 이상 지속되면 병원 방문을 추천합니다.");
+    detailTexts.push("건강 상태가 양호하더라도 정기 검진을 유지하세요.");
+    detailTexts.push("생활관리와 경과 관찰을 병행하시기 바랍니다.");
+  }
+  $("detail").innerHTML = detailTexts.map(t=>`<p>${t}</p>`).join("");
+
+  // 요약 (7줄)
+  const summaryTexts = [
+    `주제: ${resTopic}`,
+    `위험도 수준: ${level}`,
+    `응답 수: ${total}개`,
+    `위험 단어 수: ${riskCount}개`,
+    "전반적으로 안정적이며 생활관리 중심의 접근이 권장됩니다.",
+    "정기 검진과 식습관 개선으로 건강을 유지하세요.",
+    "필요 시 관련 전문의 상담을 병행하세요."
+  ];
+  $("summary").innerHTML = summaryTexts.map(s=>`<li>${s}</li>`).join("");
+
+  // 전문가 의견 (2줄)
+  const opinionTexts = [
+    `AI 분석 결과, 전반적인 위험 수준은 '${level}'입니다.`,
+    "지속적인 생활 관리와 정기 검진으로 건강을 유지하세요."
+  ];
+  $("opinion").innerHTML = opinionTexts.map(s=>`<li>${s}</li>`).join("");
+
+  // 제휴상품 로드
+  fetch("/affiliate.json")
+    .then(r=>r.json())
+    .then(map=>{
+      const supps = $("supps");
+      const items = map[resTopic] || [];
+      if(items.length===0){
+        supps.innerHTML = `<div class='muted'>해당 주제에 등록된 제휴상품이 없습니다.</div>`;
+        return;
+      }
+      items.slice(0,3).forEach(item=>{
+        const div = document.createElement("div");
+        div.className = "aff";
+        div.innerHTML = `
+          <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="pill">
+          <div>
+            <div><strong>${item.name}</strong></div>
+            <div class="muted">${item.desc||""}</div>
+            <div class="muted">쿠팡 바로가기</div>
+          </div>`;
+        div.onclick = ()=>window.open(item.link,"_blank");
+        supps.appendChild(div);
+      });
+    });
+
+  // 제휴보험 (2개 고정)
+  const ins = $("ins");
+  [
+    {name:"고혈압·심장 보장보험",desc:"혈압·심혈관질환 중심 보장 상품"},
+    {name:"만성질환 실손보험",desc:"정기 내과·검사비 보장 상품"}
+  ].forEach(i=>{
+    const div=document.createElement("div");
+    div.className="aff";
+    div.innerHTML=`
+      <img src="https://cdn-icons-png.flaticon.com/512/2965/2965401.png" alt="shield">
+      <div><div><strong>${i.name}</strong></div><div class="muted">${i.desc}</div></div>`;
+    ins.appendChild(div);
+  });
+})();
 </script>
 </body>
 </html>
