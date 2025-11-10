@@ -1,162 +1,56 @@
-<!-- ✅ question.html — 완전 교체본 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>노을빛하루 AI 진단 질문</title>
-  <style>
-    body {
-      font-family: "Pretendard", "Noto Sans KR", sans-serif;
-      background-color: #0d1420;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      min-height: 100vh;
-    }
-    h2 {
-      color: #6ba7ff;
-      margin-top: 40px;
-      font-size: 1.7em;
-    }
-    #question-box {
-      background: #182539;
-      border-radius: 16px;
-      border: 1px solid #294e80;
-      padding: 30px;
-      width: 85%;
-      max-width: 700px;
-      margin-top: 40px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-    }
-    #question-text {
-      font-size: 1.2em;
-      line-height: 1.6em;
-      margin-bottom: 30px;
-      color: #e1ecff;
-    }
-    .option {
-      background-color: #22324b;
-      border: 1px solid #315d93;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 10px 0;
-      transition: 0.2s;
-      cursor: pointer;
-      font-size: 1.05em;
-      color: #cfe2ff;
-    }
-    .option:hover {
-      background-color: #3969b5;
-      color: #fff;
-      transform: translateY(-2px);
-    }
-    #progress {
-      margin-top: 25px;
-      font-size: 0.95em;
-      color: #a4b6d6;
-    }
-    #progress-bar {
-      width: 80%;
-      height: 8px;
-      background-color: #22324b;
-      border-radius: 4px;
-      margin: 8px auto 0;
-      overflow: hidden;
-    }
-    #progress-fill {
-      height: 100%;
-      background-color: #5b8cff;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-  </style>
+  <title>질문 선택</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2 id="topic-title">AI 건강 진단</h2>
-
-  <div id="question-box">
-    <div id="question-text">질문을 불러오는 중입니다...</div>
-    <div id="options"></div>
-    <div id="progress"></div>
-    <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div class="container">
+    <h1>AI 건강 진단 - 문항 선택</h1>
+    <div id="question-container"></div>
+    <button id="submit-button">결과 보기</button>
   </div>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const topic = urlParams.get("topic");
-    document.getElementById("topic-title").innerText = `주제: ${topic}`;
+    const topic = urlParams.get('topic');
+    if (topic) localStorage.setItem('topic', topic);
 
-    let surveyData = {};
-    let currentIndex = 0;
-    let answers = [];
+    fetch('survey.json')
+      .then(response => response.json())
+      .then(data => {
+        const questions = data[topic];
+        const container = document.getElementById('question-container');
 
-    fetch("survey.json")
-      .then((response) => response.json())
-      .then((data) => {
-        surveyData = data;
-        if (!surveyData[topic]) {
-          document.getElementById("question-text").innerText = "해당 주제의 문항을 찾을 수 없습니다.";
-          return;
-        }
-        showQuestion();
-      })
-      .catch(() => {
-        document.getElementById("question-text").innerText = "문항 데이터를 불러오지 못했습니다.";
-      });
-
-    function showQuestion() {
-      const questions = surveyData[topic];
-      const q = questions[currentIndex];
-      document.getElementById("question-text").innerText = q.question;
-
-      const optionsDiv = document.getElementById("options");
-      optionsDiv.innerHTML = "";
-      q.choices.forEach((choice) => {
-        const btn = document.createElement("div");
-        btn.className = "option";
-        btn.innerText = choice;
-        btn.onclick = () => selectOption(choice);
-        optionsDiv.appendChild(btn);
-      });
-
-      const progressText = `질문 ${currentIndex + 1} / ${questions.length}`;
-      document.getElementById("progress").innerText = progressText;
-      const fillWidth = ((currentIndex + 1) / questions.length) * 100;
-      document.getElementById("progress-fill").style.width = fillWidth + "%";
-    }
-
-    function selectOption(choice) {
-      answers.push(choice);
-      currentIndex++;
-
-      if (currentIndex < surveyData[topic].length) {
-        showQuestion();
-      } else {
-        submitToServer();
-      }
-    }
-
-    function submitToServer() {
-      fetch("/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, answers })
-      })
-        .then(res => res.json())
-        .then(data => {
-          localStorage.setItem("aiResult", JSON.stringify(data));
-          window.location.href = "result.html";
-        })
-        .catch(err => {
-          alert("분석 서버 연결 실패. 다시 시도해주세요.");
-          console.error("❌ 분석 실패:", err);
+        questions.forEach((q, i) => {
+          const section = document.createElement('div');
+          section.innerHTML = `<h3>Q${i + 1}. ${q.question}</h3>`;
+          q.options.forEach(option => {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" name="q${i}" value="${option.score}"> ${option.text}`;
+            section.appendChild(label);
+            section.appendChild(document.createElement('br'));
+          });
+          container.appendChild(section);
         });
-    }
+      });
+
+    document.getElementById('submit-button').addEventListener('click', () => {
+      let total = 0;
+      for (let i = 0; i < 8; i++) {
+        const selected = document.querySelectorAll(`input[name="q${i}"]:checked`);
+        selected.forEach(el => total += parseInt(el.value));
+      }
+
+      let severity = 'mild';
+      if (total >= 15 && total < 30) severity = 'moderate';
+      else if (total >= 30) severity = 'severe';
+
+      localStorage.setItem('severity', severity);
+      window.location.href = 'result.html';
+    });
   </script>
 </body>
 </html>
