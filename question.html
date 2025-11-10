@@ -1,116 +1,102 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 종합 진단</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: #0e1a2b;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  h1 {
-    margin-top: 30px;
-    font-size: 24px;
-    text-align: center;
-  }
-  .question-container {
-    margin-top: 40px;
-    width: 90%;
-    max-width: 600px;
-    text-align: center;
-  }
-  .question-text {
-    font-size: 18px;
-    margin-bottom: 20px;
-  }
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .option-btn {
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    background-color: #1e2a3b;
-    color: #fff;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .option-btn:hover {
-    background-color: #2e3a4b;
-  }
-  .option-btn.active {
-    background-color: #4a90e2;
-  }
-  @media (max-width: 500px) {
-    .question-text {
-      font-size: 16px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>설문 - 질문</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+      padding-top: 50px;
+    }
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-bottom: 20px;
     }
     .option-btn {
-      font-size: 14px;
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fafafa;
+      transition: 0.2s;
     }
-  }
-</style>
+    .option-btn:hover {
+      background-color: #e0f7fa;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h2 id="question-title"></h2>
+    <div id="options"></div>
+  </div>
 
-<h1>AI 종합 진단</h1>
-<div class="question-container">
-  <div class="question-text" id="questionText">질문</div>
-  <div class="options" id="optionsContainer"></div>
-</div>
+  <script>
+    let survey = {}; // survey.json 전체 데이터
+    let currentIndex = 0; // 현재 문제 인덱스
+    let answers = []; // 선택지 점수 기록
 
-<script>
-  // survey.json 데이터를 불러온다고 가정
-  const surveyData = JSON.parse(localStorage.getItem("surveyData")) || {};
-  const selectedTopic = localStorage.getItem("selectedTopic") || "관절 통증"; // 예시
+    const selectedTopic = localStorage.getItem('selectedTopic');
+    if (!selectedTopic) {
+      alert("주제가 선택되지 않았습니다.");
+      location.href = 'index.html';
+    }
 
-  const questions = surveyData[selectedTopic];
-  let currentQuestionIndex = 0;
-  let scores = [];
+    const questionTitle = document.getElementById('question-title');
+    const optionsContainer = document.getElementById('options');
 
-  const questionText = document.getElementById("questionText");
-  const optionsContainer = document.getElementById("optionsContainer");
-
-  function renderQuestion() {
-    const q = questions[currentQuestionIndex];
-    questionText.textContent = q.question;
-    optionsContainer.innerHTML = "";
-
-    q.options.forEach((opt, idx) => {
-      const btn = document.createElement("button");
-      btn.classList.add("option-btn");
-      btn.textContent = opt.text;
-      btn.addEventListener("click", () => {
-        scores.push(opt.score);
-        // 색상 강조
-        btn.classList.add("active");
-
-        // 다음 문제로 이동
-        setTimeout(() => {
-          currentQuestionIndex++;
-          if (currentQuestionIndex < questions.length) {
-            renderQuestion();
-          } else {
-            // 결과 페이지 이동
-            localStorage.setItem("scores", JSON.stringify(scores));
-            window.location.href = "result.html";
-          }
-        }, 200); // 0.2초 딜레이로 색상 변화 확인
+    // survey.json 불러오기
+    fetch('survey.json')
+      .then(res => res.json())
+      .then(data => {
+        survey = data[selectedTopic];
+        showQuestion();
       });
-      optionsContainer.appendChild(btn);
-    });
-  }
 
-  renderQuestion();
-</script>
+    function showQuestion() {
+      const question = survey[currentIndex];
+      questionTitle.textContent = question.question;
+      optionsContainer.innerHTML = '';
+
+      question.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt.text;
+        btn.onclick = () => selectOption(opt.score);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function selectOption(score) {
+      answers.push(score);
+      currentIndex++;
+      if (currentIndex >= survey.length) {
+        // 마지막 문제 선택 시 결과 페이지 이동
+        localStorage.setItem('answers', JSON.stringify(answers));
+        location.href = 'result.html';
+      } else {
+        showQuestion();
+      }
+    }
+  </script>
 </body>
 </html>
