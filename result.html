@@ -1,86 +1,80 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>설문 - 결과</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>노을빛하루 AI 진단 - 결과</title>
+<link rel="stylesheet" href="style.css">
+<style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      background-color: #f5f5f5;
-      padding-top: 50px;
+        margin: 0;
+        font-family: 'Noto Sans KR', sans-serif;
+        background-color: #0f172a;
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 3rem;
+        min-height: 100vh;
     }
     .container {
-      text-align: center;
-      width: 90%;
-      max-width: 600px;
-      background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        width: 90%;
+        max-width: 600px;
+        text-align: center;
     }
-    h2 {
-      margin-bottom: 20px;
+    h1 {
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
     }
-    .result {
-      font-size: 18px;
-      line-height: 1.6;
-      margin-top: 20px;
-      text-align: left;
+    .result-box {
+        background-color: #1e293b;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: left;
+        line-height: 1.6;
     }
-    .back-btn {
-      margin-top: 30px;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      background-color: #00796b;
-      color: #fff;
-      cursor: pointer;
+    .score {
+        font-weight: bold;
+        color: #facc15;
     }
-    .back-btn:hover {
-      background-color: #004d40;
-    }
-  </style>
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>AI 맞춤형 건강 분석 결과</h2>
-    <div class="result" id="result-text"></div>
-    <button class="back-btn" onclick="goBack()">다시 설문하기</button>
-  </div>
+<div class="container">
+    <h1>AI 맞춤 건강 진단 결과</h1>
+    <div class="result-box" id="result-container">
+        분석 중...
+    </div>
+</div>
 
-  <script>
-    const resultContainer = document.getElementById('result-text');
-    const answers = JSON.parse(localStorage.getItem('answers') || '[]');
+<script>
+const selectedTopic = localStorage.getItem('selectedTopic');
+const answers = JSON.parse(localStorage.getItem('answers') || '[]');
+const resultContainer = document.getElementById('result-container');
 
-    if (answers.length === 0) {
-      resultContainer.textContent = "결과를 가져올 수 없습니다. 다시 시도해주세요.";
+if (!selectedTopic || answers.length === 0) {
+    resultContainer.textContent = '올바른 주제를 선택하고 설문을 완료해주세요.';
+} else {
+    const totalScore = answers.reduce((sum, val) => sum + val, 0);
+
+    // AI 맞춤 결과 예시: 점수 기반 간단 분석
+    let interpretation = '';
+    if (totalScore >= answers.length * 4) {
+        interpretation = '높은 위험군: 적극적인 관리가 필요합니다.';
+    } else if (totalScore >= answers.length * 2) {
+        interpretation = '중간 위험군: 생활습관 개선과 정기검진이 권장됩니다.';
     } else {
-      // 단순 점수 합산 예시
-      const totalScore = answers.reduce((acc, val) => acc + val, 0);
-
-      let analysis = '';
-      if (totalScore >= answers.length * 4) {
-        analysis = "건강 상태에 주의가 필요합니다. 전문 의료진 상담을 권장합니다.";
-      } else if (totalScore >= answers.length * 2) {
-        analysis = "건강 상태가 보통 수준입니다. 꾸준한 관리가 필요합니다.";
-      } else {
-        analysis = "전반적으로 건강한 상태입니다. 현재 상태를 유지하세요.";
-      }
-
-      resultContainer.textContent = `총 점수: ${totalScore}\n\n${analysis}`;
+        interpretation = '낮은 위험군: 현재 건강 상태가 양호합니다.';
     }
 
-    function goBack() {
-      localStorage.removeItem('answers');
-      location.href = 'index.html';
-    }
-  </script>
+    resultContainer.innerHTML = `
+        <p>선택한 주제: <span class="score">${selectedTopic}</span></p>
+        <p>총 점수: <span class="score">${totalScore}</span></p>
+        <p>AI 분석 결과:</p>
+        <p>${interpretation}</p>
+    `;
+}
+</script>
 </body>
 </html>
