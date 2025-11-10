@@ -1,3 +1,4 @@
+<!-- ✅ result.html — 완전 교체본 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -42,14 +43,12 @@
       <section class="card" id="left">
         <h2 class="hl" id="topic">주제</h2>
         <div class="level" id="level">mild</div>
-
         <div class="bar"><span id="riskBar"></span></div>
         <div class="meta">
           <div class="badge">위험도 지표: <b id="risk">0</b>/100</div>
           <div class="badge">총 응답 수: <b id="ansCount">0</b>개</div>
           <div class="badge">위험단어 수: <b id="riskWords">0</b>개</div>
         </div>
-
         <h3 class="section">상세 진단</h3>
         <ul id="detailList"></ul>
 
@@ -66,7 +65,29 @@
         <div id="supps" class="pill"></div>
 
         <h2 class="section">제휴보험 (체크해 보세요)</h2>
-        <div id="ins" class="pill"></div>
+        <div id="ins" class="pill">
+          <div class="aff" onclick="window.open('https://link.coupang.com/a/c2RTRr')">
+            <img src="https://img.icons8.com/ios-filled/50/heart-health.png" alt="">
+            <div>
+              <div><b>고혈압·심장 보장보험</b></div>
+              <div class="muted">혈압·심혈관질환 중심 보장 상품</div>
+            </div>
+          </div>
+          <div class="aff" onclick="window.open('https://link.coupang.com/a/c2RQAG')">
+            <img src="https://img.icons8.com/ios-filled/50/medical-doctor.png" alt="">
+            <div>
+              <div><b>만성질환 실손보험</b></div>
+              <div class="muted">정기 내과·검사비 보장 상품</div>
+            </div>
+          </div>
+          <div class="aff" onclick="window.open('https://link.coupang.com/a/c2R26o')">
+            <img src="https://img.icons8.com/ios-filled/50/hospital-room.png" alt="">
+            <div>
+              <div><b>검진+입원 통합형</b></div>
+              <div class="muted">검진/입원/수술비 특약 통합 설계</div>
+            </div>
+          </div>
+        </div>
 
         <div class="disclaimer">본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</div>
       </aside>
@@ -74,275 +95,39 @@
   </div>
 
   <script>
-    // ---------- 0) 유틸 ----------
-    const $ = (id)=>document.getElementById(id);
-    const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+    const $ = id => document.getElementById(id);
+    const aiResult = JSON.parse(localStorage.getItem("aiResult") || "null");
 
-    // ---------- 1) 입력 소스 (기존 구조 100% 호환) ----------
-    // 1순위: 서버가 만든 aiResult
-    // 2순위: question.html에서 저장한 aiTopic/aiAnswers로 현 페이지에서 분석 생성
-    const savedResult = JSON.parse(localStorage.getItem("aiResult")||"null");
-    const topicLS = localStorage.getItem("aiTopic");
-    const answersLS = JSON.parse(localStorage.getItem("aiAnswers")||"null");
+    if (!aiResult) {
+      alert("진단 데이터가 없습니다. 처음부터 다시 시작해주세요.");
+      location.href = "/";
+    } else {
+      const { topic, level, riskScore, answersCount, riskWords, detail, summary, opinion, supplements } = aiResult;
+      $("topic").innerText = topic;
+      $("level").innerText = level[0].toUpperCase() + level.slice(1);
+      $("risk").innerText = riskScore;
+      $("ansCount").innerText = answersCount;
+      $("riskWords").innerText = riskWords;
+      $("riskBar").style.width = riskScore + "%";
 
-    // ---------- 2) 위험단어 사전 ----------
-    const RISK_WORDS = ["심함","매우","악화","어려움","위험","즉시","갑자기","숨","통증","가슴","저림","두근","불규칙","실신","호흡곤란","혈변","흑변","출혈","마비","고열"];
+      $("detailList").innerHTML = detail.map(line => `<li>${line}</li>`).join('');
+      $("summary").innerHTML = summary.map(line => `<li>${line}</li>`).join('');
+      $("opinion").innerHTML = opinion.map(line => `<li>${line}</li>`).join('');
 
-    // ---------- 3) 레벨 매핑 ----------
-    function levelFromScore(p){
-      if(p>=70) return "severe";
-      if(p>=40) return "moderate";
-      return "mild";
-    }
-
-    // ---------- 4) 주제별 상세 문장 템플릿 (문장 풀에서 15줄 구성) ----------
-    const DETAIL_POOL = {
-      default: [
-        "응답 내용을 종합하면 현재 상태는 비교적 안정적입니다.",
-        "위험 신호는 크지 않지만 생활관리 강화가 도움이 됩니다.",
-        "수면·스트레스 관리가 전반 지표 개선에 기여합니다.",
-        "규칙적인 식사와 수분 섭취를 유지하세요.",
-        "가벼운 유산소 운동을 주 3~5회 권장합니다.",
-        "증상이 반복되면 가까운 의료기관 진료를 권합니다.",
-        "통증·불편감이 심화되면 즉시 전문의 상담이 필요합니다.",
-        "약물 복용 중이면 복용 순응도를 점검해 주세요.",
-        "자기 전 스마트폰 사용 시간을 줄여보세요.",
-        "카페인·니코틴 섭취는 줄이는 편이 좋습니다.",
-        "필요 시 영양제로 부족분을 보완할 수 있습니다.",
-        "정기검진을 통해 지표 변동을 주기적으로 확인하세요.",
-        "증상이 갑자기 심해지면 미루지 말고 응급 상담하세요.",
-        "과로·무리한 활동을 피하고 충분히 휴식하세요.",
-        "생활관리와 경과 관찰을 병행하시기 바랍니다."
-      ],
-      "관절 통증": [
-        "계단 오르내림, 장시간 서있기에서 통증이 악화될 수 있습니다.",
-        "국소 부기·열감은 염증 가능성을 시사합니다.",
-        "파스·찜질로 일시 완화되더라도 원인 교정이 필요합니다.",
-        "체중 관리가 무릎 하중을 줄여 통증 저감에 유익합니다.",
-        "저강도 근력운동과 스트레칭을 병행해 보세요.",
-      ],
-      "혈압 관리": [
-        "가정용 혈압계로 동일 시간대 측정을 권장합니다.",
-        "짠 음식·가공식품은 지표 변동에 영향을 줍니다.",
-        "이뇨제·ACEi 등 처방약 복용 순응도가 중요합니다.",
-        "규칙적 유산소 운동은 혈압 안정에 효과적입니다."
-      ],
-      "혈당·당뇨": [
-        "식후 졸림·갈증·다뇨는 혈당 변동 신호일 수 있습니다.",
-        "탄수화물 조절과 단순당 섭취 제한이 필요합니다.",
-        "걷기·근력운동 병행 시 인슐린 민감도가 개선됩니다."
-      ],
-      "불면증·수면장애": [
-        "취침·기상 시간을 일정하게 유지하세요.",
-        "늦은 시간 카페인·알코올은 수면 질을 저하시킵니다.",
-        "수면 환경(빛·소음·온도) 조절이 중요합니다."
-      ],
-      "어깨·목 통증": [
-        "장시간 고정자세는 근막 긴장을 유발합니다.",
-        "체간·견갑 안정화 운동이 통증 재발을 줄입니다."
-      ],
-      "심장·호흡·가슴통증": [
-        "활동 시 흉통·호흡곤란은 즉시 진료 사유입니다.",
-        "두근거림·부정맥 의심 시 심전도 확인이 필요합니다."
-      ],
-      "노안·시력저하": [
-        "야간 눈부심·초점 불안정은 검진을 권장합니다.",
-        "정기적인 안과 검진과 조명 환경 조절이 유익합니다."
-      ],
-      "치매·기억력 문제": [
-        "일상생활 영향도(금전·약 복용·길 찾기)를 점검하세요.",
-        "인지훈련·수면·운동·사회활동이 보호인자입니다."
-      ],
-      "전립선·배뇨 문제": [
-        "야간뇨·잔뇨감이 지속되면 비뇨의학과 상담이 권장됩니다.",
-        "수분 섭취 패턴과 카페인 섭취를 점검해 보세요."
-      ],
-      "종합 건강 체크": [
-        "체성분·혈압·혈당·지질 등 기본 지표 점검이 필요합니다.",
-        "생활 습관 전반을 균형 있게 다듬어 주세요."
-      ],
-      "보험비용 종합점검": [
-        "중복 특약·갱신형 비중을 점검하면 비용을 절감할 수 있습니다.",
-        "필요 보장과 납입 여력을 균형 있게 설계하세요."
-      ],
-      "자동차 견적·보험비용 점검": [
-        "예산·보장 범위를 정한 뒤 비교견적이 효율적입니다.",
-        "자기부담금·특약 선택에 따라 월 납입액이 크게 달라집니다."
-      ]
-    };
-
-    // ---------- 5) 요약/전문가 의견 템플릿 ----------
-    function makeSummary(topic, level, ansCount){
-      return [
-        `주제: ${topic}`,
-        `위험도 수준: ${level[0].toUpperCase()+level.slice(1)}`,
-        `응답 수: ${ansCount}개`,
-        "전반 지표를 고려할 때 생활관리 중심 접근이 권장됩니다.",
-        "규칙적 운동·균형 잡힌 식단·수면 위생을 유지하세요.",
-        "증상이 지속·악화되면 의료기관 상담을 권합니다.",
-        "정기적인 점검으로 위험 신호를 조기에 확인하세요."
-      ];
-    }
-
-    function makeOpinion(level){
-      if(level==="severe"){
-        return [
-          "고위험 신호가 감지되어 가급적 빠른 의료기관 방문을 권합니다.",
-          "증상이 갑작스레 심화되면 즉시 응급실을 고려하세요."
-        ];
+      if (supplements && supplements.length > 0) {
+        $("supps").innerHTML = supplements.slice(0, 3).map(item => `
+          <div class="aff" onclick="window.open('${item.link}')">
+            <img src="https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/ffffff/capsule.png" />
+            <div>
+              <div><b>${item.name}</b></div>
+              <div class="muted">${item.desc}</div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        $("supps").innerHTML = `<div class="muted">해당 주제에 등록된 제휴상품이 없습니다.</div>`;
       }
-      if(level==="moderate"){
-        return [
-          "중등도 신호로 판단됩니다. 3~7일 내 외래 상담을 권합니다.",
-          "생활관리와 병행하여 지표 변동을 관찰하세요."
-        ];
-      }
-      return [
-        "특별한 고위험 소견은 크지 않습니다.",
-        "생활습관 관리와 정기 검진으로 현 상태를 유지하세요."
-      ];
     }
-
-    // ---------- 6) 분석 로직 (answers 기반 자동 생성) ----------
-    function analyzeOnClient(topic, answers){
-      const ansCount = Array.isArray(answers)?answers.length:0;
-
-      // 위험 단어 카운트
-      const riskHits = (answers||[]).reduce((acc,a)=>{
-        const hit = RISK_WORDS.reduce((n,w)=> n + (String(a).includes(w)?1:0), 0);
-        return acc + hit;
-      },0);
-
-      // 간단 스코어링: 응답수 가중(<=8문항 기준) + 위험단어 가중
-      const base = Math.min(ansCount, 8)*6;      // 최대 48
-      const risk = clamp(riskHits*12, 0, 60);    // 위험단어당 12, 최대 60
-      const score = clamp(base + risk, 0, 100);  // 최종 0~100
-      const level = levelFromScore(score);
-
-      // 상세 15줄 생성 (주제 전용 + 기본 풀 섞기)
-      const pool = (DETAIL_POOL[topic]||[]).concat(DETAIL_POOL.default);
-      const lines = [];
-      // 1) 첫 줄: 상황 개요 (응답 없을 때 문구는 넣지 않음)
-      lines.push(`현재 주제는 ‘${topic}’이며, 위험도는 ${level[0].toUpperCase()+level.slice(1)} 수준으로 평가되었습니다.`);
-      // 2) 응답 반영 문장 2~3개
-      if(ansCount>0){
-        const pick = (i)=> String(answers[Math.min(i,answers.length-1)]);
-        lines.push(`응답 분석 결과, 일부 선택지(예: “${pick(0)}”)에서 주의 신호가 확인됩니다.`);
-        if(ansCount>2) lines.push(`추가 응답(예: “${pick(2)}”)도 함께 고려해 종합 판단했습니다.`);
-      }else{
-        lines.push("응답 데이터가 적어 보수적으로 안내합니다. 이후 다시 응답하시면 정밀도가 높아집니다.");
-      }
-      // 3) 위험단어 요약
-      lines.push(riskHits>0 ? `위험 관련 단어가 총 ${riskHits}개 감지되어 가중 반영되었습니다.` : "명확한 위험 단어는 다수 감지되지 않았습니다.");
-      // 4) 주제 전용 풀 + 기본 풀에서 랜덤 샘플링하여 15줄 채우기
-      const rest = pool.slice(0); // 얕은 복사
-      while(lines.length<15 && rest.length){
-        const idx = Math.floor(Math.random()*rest.length);
-        lines.push(rest.splice(idx,1)[0]);
-      }
-      // 안전장치: 그래도 모자라면 기본 문장으로 채우기
-      while(lines.length<15) lines.push("생활관리와 경과 관찰을 병행하시기 바랍니다.");
-
-      return {
-        topic,
-        level,
-        riskPercent: score,
-        answers,
-        riskWords: riskHits,
-        detail: lines,                         // 배열(15줄)
-        summary: makeSummary(topic, level, ansCount),
-        opinion: makeOpinion(level)
-      };
-    }
-    // ---------- 7) 렌더 ----------
-    function render(result){
-      $("topic").textContent = result.topic || "진단 결과";
-      $("level").textContent = result.level || "mild";
-      $("risk").textContent  = result.riskPercent ?? 0;
-      $("ansCount").textContent = Array.isArray(result.answers)?result.answers.length:0;
-      $("riskWords").textContent = result.riskWords ?? 0;
-      $("riskBar").style.width = ((result.riskPercent ?? 0) + "%");
-
-      // 상세 진단(배열 15줄)
-      $("detailList").innerHTML = (result.detail||[]).map(s=>`<li>${s}</li>`).join("");
-
-      // 요약 7줄
-      $("summary").innerHTML = (result.summary||[]).map(s=>`<li>${s}</li>`).join("");
-
-      // 전문가 의견 2줄
-      $("opinion").innerHTML = (result.opinion||[]).map(s=>`<li>${s}</li>`).join("");
-    }
-
-    // ---------- 8) 제휴상품/보험 ----------
-    function renderAffiliates(topic){
-      // affiliate.json 로드 → topic 키에 해당하는 3개 박스 생성(전체 박스 클릭)
-      fetch("/affiliate.json")
-        .then(r=>r.json())
-        .then(map=>{
-          const list = map[topic] || [];
-          const supps = $("supps");
-          supps.innerHTML = "";
-
-          if(!list.length){
-            supps.innerHTML = `<div class="muted">해당 주제에 등록된 제휴상품이 없습니다.</div>`;
-          }else{
-            list.slice(0,3).forEach(item=>{
-              const div = document.createElement("div");
-              div.className = "aff";
-              div.innerHTML = `
-                <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="pill">
-                <div>
-                  <div><strong>${item.name}</strong></div>
-                  <div class="muted">${item.desc||""}</div>
-                  <div class="muted">쿠팡 바로가기</div>
-                </div>`;
-              div.onclick = ()=> window.open(item.link, "_blank");
-              supps.appendChild(div);
-            });
-          }
-
-          // 제휴보험(3종 예시 / 링크 있으면 새창)
-          const ins = $("ins");
-          ins.innerHTML = "";
-          [
-            {name:"고혈압·심장 보장보험", desc:"혈압·심혈관질환 중심 보장 상품"},
-            {name:"만성질환 실손보험",   desc:"정기 내과·검사비 보장 상품"},
-            {name:"검진+입원 통합형",     desc:"검진/입원/수술비 특약 통합 설계"}
-          ].forEach(i=>{
-            const box = document.createElement("div");
-            box.className = "aff";
-            box.innerHTML = `
-              <img src="https://cdn-icons-png.flaticon.com/512/2965/2965401.png" alt="shield">
-              <div>
-                <div><strong>${i.name}</strong></div>
-                <div class="muted">${i.desc}</div>
-              </div>`;
-            // 필요 시 링크 연결: box.onclick = ()=> window.open("https://...", "_blank");
-            ins.appendChild(box);
-          });
-        })
-        .catch(()=>{
-          $("supps").innerHTML = `<div class="muted">제휴상품 정보를 불러오지 못했습니다.</div>`;
-          $("ins").innerHTML = `<div class="muted">제휴보험 정보를 불러오지 못했습니다.</div>`;
-        });
-    }
-
-    // ---------- 9) 메인 플로우 ----------
-    (function main(){
-      let result = savedResult;
-      // savedResult가 없으면, 로컬의 topic/answers로 분석 생성
-      if(!result && topicLS){
-        result = analyzeOnClient(topicLS, answersLS||[]);
-        // 생성 결과를 aiResult로 캐시 (이후 새로고침·이동에도 일관성)
-        localStorage.setItem("aiResult", JSON.stringify(result));
-      }
-      if(!result){
-        // 마지막 안전망
-        result = analyzeOnClient("종합 건강 체크", []);
-      }
-      render(result);
-      renderAffiliates(result.topic);
-    })();
   </script>
 </body>
 </html>
