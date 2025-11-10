@@ -1,133 +1,42 @@
-<!-- ✅ result.html — 완전 교체본 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>노을빛하루 AI 진단 결과</title>
-  <style>
-    :root{
-      --bg:#0e1117; --card:#161a22; --muted:#98a0b3; --line:#243048; --pri:#5b8cff;
-      --text:#ffffff; --sub:#cdd8ff
-    }
-    *{box-sizing:border-box}
-    body{font-family:'Pretendard','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);margin:0}
-    h1{margin:32px 0 8px;text-align:center;color:#bcd4ff}
-    .page{max-width:1200px;margin:0 auto;padding:0 48px 48px}
-    .wrap{display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
-    .card{background:var(--card);border-radius:14px;box-shadow:0 0 12px rgba(0,0,0,.35);padding:22px;min-width:380px;max-width:620px;flex:1}
-    .hl{border-left:4px solid var(--pri);padding-left:10px;margin:0 0 14px}
-    .level{color:var(--sub);margin:6px 0 10px}
-    .meta{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 14px}
-    .badge{background:#1f2531;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.95rem;color:#d7def2}
-    .bar{height:6px;background:#2a3140;border-radius:4px;overflow:hidden;margin:8px 0 6px}
-    .bar>span{display:block;height:100%;background:var(--pri);width:0;transition:width .8s}
-    .section{color:#9eb2ff;margin:18px 0 6px;border-left:3px solid var(--pri);padding-left:8px}
-    .muted{color:var(--muted)}
-    ul{margin:6px 0 10px 18px;color:#d5d7de}
-    li{margin:4px 0}
-    .pill{display:flex;gap:12px;flex-direction:column}
-    .aff{display:flex;align-items:flex-start;gap:12px;background:#1f2531;border:1px solid #283142;border-radius:12px;padding:14px;cursor:pointer;transition:.2s}
-    .aff:hover{transform:translateY(-2px);background:#232c3d}
-    .aff img{width:28px;height:28px}
-    .disclaimer{margin-top:10px;font-size:.8rem;color:#8b94a9}
-    @media (max-width:1200px){.page{padding:0 36px 40px}}
-    @media (max-width:840px){.page{padding:0 24px 36px}}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 진단 결과</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>노을빛하루 AI 진단 결과</h1>
-  <div class="page">
-    <div class="wrap">
-      <!-- LEFT -->
-      <section class="card" id="left">
-        <h2 class="hl" id="topic">주제</h2>
-        <div class="level" id="level">mild</div>
-        <div class="bar"><span id="riskBar"></span></div>
-        <div class="meta">
-          <div class="badge">위험도 지표: <b id="risk">0</b>/100</div>
-          <div class="badge">총 응답 수: <b id="ansCount">0</b>개</div>
-          <div class="badge">위험단어 수: <b id="riskWords">0</b>개</div>
-        </div>
-        <h3 class="section">상세 진단</h3>
-        <ul id="detailList"></ul>
-
-        <h3 class="section">요약</h3>
-        <ul id="summary"></ul>
-
-        <h3 class="section">전문가 의견</h3>
-        <ul id="opinion"></ul>
-      </section>
-
-      <!-- RIGHT -->
-      <aside class="card" id="right">
-        <h2 class="hl">제휴상품 (필요하신 영양제)</h2>
-        <div id="supps" class="pill"></div>
-
-        <h2 class="section">제휴보험 (체크해 보세요)</h2>
-        <div id="ins" class="pill">
-          <div class="aff" onclick="window.open('https://link.coupang.com/a/c2RTRr')">
-            <img src="https://img.icons8.com/ios-filled/50/heart-health.png" alt="">
-            <div>
-              <div><b>고혈압·심장 보장보험</b></div>
-              <div class="muted">혈압·심혈관질환 중심 보장 상품</div>
-            </div>
-          </div>
-          <div class="aff" onclick="window.open('https://link.coupang.com/a/c2RQAG')">
-            <img src="https://img.icons8.com/ios-filled/50/medical-doctor.png" alt="">
-            <div>
-              <div><b>만성질환 실손보험</b></div>
-              <div class="muted">정기 내과·검사비 보장 상품</div>
-            </div>
-          </div>
-          <div class="aff" onclick="window.open('https://link.coupang.com/a/c2R26o')">
-            <img src="https://img.icons8.com/ios-filled/50/hospital-room.png" alt="">
-            <div>
-              <div><b>검진+입원 통합형</b></div>
-              <div class="muted">검진/입원/수술비 특약 통합 설계</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="disclaimer">본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</div>
-      </aside>
-    </div>
+  <div class="container">
+    <h1>AI 건강 진단 결과</h1>
+    <div id="result"></div>
+    <div id="recommendation"></div>
   </div>
 
   <script>
-    const $ = id => document.getElementById(id);
-    const aiResult = JSON.parse(localStorage.getItem("aiResult") || "null");
+    const topic = localStorage.getItem('topic');
+    const severity = localStorage.getItem('severity') || 'mild';
 
-    if (!aiResult) {
-      alert("진단 데이터가 없습니다. 처음부터 다시 시작해주세요.");
-      location.href = "/";
-    } else {
-      const { topic, level, riskScore, answersCount, riskWords, detail, summary, opinion, supplements } = aiResult;
-      $("topic").innerText = topic;
-      $("level").innerText = level[0].toUpperCase() + level.slice(1);
-      $("risk").innerText = riskScore;
-      $("ansCount").innerText = answersCount;
-      $("riskWords").innerText = riskWords;
-      $("riskBar").style.width = riskScore + "%";
+    fetch('analysis.json')
+      .then(response => response.json())
+      .then(analysis => {
+        if (!topic || !analysis[topic]) {
+          document.getElementById('result').innerHTML = '<p>선택한 주제에 대한 분석 결과를 찾을 수 없습니다.</p>';
+          return;
+        }
 
-      $("detailList").innerHTML = detail.map(line => `<li>${line}</li>`).join('');
-      $("summary").innerHTML = summary.map(line => `<li>${line}</li>`).join('');
-      $("opinion").innerHTML = opinion.map(line => `<li>${line}</li>`).join('');
+        const topicAnalysis = analysis[topic][severity];
 
-      if (supplements && supplements.length > 0) {
-        $("supps").innerHTML = supplements.slice(0, 3).map(item => `
-          <div class="aff" onclick="window.open('${item.link}')">
-            <img src="https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/ffffff/capsule.png" />
-            <div>
-              <div><b>${item.name}</b></div>
-              <div class="muted">${item.desc}</div>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        $("supps").innerHTML = `<div class="muted">해당 주제에 등록된 제휴상품이 없습니다.</div>`;
-      }
-    }
+        const detailHtml = `<h2>상세진단</h2><p>${topicAnalysis.detail.replace(/\n/g, '<br>')}</p>`;
+        const summaryHtml = `<h2>요약</h2><ul>${topicAnalysis.summary.split('\n').map(line => `<li>${line}</li>`).join('')}</ul>`;
+        const opinionHtml = `<h2>전문가 의견</h2><p>${topicAnalysis.opinion.replace(/\n/g, '<br>')}</p>`;
+
+        document.getElementById('result').innerHTML = detailHtml + summaryHtml + opinionHtml;
+      })
+      .catch(error => {
+        console.error('분석 데이터 로딩 오류:', error);
+        document.getElementById('result').innerHTML = '<p>데이터 로딩에 실패했습니다.</p>';
+      });
   </script>
 </body>
 </html>
