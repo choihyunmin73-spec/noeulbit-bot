@@ -1,3 +1,4 @@
+<!-- ✅ question.html — 완전 교체본 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -94,7 +95,6 @@
     let currentIndex = 0;
     let answers = [];
 
-    // ✅ 설문 데이터 로드
     fetch("survey.json")
       .then((response) => response.json())
       .then((data) => {
@@ -124,14 +124,12 @@
         optionsDiv.appendChild(btn);
       });
 
-      // ✅ 진행률 표시
       const progressText = `질문 ${currentIndex + 1} / ${questions.length}`;
       document.getElementById("progress").innerText = progressText;
       const fillWidth = ((currentIndex + 1) / questions.length) * 100;
       document.getElementById("progress-fill").style.width = fillWidth + "%";
     }
 
-    // ✅ 선택 시 데이터 저장
     function selectOption(choice) {
       answers.push(choice);
       currentIndex++;
@@ -139,35 +137,25 @@
       if (currentIndex < surveyData[topic].length) {
         showQuestion();
       } else {
-        // ✅ 위험단어 분석 (심플 버전)
-        const riskWords = ["심함", "악화", "통증", "위험", "저림", "숨", "갑자기", "가슴", "이상"];
-        let detected = [];
-        answers.forEach(a => {
-          riskWords.forEach(r => {
-            if (a.includes(r)) detected.push(r);
-          });
-        });
-
-        const riskScore = Math.min(100, detected.length * 10);
-        let level = "Mild";
-        if (riskScore >= 70) level = "Severe";
-        else if (riskScore >= 40) level = "Moderate";
-
-        const aiResult = {
-          topic,
-          answers,
-          riskWords: detected,
-          riskScore,
-          level
-        };
-
-        // ✅ 로컬 저장 (result.html로 전달)
-        localStorage.setItem("aiAnswers", JSON.stringify(answers));
-        localStorage.setItem("aiResult", JSON.stringify(aiResult));
-
-        // ✅ 결과 페이지 이동
-        window.location.href = "result.html";
+        submitToServer();
       }
+    }
+
+    function submitToServer() {
+      fetch("/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, answers })
+      })
+        .then(res => res.json())
+        .then(data => {
+          localStorage.setItem("aiResult", JSON.stringify(data));
+          window.location.href = "result.html";
+        })
+        .catch(err => {
+          alert("분석 서버 연결 실패. 다시 시도해주세요.");
+          console.error("❌ 분석 실패:", err);
+        });
     }
   </script>
 </body>
