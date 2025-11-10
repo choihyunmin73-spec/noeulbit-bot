@@ -1,91 +1,80 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>노을빛하루 AI 종합 진단 시스템</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #0f172a;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            text-align: center;
-            max-width: 800px;
-            width: 90%;
-        }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        p.subtitle {
-            font-size: 1rem;
-            margin-bottom: 2rem;
-            color: #cbd5e1;
-        }
-        .topic-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-        .topic-button {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .topic-button:hover {
-            background-color: #334155;
-        }
-        footer {
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        @media (max-width: 500px) {
-            .topic-list {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>건강 AI 설문</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #1a1a1a;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 40px;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 40px;
+      font-size: 2em;
+      color: #ffffff;
+    }
+    .topics {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .topic {
+      background-color: #333333;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: background-color 0.3s;
+    }
+    .topic:hover {
+      background-color: #555555;
+    }
+    @media (max-width: 480px) {
+      .topic {
+        font-size: 1em;
+        padding: 15px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>노을빛하루 AI 종합 진단 시스템</h1>
-        <p class="subtitle">진단을 원하는 주제를 선택하세요.</p>
-        <div class="topic-list">
-            <button class="topic-button" onclick="startSurvey('관절 통증')">관절 통증</button>
-            <button class="topic-button" onclick="startSurvey('혈압 관리')">혈압 관리</button>
-            <button class="topic-button" onclick="startSurvey('혈당·당뇨')">혈당·당뇨</button>
-            <button class="topic-button" onclick="startSurvey('불면증·수면장애')">불면증·수면장애</button>
-            <button class="topic-button" onclick="startSurvey('어깨·목 통증')">어깨·목 통증</button>
-            <button class="topic-button" onclick="startSurvey('심장·호흡·가슴통증')">심장·호흡·가슴통증</button>
-            <button class="topic-button" onclick="startSurvey('노안·시력저하')">노안·시력저하</button>
-            <button class="topic-button" onclick="startSurvey('치매·기억력 문제')">치매·기억력 문제</button>
-            <button class="topic-button" onclick="startSurvey('전립선·배뇨 문제')">전립선·배뇨 문제</button>
-            <button class="topic-button" onclick="startSurvey('종합 건강 체크')">종합 건강 체크</button>
-            <button class="topic-button" onclick="startSurvey('보험비용 종합점검')">보험비용 종합점검</button>
-            <button class="topic-button" onclick="startSurvey('자동차 견적·보험비용 점검')">자동차 견적·보험비용 점검</button>
-        </div>
-        <footer>© 2025 노을빛하루 AI 진단 시스템</footer>
+  <div class="container">
+    <h1>건강 AI 설문 주제 선택</h1>
+    <div class="topics">
+      <div class="topic" onclick="goToQuestion('관절 통증')">관절 통증</div>
+      <div class="topic" onclick="goToQuestion('혈압 관리')">혈압 관리</div>
+      <div class="topic" onclick="goToQuestion('혈당·당뇨')">혈당·당뇨</div>
+      <div class="topic" onclick="goToQuestion('불면증·수면장애')">불면증·수면장애</div>
+      <div class="topic" onclick="goToQuestion('어깨·목 통증')">어깨·목 통증</div>
+      <div class="topic" onclick="goToQuestion('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
+      <div class="topic" onclick="goToQuestion('치매·기억력 문제')">치매·기억력 문제</div>
+      <div class="topic" onclick="goToQuestion('전립선·배뇨 문제')">전립선·배뇨 문제</div>
+      <div class="topic" onclick="goToQuestion('종합 건강 체크')">종합 건강 체크</div>
+      <div class="topic" onclick="goToQuestion('보험비용 종합점검')">보험비용 종합점검</div>
+      <div class="topic" onclick="goToQuestion('자동차 견적·보험비용 점검')">자동차 견적·보험비용 점검</div>
     </div>
+  </div>
 
-    <script>
-        function startSurvey(topic) {
-            // 선택한 주제를 question.html로 전달
-            localStorage.setItem('selectedTopic', topic);
-            window.location.href = 'question.html';
-        }
-    </script>
+  <script>
+    function goToQuestion(topic) {
+      // 선택한 주제를 localStorage에 저장
+      localStorage.setItem('selectedTopic', topic);
+      // 바로 question.html로 이동
+      window.location.href = 'question.html';
+    }
+  </script>
 </body>
 </html>
