@@ -20,25 +20,23 @@
     background:var(--bg);
     color:var(--white);
     margin:0;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;    /* ✅ 세로 상단 정렬 */
-    align-items:center;
+    padding:0;
     min-height:100vh;
-    padding-top:8vh;               /* ✅ 상단 여백 화면비 기준 */
   }
 
   .wrap{
-    width:90%;
-    max-width:1100px;
+    width:92%;
+    max-width:960px;
     margin:0 auto;
-    padding:30px 40px 70px;
+    padding:30px 24px 60px;
+    position:relative;
+    top:40px;                /* ✅ 화면 상단 고정 위치 */
   }
 
   h2{
     color:#98c2ff;
-    margin:8px 0 30px;
-    font-size:24px;
+    margin:0 0 28px;
+    font-size:22px;
     text-align:center;
   }
 
@@ -46,15 +44,15 @@
     background:var(--panel2);
     border:1px solid var(--line);
     border-radius:18px;
-    padding:40px 50px;
+    padding:30px 28px;
     width:100%;
-    max-width:900px;
+    max-width:860px;
     margin:0 auto;
   }
 
   .q{
-    font-size:22px;
-    margin-bottom:32px;
+    font-size:20px;
+    margin-bottom:20px;
     color:#e1ecff;
     text-align:center;
     line-height:1.5;
@@ -64,21 +62,21 @@
     background:#22324b;
     border:1px solid #315d93;
     border-radius:12px;
-    padding:18px;
-    margin:16px 0;
+    padding:14px 10px;
+    margin:10px 0;
     cursor:pointer;
     color:#cfe2ff;
-    font-size:18px;
+    font-size:17px;
     text-align:center;
     display:flex;
     align-items:center;
     justify-content:center;
-    height:58px;
+    height:auto;
+    min-height:48px;
     width:100%;
-    max-width:720px;
+    max-width:100%;
     margin-left:auto;
     margin-right:auto;
-    transition:all 0.15s ease;
   }
 
   .opt:hover{
@@ -91,7 +89,7 @@
     display:flex;
     gap:12px;
     flex-wrap:wrap;
-    margin:24px 0 10px;
+    margin:20px 0 8px;
     color:#a4b6d6;
     justify-content:center;
   }
@@ -102,7 +100,7 @@
     background:#23304a;
     overflow:hidden;
     width:100%;
-    max-width:720px;
+    max-width:700px;
     margin:0 auto;
   }
 
@@ -119,17 +117,18 @@
     background:#294e80;
     border:1px solid #3d6bb0;
     color:#fff;
-    padding:12px 20px;
+    padding:12px 18px;
     border-radius:10px;
-    margin-top:26px;
+    margin-top:24px;
     text-decoration:none;
     font-size:16px;
   }
 
   @media(max-width:768px){
-    .box{padding:28px 24px;}
-    .opt{height:auto;min-height:50px;font-size:16px;}
-    .q{font-size:20px;}
+    .wrap{padding:20px 16px;}
+    .box{padding:24px 20px;}
+    .q{font-size:18px;}
+    .opt{font-size:16px;padding:12px 8px;}
   }
 </style>
 </head>
