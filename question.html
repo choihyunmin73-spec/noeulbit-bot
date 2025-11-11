@@ -5,7 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>노을빛하루 AI 진단 질문</title>
 <style>
-  :root{--bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;}
+  :root{
+    --bg:#0d1420;
+    --panel:#121a26;
+    --panel2:#182235;
+    --line:#2a3a55;
+    --brand:#6ba7ff;
+    --muted:#9fb1cf;
+    --white:#fff;
+  }
+
   body{
     font-family:"Pretendard","Noto Sans KR",sans-serif;
     background:var(--bg);
@@ -13,23 +22,23 @@
     margin:0;
     display:flex;
     flex-direction:column;
-    justify-content:flex-start;   /* ✅ 세로 상단 정렬 */
+    justify-content:flex-start;    /* ✅ 세로 상단 정렬 */
     align-items:center;
     min-height:100vh;
-    padding-top:80px;             /* ✅ 상단 여백 확보 */
+    padding-top:8vh;               /* ✅ 상단 여백 화면비 기준 */
   }
 
   .wrap{
     width:90%;
     max-width:1100px;
     margin:0 auto;
-    padding:40px 60px 70px;
+    padding:30px 40px 70px;
   }
 
   h2{
     color:#98c2ff;
     margin:8px 0 30px;
-    font-size:22px;
+    font-size:24px;
     text-align:center;
   }
 
@@ -37,7 +46,7 @@
     background:var(--panel2);
     border:1px solid var(--line);
     border-radius:18px;
-    padding:36px 40px;
+    padding:40px 50px;
     width:100%;
     max-width:900px;
     margin:0 auto;
@@ -45,17 +54,18 @@
 
   .q{
     font-size:22px;
-    margin-bottom:28px;
+    margin-bottom:32px;
     color:#e1ecff;
     text-align:center;
+    line-height:1.5;
   }
 
   .opt{
     background:#22324b;
     border:1px solid #315d93;
     border-radius:12px;
-    padding:16px;
-    margin:14px 0;
+    padding:18px;
+    margin:16px 0;
     cursor:pointer;
     color:#cfe2ff;
     font-size:18px;
@@ -63,11 +73,12 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    height:55px;
+    height:58px;
     width:100%;
-    max-width:700px;
+    max-width:720px;
     margin-left:auto;
     margin-right:auto;
+    transition:all 0.15s ease;
   }
 
   .opt:hover{
@@ -80,7 +91,7 @@
     display:flex;
     gap:12px;
     flex-wrap:wrap;
-    margin:20px 0 8px;
+    margin:24px 0 10px;
     color:#a4b6d6;
     justify-content:center;
   }
@@ -91,7 +102,7 @@
     background:#23304a;
     overflow:hidden;
     width:100%;
-    max-width:700px;
+    max-width:720px;
     margin:0 auto;
   }
 
@@ -108,11 +119,17 @@
     background:#294e80;
     border:1px solid #3d6bb0;
     color:#fff;
-    padding:12px 18px;
+    padding:12px 20px;
     border-radius:10px;
-    margin-top:24px;
+    margin-top:26px;
     text-decoration:none;
     font-size:16px;
+  }
+
+  @media(max-width:768px){
+    .box{padding:28px 24px;}
+    .opt{height:auto;min-height:50px;font-size:16px;}
+    .q{font-size:20px;}
   }
 </style>
 </head>
@@ -179,7 +196,6 @@ function choose(ch){
   if (idx < list.length) {
     render();
   } else {
-    // 서버 분석 요청 → result.html에서 사용
     fetch("/analyze",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
