@@ -11,23 +11,83 @@
     background:var(--bg);
     color:var(--white);
     margin:0;
-    display:flex;                 
+    display:flex;
     flex-direction:column;
-    justify-content:flex-start;   /* ✅ 상단 중앙 정렬 */
-    align-items:center;           
-    min-height:100vh;             
-    padding-top:60px;             /* ✅ 상단 여백 살짝 추가 */
+    justify-content:flex-start;   /* 상단 중앙정렬 */
+    align-items:center;
+    min-height:100vh;
+    padding-top:60px;
   }
-  .wrap{max-width:900px;margin:0 auto;padding:30px 32px 50px}
-  h2{color:#98c2ff;margin:8px 0 14px}
-  .box{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:24px}
-  .q{font-size:18px;margin-bottom:18px;color:#e1ecff}
-  .opt{background:#22324b;border:1px solid #315d93;border-radius:10px;padding:12px;margin:10px 0;cursor:pointer;color:#cfe2ff}
-  .opt:hover{background:#3969b5;color:#fff;transform:translateY(-2px)}
-  .info{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 6px;color:#a4b6d6}
-  .bar{height:8px;border-radius:4px;background:#23304a;overflow:hidden}
-  .bar > span{display:block;height:100%;width:0;background:#6ba7ff;transition:width .25s}
-  a.btn{display:inline-block;background:#294e80;border:1px solid #3d6bb0;color:#fff;padding:10px 14px;border-radius:10px;margin-top:14px;text-decoration:none}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 40px 60px;}
+  h2{color:#98c2ff;margin:8px 0 20px;font-size:22px;text-align:center;}
+  .box{
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:32px;
+    width:80%;
+    max-width:700px;
+  }
+  .q{
+    font-size:20px;
+    margin-bottom:22px;
+    color:#e1ecff;
+    text-align:center;
+  }
+  .opt{
+    background:#22324b;
+    border:1px solid #315d93;
+    border-radius:12px;
+    padding:14px;
+    margin:12px 0;
+    cursor:pointer;
+    color:#cfe2ff;
+    font-size:18px;
+    text-align:center;
+    display:flex;                 /* ✅ 수평/수직 중앙정렬 */
+    align-items:center;           /* ✅ 세로 중앙정렬 */
+    justify-content:center;       /* ✅ 가로 중앙정렬 */
+    height:50px;                  /* ✅ 일정 높이로 통일 */
+  }
+  .opt:hover{
+    background:#3969b5;
+    color:#fff;
+    transform:translateY(-2px);
+  }
+  .info{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin:18px 0 8px;
+    color:#a4b6d6;
+    justify-content:center;
+  }
+  .bar{
+    height:10px;
+    border-radius:5px;
+    background:#23304a;
+    overflow:hidden;
+    width:100%;
+    max-width:700px;
+  }
+  .bar > span{
+    display:block;
+    height:100%;
+    width:0;
+    background:#6ba7ff;
+    transition:width .25s;
+  }
+  a.btn{
+    display:inline-block;
+    background:#294e80;
+    border:1px solid #3d6bb0;
+    color:#fff;
+    padding:12px 18px;
+    border-radius:10px;
+    margin-top:20px;
+    text-decoration:none;
+    font-size:16px;
+  }
 </style>
 </head>
 <body>
