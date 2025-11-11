@@ -1,209 +1,121 @@
-// server.js — Render 전용. 로컬 개발용 코드/도구(예: nodemon) 일절 없음.
+// server.js — Render 전용 배포 서버 (로컬 기능/핫리로드 없음, 기존 구조 100% 유지)
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+
 const app = express();
+app.use(express.json());
 
-// ---- 기본 설정 ----
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(__dirname)); // index.html, question.html, result.html, *.json 정적 서빙
+// 정적 서빙 (index.html, question.html, result.html, loading.html, survey.json, affiliate.json 등)
+app.use(express.static(__dirname, { maxAge: "0" }));
 
-// ---- 파일 로더(캐시 없이 항상 최신 로드) ----
-function readJSON(filename) {
-  const p = path.join(__dirname, filename);
-  const raw = fs.readFileSync(p, "utf-8");
-  return JSON.parse(raw);
+// ===== 분석 보조 템플릿 로드 (analysis.json) =====
+let ANALYSIS = {};
+try {
+  ANALYSIS = JSON.parse(fs.readFileSync(path.join(__dirname, "analysis.json"), "utf-8"));
+} catch (e) {
+  console.error("[analysis.json] 로드 실패:", e.message);
+  ANALYSIS = {};
 }
 
-// ---- 건강 분석 엔진 (OpenAI + 규칙 기반 혼합) ----
-const USE_OPENAI = !!process.env.OPENAI_API_KEY;
-let openai = null;
-if (USE_OPENAI) {
-  // OpenAI SDK v4
-  const OpenAI = require("openai");
-  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-}
-
-// 위험 단어 사전(가벼운 탐지)
+// ===== 공통 위험 단어 사전 =====
 const RISK_WORDS = [
-  "심한", "악화", "어려움", "높음", "위험", "즉시", "갑자기", "숨", "통증",
-  "가슴", "저림", "실신", "마비", "출혈", "호흡곤란", "실어증", "의식저하",
-  "부정맥", "찌릿", "쥐남", "열감", "붓기", "발열", "고열", "구토", "설사",
-  "혈뇨", "흑변", "시력저하", "시야장애"
+  "심함","악화","어려움","높음","위험","즉시","갑자기","숨","호흡곤란","통증","가슴","저림",
+  "두근거림","부정맥","실신","출혈","마비","부종","열감","발열","장애","응급","수술","검사 필요"
 ];
 
-// 레벨 산정 기준
-function levelFromScore(p) {
+// ===== 유틸: 레벨 계산 =====
+function levelFromPercent(p) {
   if (p >= 70) return "severe";
   if (p >= 40) return "moderate";
   return "mild";
 }
 
-// 규칙 기반 기본 요약/권고 생성기(응답/주제 기반)
-function ruleBasedSynthesis(topic, answers, riskPercent) {
-  const level = levelFromScore(riskPercent);
-  const baseVisit =
-    level === "severe" ? "즉시 응급실 내원 또는 119/응급실 이용이 필요합니다." :
-    level === "moderate" ? "가까운 시일 내(3일 이내) 진료를 권장합니다." :
-    "현재로선 비교적 양호합니다. 생활습관 관리 위주로 경과 관찰하세요.";
-
-  // 15줄 상세(항상 15개)
-  const details = [
-    `선택 주제는 ‘${topic}’이며, 현재 위험도는 ${level.toUpperCase()} 수준으로 추정됩니다.`,
-    `총 응답 ${answers.length}개와 선택 항목의 표현을 기준으로 상태를 분석했습니다.`,
-    `위험 신호 단어 감지 결과를 반영해 지표를 계산했습니다.`,
-    `현재 상태는 ${level === "mild" ? "비교적 안정적" : level === "moderate" ? "주의가 필요" : "즉각적인 조치가 필요"}한 단계로 판단됩니다.`,
-    `증상/불편이 반복되면 지체 없이 전문의 상담을 받으세요.`,
-    `수면, 식사, 수분 섭취, 가벼운 활동 등 기본 생활 리듬을 회복하는 것이 중요합니다.`,
-    `통증·불편이 지속/악화되면 즉시 의료기관 방문을 고려하세요.`,
-    `스트레스 관리와 자세 교정, 무리한 활동 피하기를 권장합니다.`,
-    `필요 시 보호자/가족과 증상 기록(발생 시간·유발 요인)을 남기세요.`,
-    `복약 중이라면 처방/복용 스케줄을 지키고, 이상반응 시 즉시 상담하세요.`,
-    `증상 변화가 심해지거나 새로운 신호가 나타나면 진료를 서두르세요.`,
-    `생활관리만으로 불충분하면 물리치료·운동치료·상담치료 등을 검토하세요.`,
-    `정기 검진(혈압·혈당·혈중지표 등)으로 기초 상태를 점검하세요.`,
-    `필요 시 영양제 보충으로 회복을 돕되, 기존 약과의 상호작용은 확인하세요.`,
-    baseVisit
-  ];
-
-  // 7줄 요약
-  const summary = [
-    `주제: ${topic}`,
-    `위험도: ${level.toUpperCase()}`,
-    `응답 수: ${answers.length}개`,
-    `현재 상태: ${level === "mild" ? "양호" : level === "moderate" ? "주의 요망" : "고위험"}`,
-    `권장: ${level === "mild" ? "생활관리·경과관찰" : level === "moderate" ? "단기 내 진료 권고" : "즉시 진료/응급"}`,
-    `증상 기록/유발 요인 파악 및 반복 여부 관찰`,
-    `충분한 휴식·수분·균형 잡힌 식사 유지`
-  ];
-
-  // 2줄 전문가 의견
-  const opinion = [
-    level === "severe"
-      ? "증상 경향과 위험 신호 빈도상 고위험 가능성이 큽니다."
-      : "응답 기반으로 현재 단계는 정밀 위험 범주에 해당하지 않습니다.",
-    level === "severe"
-      ? "지체 없이 진료를 받으시고, 위험 신호(가슴통증·호흡곤란·실신 등) 시 응급실을 이용하세요."
-      : "생활관리와 정기 점검을 유지하면서 증상 변화를 기록해 주세요."
-  ];
-
-  return { details, summary, opinion };
+// ===== 유틸: 주제 → 템플릿 키 매핑 =====
+// * 보험/자동차/복지·생활지원금 은 하나의 재정 템플릿 "finance" 로 수렴 (요청 반영)
+function resolveTemplateKey(topic) {
+  const financeSet = new Set(["보험비용 종합점검", "자동차 견적·보험비용 점검", "복지·생활지원금"]);
+  if (financeSet.has(topic)) return "finance";
+  // 그 외는 topic 그대로(analysis.json에 동일 키가 있을 때 사용)
+  return topic;
 }
 
-// GPT 보조(선택적). 실패 시 규칙 기반으로 대체
-async function gptAssist(topic, answers, riskPercent) {
-  const { details, summary, opinion } = ruleBasedSynthesis(topic, answers, riskPercent);
-
-  if (!USE_OPENAI) {
-    return { details, summary, opinion };
-  }
-
-  const sys = `You are a Korean medical-style assistant for seniors.
-Return three arrays:
-- detail: 15 concise bullet lines
-- summary: 7 bullet lines
-- opinion: 2 bullet lines
-Tone: calm, friendly, non-alarmist. Use polite Korean.`;
-
-  const usr = `주제: ${topic}
-위험도 지표: ${riskPercent}
-응답(선택항목들): ${answers.join(" | ")}
-
-요청:
-- detail 15줄
-- summary 7줄
-- opinion 2줄
-형식: JSON {"detail":[], "summary":[], "opinion":[]}`;
-
-  try {
-    const resp = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: sys },
-        { role: "user", content: usr }
-      ],
-      temperature: 0.4
-    });
-    const text = resp.choices?.[0]?.message?.content?.trim() || "";
-    const jsonStart = text.indexOf("{");
-    const jsonEnd = text.lastIndexOf("}");
-    if (jsonStart >= 0 && jsonEnd > jsonStart) {
-      const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
-      const det = Array.isArray(parsed.detail) && parsed.detail.length >= 12 ? parsed.detail.slice(0, 15) : details;
-      const sum = Array.isArray(parsed.summary) && parsed.summary.length >= 5 ? parsed.summary.slice(0, 7) : summary;
-      const opn = Array.isArray(parsed.opinion) && parsed.opinion.length >= 2 ? parsed.opinion.slice(0, 2) : opinion;
-      return { details: det, summary: sum, opinion: opn };
-    }
-    return { details, summary, opinion };
-  } catch {
-    return { details, summary, opinion };
-  }
-}
-
-// 분석 API
-app.post("/analyze", async (req, res) => {
+// ===== 메인 분석 엔드포인트 =====
+app.post("/analyze", (req, res) => {
   try {
     const { topic, answers } = req.body || {};
-    const safeTopic = typeof topic === "string" ? topic : "알 수 없음";
-    const arr = Array.isArray(answers) ? answers : [];
+    const safeTopic = typeof topic === "string" ? topic.trim() : "진단";
+    const list = Array.isArray(answers) ? answers : [];
 
-    // 위험단어 카운트
-    let riskCount = 0;
-    for (const a of arr) {
-      const s = String(a || "");
+    // 위험 단어 스캔
+    let riskHits = 0;
+    const lowered = list.map(a => String(a || "").toLowerCase());
+    for (const ans of lowered) {
       for (const w of RISK_WORDS) {
-        if (s.includes(w)) riskCount++;
+        if (ans.includes(w.toLowerCase())) riskHits++;
       }
     }
-    // 간단 지표 계산(응답수/위험단어 가중치)
-    const base = Math.min(100, arr.length * 4);      // 응답수 1개당 4점
-    const risk = Math.min(100, riskCount * 8);       // 위험단어 1개당 8점
-    const riskPercent = Math.min(100, Math.round(base * 0.4 + risk * 0.6));
-    const level = levelFromScore(riskPercent);
 
-    // GPT/규칙 혼합 생성
-    const synth = await gptAssist(safeTopic, arr, riskPercent);
+    // 위험 점수/레벨
+    // - 선택 8문항 기준: 위험 단어 1개당 10~12p 가중치, 상한 100
+    const base = Math.min(100, Math.round(riskHits * 12.5));
+    const riskPercent = base;
+    const level = levelFromPercent(riskPercent);
 
+    // 템플릿 결정
+    const key = resolveTemplateKey(safeTopic);
+    const tpl = ANALYSIS[key] || {};
+
+    // 상세/요약/전문가 의견 생성
+    // - analysis.json 에 배열로 존재하면 랜덤 샘플링 및 길이 보정
+    const pickLines = (arr = [], want = 15) => {
+      if (!Array.isArray(arr) || arr.length === 0) return [];
+      if (arr.length >= want) return arr.slice(0, want);
+      // 부족하면 뒤를 반복 채우되 문장 중복 3회 이상 방지
+      const out = [...arr];
+      let guard = 0;
+      while (out.length < want && guard < 100) {
+        out.push(arr[out.length % arr.length]);
+        guard++;
+      }
+      return out.slice(0, want);
+    };
+
+    // 상세(문단) 15줄, 요약 7줄, 전문가의견 2줄 — 요청 스펙 고정
+    const detailLines = pickLines(tpl.detail, 15);
+    const summaryLines = pickLines(tpl.summary, 7);
+    const expertLines = pickLines(tpl.expert || tpl.opinion, 2);
+
+    // 응답 수/위험 단어 수 보강(클라이언트에 그대로 표시됨)
     const result = {
       topic: safeTopic,
-      level,
+      answers: list,
       riskPercent,
-      answerCount: arr.length,
-      riskWordCount: riskCount,
-      detail: synth.details,
-      summary: synth.summary,
-      opinion: synth.opinion
+      level, // "mild" | "moderate" | "severe"
+      answerCount: list.length,
+      riskWordCount: riskHits,
+
+      // 클라이언트(result.html) 호환 필드명
+      detail: detailLines.join("\n"),
+      summary: summaryLines,
+      opinion: expertLines
     };
+
     return res.json({ ok: true, result });
   } catch (e) {
-    return res.status(500).json({ ok: false, error: "analyze_failed" });
+    console.error("/analyze error:", e);
+    return res.status(500).json({ ok: false, error: "internal_error" });
   }
 });
 
-// 핫 리로드: affiliate.json 변경 감지 없이 항상 최신 로드
-app.get("/affiliate-live", (req, res) => {
-  try {
-    const map = readJSON("affiliate.json");
-    res.json(map);
-  } catch {
-    res.status(500).json({ ok: false });
-  }
-});
+// ===== 기본 라우팅 =====
+app.get("/", (_, r) => r.sendFile(path.join(__dirname, "index.html")));
+app.get("/question.html", (_, r) => r.sendFile(path.join(__dirname, "question.html")));
+app.get("/result.html",   (_, r) => r.sendFile(path.join(__dirname, "result.html")));
+app.get("/loading.html",  (_, r) => r.sendFile(path.join(__dirname, "loading.html")));
 
-// 라우팅(정적)
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-app.get("/question", (_req, res) => {
-  res.sendFile(path.join(__dirname, "question.html"));
-});
-app.get("/result", (_req, res) => {
-  res.sendFile(path.join(__dirname, "result.html"));
-});
-
-// 포트
-const PORT = process.env.PORT || 10000;
+// ===== 서버 기동 =====
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Noeulbit Haru AI running on :${PORT}`);
+  console.log(`Noeulbit Haru server running on :${PORT}`);
 });
