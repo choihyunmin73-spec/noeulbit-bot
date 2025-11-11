@@ -1,112 +1,52 @@
 {
-  "관절 통증": {
-    "products": [
-      { "name": "글루코사민", "link": "https://link.coupang.com/a/c2RH71" },
-      { "name": "MSM 관절영양", "link": "https://link.coupang.com/a/c2RKZl" },
-      { "name": "콜라겐 플러스", "link": "https://link.coupang.com/a/c2RNHD" }
-    ],
-    "insurance": [
-      { "name": "관절질환 실비보험", "link": "https://www.naver.com" },
-      { "name": "정형외과 통원케어", "link": "https://www.daum.net" }
-    ]
-  },
-  "혈압 관리": {
-    "products": [
-      { "name": "오메가3 트리플케어", "link": "https://link.coupang.com/a/c2RQAG" },
-      { "name": "마그네슘 밸런스", "link": "https://link.coupang.com/a/c2RTRr" },
-      { "name": "코엔자임Q10 플러스", "link": "https://link.coupang.com/a/c2RWlM" }
-    ],
-    "insurance": [
-      { "name": "고혈압 전용 실손보험", "link": "https://www.naver.com" },
-      { "name": "혈압 관리케어 보험", "link": "https://www.daum.net" }
-    ]
-  },
-  "혈당·당뇨": {
-    "products": [
-      { "name": "알파리포산 600", "link": "https://link.coupang.com/a/c2RXDT" },
-      { "name": "크롬 포뮬러", "link": "https://link.coupang.com/a/c2RZ7S" },
-      { "name": "오메가3 밸런스", "link": "https://link.coupang.com/a/c2R1hr" }
-    ],
-    "insurance": [
-      { "name": "당뇨 병력자 보험", "link": "https://www.naver.com" },
-      { "name": "혈당 관리케어 보험", "link": "https://www.daum.net" }
-    ]
-  },
-  "불면증·수면장애": {
-    "products": [
-      { "name": "테아닌 릴렉스", "link": "https://link.coupang.com/a/c2R26o" },
-      { "name": "마그네슘 나이트", "link": "https://link.coupang.com/a/c2R5lm" },
-      { "name": "GABA 컴플렉스", "link": "https://link.coupang.com/a/c2R9RO" }
-    ],
-    "insurance": [
-      { "name": "정신건강 전문보험", "link": "https://www.naver.com" },
-      { "name": "수면장애 보장형", "link": "https://www.daum.net" }
-    ]
-  },
-  "어깨·목 통증": {
-    "products": [
-      { "name": "MSM 관절근육 포뮬러", "link": "https://link.coupang.com/a/c2SdN1" },
-      { "name": "마그네슘 이지업", "link": "https://link.coupang.com/a/c2SeX4" },
-      { "name": "비타민B 컴플렉스", "link": "https://link.coupang.com/a/c2SgkD" }
-    ],
-    "insurance": [
-      { "name": "근골격계 실비보험", "link": "https://www.naver.com" },
-      { "name": "목·허리 집중케어", "link": "https://www.daum.net" }
-    ]
-  },
-  "심장·호흡·가슴통증": {
-    "products": [
-      { "name": "코엔자임Q10 하트케어", "link": "https://link.coupang.com/a/c2SnFt" },
-      { "name": "오메가3 심혈관 포뮬러", "link": "https://link.coupang.com/a/c2So9Q" },
-      { "name": "폴리코사놀 10", "link": "https://link.coupang.com/a/c2SrCT" }
-    ],
-    "insurance": [
-      { "name": "심혈관 질환 전용보험", "link": "https://www.naver.com" },
-      { "name": "심장질환케어 플랜", "link": "https://www.daum.net" }
-    ]
-  },
-  "노안·시력저하": {
-    "products": [
-      { "name": "루테인 지아잔틴", "link": "https://link.coupang.com/a/c2StF3" },
-      { "name": "비타민A 아이케어", "link": "https://link.coupang.com/a/c2Svgp" },
-      { "name": "아스타잔틴 비전", "link": "https://link.coupang.com/a/c2SwxO" }
-    ],
-    "insurance": [
-      { "name": "안과 진단 실비보험", "link": "https://www.naver.com" },
-      { "name": "시력 교정 보장형", "link": "https://www.daum.net" }
-    ]
-  },
-  "치매·기억력 문제": {
-    "products": [
-      { "name": "오메가3", "link": "https://link.coupang.com/a/c2SxOq" },
-      { "name": "포스파티딜세린", "link": "https://link.coupang.com/a/c2SzKf" },
-      { "name": "은행잎추출물", "link": "https://link.coupang.com/a/c2SBSY" }
-    ],
-    "insurance": [
-      { "name": "치매 전용보험", "link": "https://www.naver.com" },
-      { "name": "기억력 저하 케어보험", "link": "https://www.daum.net" }
-    ]
-  },
-  "전립선·배뇨 문제": {
-    "products": [
-      { "name": "아연", "link": "https://link.coupang.com/a/c2SC9E" },
-      { "name": "쏘팔메토", "link": "https://link.coupang.com/a/c2SH2O" },
-      { "name": "비타민E", "link": "https://link.coupang.com/a/c2SJVq" }
-    ],
-    "insurance": [
-      { "name": "남성 건강보장 보험", "link": "https://www.naver.com" },
-      { "name": "배뇨건강 전용플랜", "link": "https://www.daum.net" }
-    ]
-  },
-  "종합 건강 체크": {
-    "products": [
-      { "name": "멀티비타민", "link": "https://link.coupang.com/a/c2SKDt" },
-      { "name": "유산균", "link": "https://link.coupang.com/a/c2SLLs" },
-      { "name": "오메가3", "link": "https://link.coupang.com/a/c2SxOq" }
-    ],
-    "insurance": [
-      { "name": "건강검진 보험", "link": "https://www.naver.com" },
-      { "name": "웰니스케어 플랜", "link": "https://www.daum.net" }
-    ]
-  }
+  "관절 통증": [
+    { "name": "글루코사민", "desc": "관절 유연성·통증 완화에 도움", "link": "https://link.coupang.com/a/c2RH71" },
+    { "name": "MSM 관절영양", "desc": "관절·연골 건강 및 염증 완화", "link": "https://link.coupang.com/a/c2RKZl" },
+    { "name": "콜라겐 플러스", "desc": "연골 탄력 유지 및 관절 피로 완화", "link": "https://link.coupang.com/a/c2RNHD" }
+  ],
+  "혈압 관리": [
+    { "name": "오메가3 트리플케어", "desc": "혈압 조절 및 혈관 건강 지원", "link": "https://link.coupang.com/a/c2RQAG" },
+    { "name": "마그네슘 밸런스", "desc": "혈관 이완 및 심장 기능 안정화", "link": "https://link.coupang.com/a/c2RTRr" },
+    { "name": "코엔자임Q10 플러스", "desc": "심혈관 에너지 대사 및 피로 개선", "link": "https://link.coupang.com/a/c2RWlM" }
+  ],
+  "혈당·당뇨": [
+    { "name": "알파리포산 600", "desc": "혈당 관리 및 신경 대사 개선", "link": "https://link.coupang.com/a/c2RXDT" },
+    { "name": "크롬 포뮬러", "desc": "포도당 대사 조절 및 인슐린 민감도 향상", "link": "https://link.coupang.com/a/c2RZ7S" },
+    { "name": "오메가3 밸런스", "desc": "혈중 지질 밸런스 및 대사 안정", "link": "https://link.coupang.com/a/c2R1hr" }
+  ],
+  "불면증·수면장애": [
+    { "name": "테아닌 릴렉스", "desc": "긴장 완화 및 숙면 유도", "link": "https://link.coupang.com/a/c2R26o" },
+    { "name": "마그네슘 나이트", "desc": "근육 이완과 수면 질 향상", "link": "https://link.coupang.com/a/c2R5lm" },
+    { "name": "GABA 컴플렉스", "desc": "스트레스 완화 및 안정된 수면 도움", "link": "https://link.coupang.com/a/c2R9RO" }
+  ],
+  "어깨·목 통증": [
+    { "name": "MSM 관절근육 포뮬러", "desc": "근막 긴장 완화 및 근육 통증 완화", "link": "https://link.coupang.com/a/c2SdN1" },
+    { "name": "마그네슘 이지업", "desc": "긴장성 통증 완화 및 피로 회복", "link": "https://link.coupang.com/a/c2SeX4" },
+    { "name": "비타민B 컴플렉스", "desc": "신경 피로 완화 및 에너지 대사 개선", "link": "https://link.coupang.com/a/c2SgkD" }
+  ],
+  "심장·호흡·가슴통증": [
+    { "name": "코엔자임Q10 하트케어", "desc": "심장 에너지 강화 및 피로 회복", "link": "https://link.coupang.com/a/c2SnFt" },
+    { "name": "오메가3 심혈관 포뮬러", "desc": "심혈관 건강 및 혈류 개선", "link": "https://link.coupang.com/a/c2So9Q" },
+    { "name": "폴리코사놀 10", "desc": "콜레스테롤 밸런스 유지", "link": "https://link.coupang.com/a/c2SrCT" }
+  ],
+  "노안·시력저하": [
+    { "name": "루테인 지아잔틴", "desc": "눈의 피로 완화 및 황반 보호", "link": "https://link.coupang.com/a/c2StF3" },
+    { "name": "비타민A 아이케어", "desc": "야간 시력 및 시각 기능 보조", "link": "https://link.coupang.com/a/c2Svgp" },
+    { "name": "아스타잔틴 비전", "desc": "시야 선명도 및 망막 보호", "link": "https://link.coupang.com/a/c2SwxO" }
+  ],
+  "치매·기억력 문제": [
+    { "name": "오메가3", "desc": "두뇌 기능 및 기억력 개선", "link": "https://link.coupang.com/a/c2SxOq" },
+    { "name": "포스파티딜세린", "desc": "집중력 및 인지 기능 유지", "link": "https://link.coupang.com/a/c2SzKf" },
+    { "name": "은행잎추출물", "desc": "뇌혈류 개선 및 인지저하 예방", "link": "https://link.coupang.com/a/c2SBSY" }
+  ],
+  "전립선·배뇨 문제": [
+    { "name": "아연", "desc": "남성 호르몬 밸런스 및 면역 보조", "link": "https://link.coupang.com/a/c2SC9E" },
+    { "name": "쏘팔메토", "desc": "전립선 건강 및 배뇨 개선", "link": "https://link.coupang.com/a/c2SH2O" },
+    { "name": "비타민E", "desc": "항산화 보호 및 혈류 개선", "link": "https://link.coupang.com/a/c2SJVq" }
+  ],
+  "종합 건강 체크": [
+    { "name": "멀티비타민", "desc": "기초 영양 밸런스 및 피로 개선", "link": "https://link.coupang.com/a/c2SKDt" },
+    { "name": "유산균", "desc": "장 건강 및 면역력 강화", "link": "https://link.coupang.com/a/c2SLLs" },
+    { "name": "오메가3", "desc": "혈중 지질 밸런스 유지", "link": "https://link.coupang.com/a/c2SxOq" }
+  ]
 }
