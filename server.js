@@ -1,420 +1,209 @@
-{
-  "관절 통증": [
-    {
-      "question": "통증이 주로 발생하는 부위는 어디인가요?",
-      "choices": ["무릎", "허리", "어깨", "손목", "발목", "고관절"]
-    },
-    {
-      "question": "통증이 얼마나 자주 발생하나요?",
-      "choices": ["거의 없음", "가끔 있음", "주 1~2회", "거의 매일", "하루 종일 지속", "활동 후 악화"]
-    },
-    {
-      "question": "계단 오르내릴 때 통증이 있나요?",
-      "choices": ["없음", "약간 있음", "자주 있음", "심함", "오르내리기 어려움", "불가능함"]
-    },
-    {
-      "question": "통증 시 부기가 동반되나요?",
-      "choices": ["없음", "가끔 있음", "자주 있음", "항상 있음", "열감 동반", "변형 있음"]
-    },
-    {
-      "question": "어떤 치료나 방법을 사용 중이신가요?",
-      "choices": ["파스", "찜질", "진통제", "한의원 치료", "병원 물리치료", "별도 없음"]
-    },
-    {
-      "question": "통증이 일상생활에 영향을 주나요?",
-      "choices": ["거의 없음", "조금 불편", "걸을 때 통증", "앉았다 일어나기 힘듦", "수면 방해", "심한 불편"]
-    },
-    {
-      "question": "최근 진단을 받은 적이 있나요?",
-      "choices": ["없음", "관절염 초기", "퇴행성 관절염", "류마티스 진단", "수술 권유 받음", "치료 중"]
-    },
-    {
-      "question": "운동이나 체중 변화는 어떤가요?",
-      "choices": ["활동적", "보통", "운동 거의 안함", "체중 증가", "체중 감소", "체중 유지"]
-    }
-  ],
+// server.js — Render 전용. 로컬 개발용 코드/도구(예: nodemon) 일절 없음.
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const app = express();
 
-  "혈압 관리": [
-    {
-      "question": "혈압을 얼마나 자주 측정하시나요?",
-      "choices": ["매일", "주 2~3회", "가끔", "거의 안함", "기억 안남", "측정기 없음"]
-    },
-    {
-      "question": "최근 혈압 수치는 어느 정도인가요?",
-      "choices": ["정상 (120/80 이하)", "약간 높음 (130~139)", "고혈압 (140 이상)", "매우 높음 (160 이상)", "기억 안남", "모름"]
-    },
-    {
-      "question": "어지럼증이나 두통이 자주 있나요?",
-      "choices": ["없음", "가끔", "자주", "매우 자주", "운동 시 발생", "수면 후 발생"]
-    },
-    {
-      "question": "혈압약을 복용하고 계신가요?",
-      "choices": ["복용 안함", "가끔 복용", "매일 복용", "복용 중단함", "의사 처방 대기", "건강식품만 섭취"]
-    },
-    {
-      "question": "식습관은 어떤가요?",
-      "choices": ["짜게 먹지 않음", "보통", "조금 짜게", "짠 음식 선호", "패스트푸드 자주", "야식 잦음"]
-    },
-    {
-      "question": "운동 습관은 어떤가요?",
-      "choices": ["매일 함", "주 3회 이상", "주 1회 이하", "거의 안함", "걷기 위주", "집에서 스트레칭만"]
-    },
-    {
-      "question": "혈압 관리에 어려움이 있으신가요?",
-      "choices": ["없음", "식습관 조절 어려움", "복약 지속 어려움", "운동 부족", "스트레스 영향", "모름"]
-    },
-    {
-      "question": "최근 병원 진료를 받으셨나요?",
-      "choices": ["없음", "1년 내 있음", "6개월 내 있음", "최근 방문", "약 조정 중", "정기 검진 중"]
-    }
-  ],
+// ---- 기본 설정 ----
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(__dirname)); // index.html, question.html, result.html, *.json 정적 서빙
 
-  "혈당·당뇨": [
-    {
-      "question": "공복 혈당 측정을 하고 계신가요?",
-      "choices": ["매일", "주 1~2회", "가끔", "거의 안함", "측정기 없음", "모름"]
-    },
-    {
-      "question": "단 음식 섭취 빈도는 어떤가요?",
-      "choices": ["거의 안 먹음", "가끔", "주 2~3회", "매일", "하루 여러 번", "자제 중"]
-    },
-    {
-      "question": "식후 피로감이나 졸림이 있나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "심할 때 있음", "모름"]
-    },
-    {
-      "question": "최근 체중 변화가 있었나요?",
-      "choices": ["변화 없음", "3kg 이상 증가", "3kg 이상 감소", "급격한 변화", "기억 안남", "체중 유지 중"]
-    },
-    {
-      "question": "운동량은 어느 정도인가요?",
-      "choices": ["매일", "주 2~3회", "가끔", "거의 안함", "걷기만 함", "생활활동만"]
-    },
-    {
-      "question": "가족 중 당뇨 진단을 받은 분이 있나요?",
-      "choices": ["없음", "있음", "모름", "고혈압만 있음", "심혈관 질환 있음", "여러 명 있음"]
-    },
-    {
-      "question": "현재 복용 중인 약이 있나요?",
-      "choices": ["없음", "가끔 복용", "매일 복용", "인슐린 주사", "약 조정 중", "한약 복용 중"]
-    },
-    {
-      "question": "식단 관리를 하고 계신가요?",
-      "choices": ["철저히 함", "가끔 함", "거의 안함", "시도 중", "포기함", "모름"]
-    }
-  ],
-  "불면증·수면장애": [
-    {
-      "question": "평균 잠드는 데 걸리는 시간은?",
-      "choices": ["10분 이내", "30분 이내", "1시간 이상", "2시간 이상", "새벽까지 잠 안 옴", "수면제 복용 중"]
-    },
-    {
-      "question": "밤중에 자주 깨시나요?",
-      "choices": ["없음", "가끔", "자주", "매우 자주", "2시간마다", "새벽에 깸"]
-    },
-    {
-      "question": "자고 일어나도 피곤함이 남나요?",
-      "choices": ["없음", "약간 피곤함", "자주 피곤함", "항상 피곤함", "두통 동반", "기억력 저하"]
-    },
-    {
-      "question": "평균 수면 시간은 몇 시간인가요?",
-      "choices": ["8시간 이상", "6~7시간", "4~5시간", "4시간 이하", "잠들지 못함", "낮잠으로 보충"]
-    },
-    {
-      "question": "수면제나 건강보조제를 복용하나요?",
-      "choices": ["복용 안함", "가끔 복용", "정기 복용", "최근 시작", "의사 처방", "자연요법"]
-    },
-    {
-      "question": "수면 환경(빛, 소음, 온도)은 어떤가요?",
-      "choices": ["편안함", "조금 불편", "불편", "매우 불편", "조명 밝음", "소음 심함"]
-    },
-    {
-      "question": "스트레스나 불안으로 인해 잠이 방해되나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "걱정 많음", "생각 많음"]
-    },
-    {
-      "question": "수면 문제로 병원 진료를 받았나요?",
-      "choices": ["없음", "예전에 받음", "최근 받음", "정기 진료 중", "상담 예정", "모름"]
-    }
-  ],
-
-  "어깨·목 통증": [
-    {
-      "question": "통증이 가장 심한 부위는?",
-      "choices": ["어깨", "목", "등", "팔", "손", "기타"]
-    },
-    {
-      "question": "통증이 시작된 지 얼마나 되었나요?",
-      "choices": ["1주일 이내", "1개월 이내", "3개월 이상", "6개월 이상", "1년 이상", "기억 안남"]
-    },
-    {
-      "question": "통증의 강도는 어느 정도인가요?",
-      "choices": ["약함", "보통", "심함", "매우 심함", "움직일 수 없음", "간헐적임"]
-    },
-    {
-      "question": "통증이 주로 언제 심해지나요?",
-      "choices": ["아침", "저녁", "장시간 앉을 때", "운동 후", "스트레스 받을 때", "기상 직후"]
-    },
-    {
-      "question": "통증 완화를 위해 어떤 방법을 사용하나요?",
-      "choices": ["파스", "찜질", "마사지", "약 복용", "물리치료", "별도 없음"]
-    },
-    {
-      "question": "저림이나 근육 긴장도 있나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "목만 저림", "팔까지 저림"]
-    },
-    {
-      "question": "자세 문제로 통증이 악화되나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "컴퓨터 사용 시", "스마트폰 사용 시"]
-    },
-    {
-      "question": "통증으로 인해 일상에 불편이 있나요?",
-      "choices": ["없음", "약간 있음", "자주 있음", "수면 방해", "업무 불가", "심한 통증 지속"]
-    }
-  ],
-
-  "심장·호흡·가슴통증": [
-    {
-      "question": "가슴 통증이 있을 때의 상황은?",
-      "choices": ["운동 중", "휴식 중", "식후", "불규칙", "스트레스 시", "밤에만 발생"]
-    },
-    {
-      "question": "호흡 곤란이나 숨참 증상이 있나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "운동 시", "수면 중"]
-    },
-    {
-      "question": "심장이 빨리 뛰거나 두근거림이 있나요?",
-      "choices": ["없음", "가끔", "자주", "매일", "불규칙", "수면 중"]
-    },
-    {
-      "question": "의사에게 심장 질환 진단을 받은 적이 있나요?",
-      "choices": ["없음", "심계항진", "부정맥", "협심증", "심근경색", "기타"]
-    },
-    {
-      "question": "혈압 또는 심전도 검사를 받은 시기는?",
-      "choices": ["1년 내", "6개월 내", "3개월 내", "최근", "기억 안남", "정기검진 중"]
-    },
-    {
-      "question": "가슴 통증이 지속되는 시간은?",
-      "choices": ["1분 이내", "5분 이내", "10분 이상", "30분 이상", "계속 지속", "간헐적임"]
-    },
-    {
-      "question": "통증 완화를 위해 어떤 조치를 하나요?",
-      "choices": ["휴식", "약 복용", "병원 방문", "참음", "산책", "심호흡"]
-    },
-    {
-      "question": "최근 스트레스가 심하다고 느끼나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "수면 부족", "불안 동반"]
-    }
-  ],
-
-  "노안·시력저하": [
-    {
-      "question": "최근 시야가 흐릿하거나 초점이 잘 안 맞나요?",
-      "choices": ["없음", "가끔 있음", "자주 있음", "항상 흐림", "야간에 심함", "책 볼 때 심함"]
-    },
-    {
-      "question": "가까운 글씨를 볼 때 불편함이 있나요?",
-      "choices": ["없음", "가끔 있음", "자주 있음", "항상 있음", "돋보기 사용 중", "안경 착용 중"]
-    },
-    {
-      "question": "눈의 피로감은 어느 정도인가요?",
-      "choices": ["없음", "가끔", "자주", "항상 피로", "컴퓨터 사용 시 심함", "휴대폰 사용 시 심함"]
-    },
-    {
-      "question": "눈의 건조함이나 뻑뻑함을 느끼시나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "인공눈물 사용 중", "눈이 시림"]
-    },
-    {
-      "question": "빛 번짐이나 눈부심이 있나요?",
-      "choices": ["없음", "가끔 있음", "자주 있음", "야간 운전 시 심함", "항상 있음", "모름"]
-    },
-    {
-      "question": "정기적으로 안과 검진을 받으시나요?",
-      "choices": ["매년 함", "2년마다", "가끔", "받은 적 없음", "예정 중", "모름"]
-    },
-    {
-      "question": "안경 또는 렌즈 착용 여부는?",
-      "choices": ["안경 착용", "돋보기 착용", "렌즈 착용", "비교적 시력 양호", "착용 안함", "수술 경험 있음"]
-    },
-    {
-      "question": "시야에 검은 점이나 떠다니는 것이 보이나요?",
-      "choices": ["없음", "가끔", "자주", "항상 있음", "심해지는 중", "안과 진단 필요"]
-    }
-  ],
-
-  "치매·기억력 문제": [
-    {
-      "question": "최근 약속이나 사람 이름을 자주 잊나요?",
-      "choices": ["없음", "가끔", "자주", "매일", "심각함", "기억 안남"]
-    },
-    {
-      "question": "물건을 두고 어디에 뒀는지 잊는 일이 있나요?",
-      "choices": ["없음", "가끔", "자주", "매우 자주", "습관적임", "기억 복원 어려움"]
-    },
-    {
-      "question": "대화 내용을 기억하기 어렵나요?",
-      "choices": ["없음", "가끔", "자주", "거의 기억 안남", "항상 잊음", "가족이 지적함"]
-    },
-    {
-      "question": "집 근처 길을 잃은 적이 있나요?",
-      "choices": ["없음", "한두 번", "가끔", "자주", "최근 발생", "심각함"]
-    },
-    {
-      "question": "집안 일상생활(식사, 청소 등)을 혼자 하시나요?",
-      "choices": ["문제 없음", "약간 도움 필요", "가끔 도움 필요", "자주 도움 필요", "거의 혼자 못함", "요양 중"]
-    },
-    {
-      "question": "집중력이 떨어진다고 느끼시나요?",
-      "choices": ["없음", "약간", "자주", "항상", "심함", "모름"]
-    },
-    {
-      "question": "기억력 저하로 인해 불안감을 느끼나요?",
-      "choices": ["없음", "약간", "자주", "항상", "매우 심함", "모름"]
-    },
-    {
-      "question": "병원에서 인지기능 검사를 받아보셨나요?",
-      "choices": ["없음", "1년 내 있음", "6개월 내 있음", "최근 검진", "예정 중", "정기검사 중"]
-    }
-  ]
-,
-  "전립선·배뇨 문제": [
-    {
-      "question": "소변 줄기가 약해졌다고 느끼시나요?",
-      "choices": ["없음", "약간 약함", "자주 느낌", "항상 약함", "끊김 있음", "배뇨 시간 길어짐"]
-    },
-    {
-      "question": "야간에 몇 번 정도 소변을 보시나요?",
-      "choices": ["0~1회", "2회", "3회", "4회 이상", "매시간", "기억 안남"]
-    },
-    {
-      "question": "소변을 볼 때 통증이 있나요?",
-      "choices": ["없음", "약간 있음", "자주 있음", "항상 있음", "화끈거림", "심한 통증"]
-    },
-    {
-      "question": "배뇨 후 잔뇨감이 있나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "심함", "불쾌감 있음"]
-    },
-    {
-      "question": "소변을 급하게 보고 싶은 충동이 있나요?",
-      "choices": ["없음", "가끔", "자주", "항상", "참기 어려움", "누출 있음"]
-    },
-    {
-      "question": "전립선 검사를 받은 적이 있나요?",
-      "choices": ["없음", "1년 내", "6개월 내", "최근 검사", "정기검사 중", "예정 중"]
-    },
-    {
-      "question": "물 섭취량은 얼마나 되나요?",
-      "choices": ["1L 이하", "1~2L", "2~3L", "3L 이상", "불규칙", "잘 모름"]
-    },
-    {
-      "question": "비뇨기과 진료를 받은 적이 있나요?",
-      "choices": ["없음", "예전에 받음", "최근 받음", "치료 중", "정기 관리 중", "예정 중"]
-    }
-  ],
-
-  "보험비용 종합점검": [
-    {
-      "question": "현재 월 보험료 총합은 얼마인가요?",
-      "choices": ["10만원 이하", "10~20만원", "20~30만원", "30만원 이상", "모름", "불규칙 납부"]
-    },
-    {
-      "question": "보험 상품을 몇 개나 보유 중인가요?",
-      "choices": ["1개", "2~3개", "4개 이상", "10개 이상", "모름", "해지 중 있음"]
-    },
-    {
-      "question": "최근 1년 내 보험 점검을 하셨나요?",
-      "choices": ["없음", "있음", "예정 중", "상담 중", "모름", "해지 고려 중"]
-    },
-    {
-      "question": "중복 보장 특약이 있나요?",
-      "choices": ["없음", "모름", "있음", "많이 있음", "상담 중", "점검 예정"]
-    },
-    {
-      "question": "보험료가 부담되시나요?",
-      "choices": ["아니오", "약간 부담", "많이 부담", "해지 고려", "납입 중단함", "자동이체 해지함"]
-    },
-    {
-      "question": "갱신형 보험이 많나요?",
-      "choices": ["없음", "모름", "있음", "대부분 갱신형", "전환 고려 중", "정기 점검 중"]
-    },
-    {
-      "question": "보장 공백(보장 안 되는 부분)이 있나요?",
-      "choices": ["없음", "모름", "약간 있음", "크게 있음", "보험 리모델링 중", "상담 필요"]
-    },
-    {
-      "question": "보험 리모델링 상담을 받아볼 의향이 있나요?",
-      "choices": ["없음", "관심 있음", "상담 예정", "이미 진행 중", "완료함", "비교 예정"]
-    }
-  ],
-
-  "자동차 견적·보험비용 점검": [
-    {
-      "question": "현재 차량 구매 계획이 있으신가요?",
-      "choices": ["예", "아니오", "렌트 고려 중", "리스 고려 중", "교체 예정", "관심 없음"]
-    },
-    {
-      "question": "구입 예산은 어느 정도인가요?",
-      "choices": ["1500만원 이하", "1500~2500만원", "2500~3500만원", "3500만원 이상", "모름", "추후 결정"]
-    },
-    {
-      "question": "구입 방식은 어떤 것을 원하시나요?",
-      "choices": ["현금", "할부", "렌트", "리스", "기타", "아직 미정"]
-    },
-    {
-      "question": "렌트나 리스 시 월 납입 희망 금액은?",
-      "choices": ["30만원 이하", "30~50만원", "50~80만원", "80만원 이상", "100만원 이상", "모름"]
-    },
-    {
-      "question": "차량 선택 시 가장 중요하게 보는 요소는?",
-      "choices": ["가격", "연비", "브랜드", "안전성", "유지비", "디자인"]
-    },
-    {
-      "question": "자동차 보험료 수준은 만족하시나요?",
-      "choices": ["만족", "보통", "높음", "너무 높음", "모름", "조정 예정"]
-    },
-    {
-      "question": "보험사 비교를 해본 적이 있나요?",
-      "choices": ["없음", "예전에 함", "최근 함", "진행 중", "비교 사이트 사용", "상담 예정"]
-    },
-    {
-      "question": "차량 견적이나 보험 비교는 어떤 방식이 좋으신가요?",
-      "choices": ["온라인 견적", "전화 상담", "방문 상담", "앱으로 받고 싶음", "아직 미정", "모름"]
-    }
-  ],
-
-  "종합 건강 체크": [
-    {
-      "question": "최근 건강검진을 받은 시기는 언제인가요?",
-      "choices": ["6개월 이내", "1년 이내", "2년 이내", "5년 이내", "받은 적 없음", "기억 안남"]
-    },
-    {
-      "question": "평소 운동 빈도는 어느 정도인가요?",
-      "choices": ["매일", "주 3~4회", "주 1~2회", "가끔", "거의 안함", "기억 안남"]
-    },
-    {
-      "question": "평균 수면 시간은 얼마나 되나요?",
-      "choices": ["8시간 이상", "6~7시간", "4~5시간", "4시간 이하", "불면증 있음", "모름"]
-    },
-    {
-      "question": "평소 스트레스 수준은 어떤가요?",
-      "choices": ["거의 없음", "약간 있음", "보통", "많음", "매우 많음", "모름"]
-    },
-    {
-      "question": "현재 복용 중인 약이 있나요?",
-      "choices": ["없음", "영양제만 복용", "처방약 복용 중", "한약 복용", "여러 약 동시 복용", "모름"]
-    },
-    {
-      "question": "가족 중 만성질환(당뇨, 고혈압 등) 있는 분이 있나요?",
-      "choices": ["없음", "있음", "여러 명 있음", "모름", "과거 있었음", "검사 중"]
-    },
-    {
-      "question": "최근 체중 변화가 있었나요?",
-      "choices": ["변화 없음", "3kg 이상 증가", "3kg 이상 감소", "급격한 변화", "기억 안남", "체중 유지 중"]
-    },
-    {
-      "question": "현재 건강에 대한 전반적인 만족도는?",
-      "choices": ["매우 만족", "보통", "조금 불만", "불만족", "심각하게 나쁨", "모름"]
-    }
-  ]
+// ---- 파일 로더(캐시 없이 항상 최신 로드) ----
+function readJSON(filename) {
+  const p = path.join(__dirname, filename);
+  const raw = fs.readFileSync(p, "utf-8");
+  return JSON.parse(raw);
 }
+
+// ---- 건강 분석 엔진 (OpenAI + 규칙 기반 혼합) ----
+const USE_OPENAI = !!process.env.OPENAI_API_KEY;
+let openai = null;
+if (USE_OPENAI) {
+  // OpenAI SDK v4
+  const OpenAI = require("openai");
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
+
+// 위험 단어 사전(가벼운 탐지)
+const RISK_WORDS = [
+  "심한", "악화", "어려움", "높음", "위험", "즉시", "갑자기", "숨", "통증",
+  "가슴", "저림", "실신", "마비", "출혈", "호흡곤란", "실어증", "의식저하",
+  "부정맥", "찌릿", "쥐남", "열감", "붓기", "발열", "고열", "구토", "설사",
+  "혈뇨", "흑변", "시력저하", "시야장애"
+];
+
+// 레벨 산정 기준
+function levelFromScore(p) {
+  if (p >= 70) return "severe";
+  if (p >= 40) return "moderate";
+  return "mild";
+}
+
+// 규칙 기반 기본 요약/권고 생성기(응답/주제 기반)
+function ruleBasedSynthesis(topic, answers, riskPercent) {
+  const level = levelFromScore(riskPercent);
+  const baseVisit =
+    level === "severe" ? "즉시 응급실 내원 또는 119/응급실 이용이 필요합니다." :
+    level === "moderate" ? "가까운 시일 내(3일 이내) 진료를 권장합니다." :
+    "현재로선 비교적 양호합니다. 생활습관 관리 위주로 경과 관찰하세요.";
+
+  // 15줄 상세(항상 15개)
+  const details = [
+    `선택 주제는 ‘${topic}’이며, 현재 위험도는 ${level.toUpperCase()} 수준으로 추정됩니다.`,
+    `총 응답 ${answers.length}개와 선택 항목의 표현을 기준으로 상태를 분석했습니다.`,
+    `위험 신호 단어 감지 결과를 반영해 지표를 계산했습니다.`,
+    `현재 상태는 ${level === "mild" ? "비교적 안정적" : level === "moderate" ? "주의가 필요" : "즉각적인 조치가 필요"}한 단계로 판단됩니다.`,
+    `증상/불편이 반복되면 지체 없이 전문의 상담을 받으세요.`,
+    `수면, 식사, 수분 섭취, 가벼운 활동 등 기본 생활 리듬을 회복하는 것이 중요합니다.`,
+    `통증·불편이 지속/악화되면 즉시 의료기관 방문을 고려하세요.`,
+    `스트레스 관리와 자세 교정, 무리한 활동 피하기를 권장합니다.`,
+    `필요 시 보호자/가족과 증상 기록(발생 시간·유발 요인)을 남기세요.`,
+    `복약 중이라면 처방/복용 스케줄을 지키고, 이상반응 시 즉시 상담하세요.`,
+    `증상 변화가 심해지거나 새로운 신호가 나타나면 진료를 서두르세요.`,
+    `생활관리만으로 불충분하면 물리치료·운동치료·상담치료 등을 검토하세요.`,
+    `정기 검진(혈압·혈당·혈중지표 등)으로 기초 상태를 점검하세요.`,
+    `필요 시 영양제 보충으로 회복을 돕되, 기존 약과의 상호작용은 확인하세요.`,
+    baseVisit
+  ];
+
+  // 7줄 요약
+  const summary = [
+    `주제: ${topic}`,
+    `위험도: ${level.toUpperCase()}`,
+    `응답 수: ${answers.length}개`,
+    `현재 상태: ${level === "mild" ? "양호" : level === "moderate" ? "주의 요망" : "고위험"}`,
+    `권장: ${level === "mild" ? "생활관리·경과관찰" : level === "moderate" ? "단기 내 진료 권고" : "즉시 진료/응급"}`,
+    `증상 기록/유발 요인 파악 및 반복 여부 관찰`,
+    `충분한 휴식·수분·균형 잡힌 식사 유지`
+  ];
+
+  // 2줄 전문가 의견
+  const opinion = [
+    level === "severe"
+      ? "증상 경향과 위험 신호 빈도상 고위험 가능성이 큽니다."
+      : "응답 기반으로 현재 단계는 정밀 위험 범주에 해당하지 않습니다.",
+    level === "severe"
+      ? "지체 없이 진료를 받으시고, 위험 신호(가슴통증·호흡곤란·실신 등) 시 응급실을 이용하세요."
+      : "생활관리와 정기 점검을 유지하면서 증상 변화를 기록해 주세요."
+  ];
+
+  return { details, summary, opinion };
+}
+
+// GPT 보조(선택적). 실패 시 규칙 기반으로 대체
+async function gptAssist(topic, answers, riskPercent) {
+  const { details, summary, opinion } = ruleBasedSynthesis(topic, answers, riskPercent);
+
+  if (!USE_OPENAI) {
+    return { details, summary, opinion };
+  }
+
+  const sys = `You are a Korean medical-style assistant for seniors.
+Return three arrays:
+- detail: 15 concise bullet lines
+- summary: 7 bullet lines
+- opinion: 2 bullet lines
+Tone: calm, friendly, non-alarmist. Use polite Korean.`;
+
+  const usr = `주제: ${topic}
+위험도 지표: ${riskPercent}
+응답(선택항목들): ${answers.join(" | ")}
+
+요청:
+- detail 15줄
+- summary 7줄
+- opinion 2줄
+형식: JSON {"detail":[], "summary":[], "opinion":[]}`;
+
+  try {
+    const resp = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: sys },
+        { role: "user", content: usr }
+      ],
+      temperature: 0.4
+    });
+    const text = resp.choices?.[0]?.message?.content?.trim() || "";
+    const jsonStart = text.indexOf("{");
+    const jsonEnd = text.lastIndexOf("}");
+    if (jsonStart >= 0 && jsonEnd > jsonStart) {
+      const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+      const det = Array.isArray(parsed.detail) && parsed.detail.length >= 12 ? parsed.detail.slice(0, 15) : details;
+      const sum = Array.isArray(parsed.summary) && parsed.summary.length >= 5 ? parsed.summary.slice(0, 7) : summary;
+      const opn = Array.isArray(parsed.opinion) && parsed.opinion.length >= 2 ? parsed.opinion.slice(0, 2) : opinion;
+      return { details: det, summary: sum, opinion: opn };
+    }
+    return { details, summary, opinion };
+  } catch {
+    return { details, summary, opinion };
+  }
+}
+
+// 분석 API
+app.post("/analyze", async (req, res) => {
+  try {
+    const { topic, answers } = req.body || {};
+    const safeTopic = typeof topic === "string" ? topic : "알 수 없음";
+    const arr = Array.isArray(answers) ? answers : [];
+
+    // 위험단어 카운트
+    let riskCount = 0;
+    for (const a of arr) {
+      const s = String(a || "");
+      for (const w of RISK_WORDS) {
+        if (s.includes(w)) riskCount++;
+      }
+    }
+    // 간단 지표 계산(응답수/위험단어 가중치)
+    const base = Math.min(100, arr.length * 4);      // 응답수 1개당 4점
+    const risk = Math.min(100, riskCount * 8);       // 위험단어 1개당 8점
+    const riskPercent = Math.min(100, Math.round(base * 0.4 + risk * 0.6));
+    const level = levelFromScore(riskPercent);
+
+    // GPT/규칙 혼합 생성
+    const synth = await gptAssist(safeTopic, arr, riskPercent);
+
+    const result = {
+      topic: safeTopic,
+      level,
+      riskPercent,
+      answerCount: arr.length,
+      riskWordCount: riskCount,
+      detail: synth.details,
+      summary: synth.summary,
+      opinion: synth.opinion
+    };
+    return res.json({ ok: true, result });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: "analyze_failed" });
+  }
+});
+
+// 핫 리로드: affiliate.json 변경 감지 없이 항상 최신 로드
+app.get("/affiliate-live", (req, res) => {
+  try {
+    const map = readJSON("affiliate.json");
+    res.json(map);
+  } catch {
+    res.status(500).json({ ok: false });
+  }
+});
+
+// 라우팅(정적)
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get("/question", (_req, res) => {
+  res.sendFile(path.join(__dirname, "question.html"));
+});
+app.get("/result", (_req, res) => {
+  res.sendFile(path.join(__dirname, "result.html"));
+});
+
+// 포트
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+  console.log(`Noeulbit Haru AI running on :${PORT}`);
+});
