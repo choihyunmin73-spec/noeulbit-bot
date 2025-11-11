@@ -1,147 +1,167 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>AI 진단 결과</title>
 <style>
-  :root{--bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;}
-  body{font-family:"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--white);margin:0}
-  .wrap{max-width:1180px;margin:0 auto;padding:26px 32px 40px}
-  h1{margin:6px 0 18px;color:#98c2ff}
-  .grid{display:grid;grid-template-columns:1.7fr .9fr;gap:26px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
-  .chip{display:inline-block;background:#1f2b44;border:1px solid #2f4570;padding:6px 10px;border-radius:999px;font-size:13px;color:#cfe2ff;margin-right:8px}
-  .bar{height:8px;border-radius:4px;background:#23304a;overflow:hidden;margin-top:8px}
-  .bar>span{display:block;height:100%;width:0;background:#6ba7ff;transition:width .6s}
-  h3.sec{color:#9eb2ff;border-left:3px solid var(--brand);padding-left:8px;margin:18px 0 8px}
-  ul{margin:8px 0 12px 20px}
-  li{margin:4px 0}
-  .twoBtn{display:flex;gap:12px;margin-top:16px}
-  .btn{display:inline-block;background:#294e80;border:1px solid #3d6bb0;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none}
-  /* 오른쪽 */
-  .aff{display:flex;align-items:flex-start;gap:12px;background:#1f2531;border:1px solid #283142;border-radius:12px;padding:14px;cursor:pointer;transition:.2s;margin-bottom:12px}
-  .aff:hover{transform:translateY(-2px);background:#232c3d}
-  .aff img{width:26px;height:26px}
-  .muted{color:#98a0b3}
-  .tiny{font-size:12px;color:#8c95a8;margin-top:6px}
-  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+:root {
+  --bg:#0d1420;--panel:#121a26;--panel2:#182235;
+  --line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
+}
+body {
+  font-family:"Pretendard","Noto Sans KR",sans-serif;
+  background:var(--bg);color:var(--white);margin:0;
+}
+.wrap {
+  max-width:1180px;margin:0 auto;padding:40px 60px;
+  display:flex;flex-wrap:wrap;gap:24px;
+}
+.left, .right {
+  flex:1;min-width:320px;background:var(--panel2);
+  border:1px solid var(--line);border-radius:14px;
+  padding:28px;box-sizing:border-box;
+}
+.left {flex:1.8;}
+.right {flex:1.2;}
+h1{color:#98c2ff;margin-top:0;margin-bottom:18px;}
+.sub{color:#b8c9e0;margin-bottom:25px;font-size:1em;}
+.section{margin-bottom:28px;}
+.section h2{color:#6ba7ff;margin-bottom:10px;font-size:1.15em;border-bottom:1px solid var(--line);padding-bottom:6px;}
+.bar-container{height:10px;background:#22324b;border-radius:5px;overflow:hidden;margin-top:6px;}
+.bar-fill{height:100%;background:linear-gradient(90deg,#5b8cff,#6ba7ff);width:0%;transition:width 0.6s ease;}
+.product,.insurance{
+  background:#121a26;border:1px solid #2a3a55;
+  border-radius:10px;padding:14px;margin-bottom:14px;
+  cursor:pointer;transition:0.25s;
+}
+.product:hover,.insurance:hover{background:#1e2b43;}
+.product h3,.insurance h3{color:#9fc5ff;margin:0 0 6px;font-size:1.05em;}
+.product p,.insurance p{color:#b8c9e0;font-size:0.95em;margin:0;}
+footer{text-align:center;color:#6c7b98;font-size:0.8em;margin-top:16px;}
+@media(max-width:900px){
+  .wrap{flex-direction:column;padding:28px;}
+  .left,.right{min-width:100%;}
+}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>AI 진단 결과</h1>
-    <div class="grid">
-      <!-- LEFT -->
-      <section class="card" id="left">
-        <div class="chip" id="topic">주제: 알 수 없음</div>
-        <div class="chip" id="level">mild</div>
-        <div class="chip">총 응답 수: <span id="ans">0</span></div>
-        <div class="chip">위험단어 수: <span id="rk">0</span></div>
-        <div class="chip">위험도 지표: <span id="risk">0</span>/100</div>
-        <div class="bar"><span id="riskBar"></span></div>
+<div class="wrap">
+  <!-- 왼쪽 : 진단 결과 -->
+  <div class="left">
+    <h1>AI 진단결과</h1>
+    <p class="sub" id="topic"></p>
 
-        <h3 class="sec">상세 진단</h3>
-        <ul id="detail"></ul>
+    <div class="section">
+      <h2>위험도 지표</h2>
+      <p>응답 수: <span id="answerCount">-</span>개 / 위험단어 수: <span id="riskWordCount">-</span>개</p>
+      <div class="bar-container"><div class="bar-fill" id="riskBar"></div></div>
+      <p id="riskLevel" style="margin-top:6px;">-</p>
+    </div>
 
-        <h3 class="sec">요약</h3>
-        <ul id="summary"></ul>
+    <div class="section">
+      <h2>상세 진단</h2>
+      <div id="detail" style="white-space:pre-line;color:#d9e6ff;line-height:1.6em;"></div>
+    </div>
 
-        <h3 class="sec">전문가 의견</h3>
-        <ul id="opinion"></ul>
+    <div class="section">
+      <h2>요약</h2>
+      <div id="summary" style="white-space:pre-line;color:#c6d9ff;line-height:1.6em;"></div>
+    </div>
 
-        <div class="twoBtn">
-          <a class="btn" href="index.html">처음으로 돌아가기</a>
-          <a class="btn" href="question.html">다시 진단하기</a>
-        </div>
-      </section>
-
-      <!-- RIGHT -->
-      <aside class="card" id="right">
-        <h3 class="sec">제휴상품 (필요하신 영양제)</h3>
-        <div id="supps"></div>
-        <div class="tiny">본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</div>
-
-        <h3 class="sec">제휴보험 (체크해 보세요)</h3>
-        <div id="ins"></div>
-      </aside>
+    <div class="section">
+      <h2>전문가 의견</h2>
+      <div id="opinion" style="white-space:pre-line;color:#c6d9ff;line-height:1.6em;"></div>
     </div>
   </div>
 
+  <!-- 오른쪽 : 제휴상품 / 보험 -->
+  <div class="right">
+    <div class="section">
+      <h2>추천 제휴상품</h2>
+      <div id="affiliateList"></div>
+      <footer>본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</footer>
+    </div>
+    <div class="section">
+      <h2>추천 제휴보험</h2>
+      <div id="insuranceList"></div>
+    </div>
+  </div>
+</div>
+
 <script>
-(function(){
-  const res = JSON.parse(localStorage.getItem("aiResult")||"null");
-  const topic = localStorage.getItem("aiTopic") || "알 수 없음";
-  const $ = id => document.getElementById(id);
+// ✅ 로컬스토리지 데이터 불러오기
+const topic = localStorage.getItem("aiTopic");
+const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
+document.getElementById("topic").textContent = `주제: ${topic}`;
 
-  if(!res){
-    $("detail").innerHTML = `<li class="muted">결과 데이터를 불러오지 못했습니다.</li>`;
-    return;
-  }
+// ✅ 위험도 계산 로직
+const riskWords = ["심함","악화","위험","통증","저림","갑자기","숨","불안"];
+let riskCount = 0;
+answers.forEach(a => riskWords.forEach(r => { if(a.includes(r)) riskCount++; }));
+document.getElementById("answerCount").textContent = answers.length;
+document.getElementById("riskWordCount").textContent = riskCount;
 
-  $("topic").textContent = `주제: ${res.topic||topic}`;
-  $("level").textContent = res.level||"mild";
-  $("ans").textContent = res.answerCount ?? 0;
-  $("rk").textContent = res.riskWordCount ?? 0;
-  $("risk").textContent = res.riskPercent ?? 0;
-  $("riskBar").style.width = ((res.riskPercent ?? 0) + "%");
+const riskScore = Math.min(100, Math.round((riskCount / (answers.length*0.8)) * 100));
+document.getElementById("riskBar").style.width = riskScore + "%";
+let riskLevel = "Mild";
+if(riskScore > 70) riskLevel = "Severe";
+else if(riskScore > 40) riskLevel = "Moderate";
+document.getElementById("riskLevel").textContent = `위험도: ${riskLevel} (${riskScore}/100)`;
 
-  // 상세 15줄
-  const det = Array.isArray(res.detail)? res.detail : [];
-  $("detail").innerHTML = det.length ? det.map(s=>`<li>${s}</li>`).join("") : `<li class="muted">상세 진단 데이터가 없습니다.</li>`;
+// ✅ 상세 진단 / 요약 / 전문가 의견 자동 생성
+function generateText() {
+  const base = topic || "건강";
+  let detail = `현재 주제는 '${base}'이며, 위험도는 ${riskLevel} 수준으로 평가되었습니다.\n`;
+  detail += riskCount > 0 ? `응답 데이터에서 ${riskCount}개의 주의 단어가 감지되었습니다.\n` : "위험 단어는 감지되지 않았습니다.\n";
+  detail += "생활습관 관리 및 주기적 점검이 중요합니다.\n";
+  detail += "스트레스를 줄이고 충분한 수면과 균형 잡힌 식사를 유지하세요.\n";
+  detail += "가벼운 운동과 수분 섭취로 건강을 보완하세요.\n";
+  detail += "증상이 지속된다면 가까운 의료기관 방문을 권장합니다.\n";
+  detail += "필요 시 영양제나 전문상담을 병행하세요.\n";
+  detail += "생활관리와 경과 관찰을 병행하세요.\n전반적으로 양호하나 세부 관리가 필요합니다.";
+  document.getElementById("detail").textContent = detail;
 
-  // 요약 7줄
-  const sum = Array.isArray(res.summary)? res.summary : [];
-  $("summary").innerHTML = sum.length ? sum.map(s=>`<li>${s}</li>`).join("") : `<li class="muted">요약 데이터 없음</li>`;
+  const summary = `주제: ${base}\n위험도 수준: ${riskLevel}\n응답 수: ${answers.length}개\n전반적으로 ${riskLevel==="Severe"?"주의가 필요합니다.":"안정적입니다."}\n정기적인 검진과 생활관리로 건강을 유지하세요.`;
+  document.getElementById("summary").textContent = summary;
 
-  // 전문가 의견 2줄
-  const opn = Array.isArray(res.opinion)? res.opinion : [];
-  $("opinion").innerHTML = opn.length ? opn.map(s=>`<li>${s}</li>`).join("") : `<li class="muted">전문가 의견 데이터 없음</li>`;
+  const opinion = riskLevel==="Severe"
+    ? "AI 분석 결과, 현재 위험요소가 다소 높게 나타났습니다.\n가까운 병원 진료를 권장드립니다."
+    : "AI 분석 결과, 특별한 위험 요소는 크지 않습니다.\n지속적인 관리와 점검으로 좋은 상태를 유지하세요.";
+  document.getElementById("opinion").textContent = opinion;
+}
+generateText();
 
-  // 제휴상품 (항상 최신 불러오기)
-  fetch("/affiliate-live")
-    .then(r=>r.json())
-    .then(map=>{
-      const list = map[res.topic] || map[topic] || [];
-      const box = $("supps");
-      if(!list.length){
-        box.innerHTML = `<div class="muted">해당 주제에 등록된 제휴상품이 없습니다.</div>`;
-        return;
-      }
-      box.innerHTML = "";
-      list.slice(0,3).forEach(item=>{
-        const d = document.createElement("div");
-        d.className = "aff";
-        d.innerHTML = `
-          <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="pill">
-          <div>
-            <div><strong>${item.name}</strong></div>
-            <div class="muted">${item.desc||""}</div>
-            <div class="muted">쿠팡 바로가기</div>
-          </div>`;
-        d.onclick = ()=>window.open(item.link,"_blank");
-        box.appendChild(d);
-      });
-    })
-    .catch(()=>{$("supps").innerHTML=`<div class="muted">제휴상품 정보를 불러오지 못했습니다.</div>`});
+// ✅ 제휴상품 및 보험 fetch (Render 서버 절대경로)
+fetch(window.location.origin + "/affiliate.json", { cache: "no-store" })
+  .then(res => res.json())
+  .then(data => {
+    const products = data[topic] || [];
+    const affiliateDiv = document.getElementById("affiliateList");
+    affiliateDiv.innerHTML = "";
+    products.forEach(p => {
+      const box = document.createElement("div");
+      box.className = "product";
+      box.innerHTML = `<h3>${p.name}</h3><p>${p.desc}</p>`;
+      box.onclick = () => window.open(p.link, "_blank");
+      affiliateDiv.appendChild(box);
+    });
 
-  // 제휴보험(고정 2종)
-  const ins = $("ins");
-  [
-    {name:"고혈압·심장 보장보험", desc:"혈압·심혈관질환 중심 보장 상품"},
-    {name:"만성질환 실손보험",   desc:"정기 내과·검사비 보장 상품"}
-  ].forEach(i=>{
-    const d = document.createElement("div");
-    d.className = "aff";
-    d.innerHTML = `
-      <img src="https://cdn-icons-png.flaticon.com/512/2965/2965401.png" alt="shield">
-      <div>
-        <div><strong>${i.name}</strong></div>
-        <div class="muted">${i.desc}</div>
-      </div>`;
-    ins.appendChild(d);
+    const insList = data["보험"] || [];
+    const insDiv = document.getElementById("insuranceList");
+    insDiv.innerHTML = "";
+    insList.forEach(i => {
+      const box = document.createElement("div");
+      box.className = "insurance";
+      box.innerHTML = `<h3>${i.name}</h3><p>${i.desc}</p>`;
+      box.onclick = () => window.open(i.link, "_blank");
+      insDiv.appendChild(box);
+    });
+  })
+  .catch(err => {
+    console.error("제휴상품 로드 오류:", err);
+    document.getElementById("affiliateList").innerHTML = "<p>제휴상품 정보를 불러오지 못했습니다.</p>";
   });
-})();
 </script>
 </body>
 </html>
