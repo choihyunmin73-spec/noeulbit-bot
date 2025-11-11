@@ -13,55 +13,78 @@
     margin:0;
     display:flex;
     flex-direction:column;
-    justify-content:flex-start;   /* 상단 중앙정렬 */
+    justify-content:flex-start;   /* ✅ 세로 상단 정렬 */
     align-items:center;
     min-height:100vh;
-    padding-top:60px;
+    padding-top:80px;             /* ✅ 상단 여백 확보 */
   }
-  .wrap{max-width:1100px;margin:0 auto;padding:40px 40px 60px;}
-  h2{color:#98c2ff;margin:8px 0 20px;font-size:22px;text-align:center;}
+
+  .wrap{
+    width:90%;
+    max-width:1100px;
+    margin:0 auto;
+    padding:40px 60px 70px;
+  }
+
+  h2{
+    color:#98c2ff;
+    margin:8px 0 30px;
+    font-size:22px;
+    text-align:center;
+  }
+
   .box{
     background:var(--panel2);
     border:1px solid var(--line);
     border-radius:18px;
-    padding:32px;
-    width:80%;
-    max-width:700px;
+    padding:36px 40px;
+    width:100%;
+    max-width:900px;
+    margin:0 auto;
   }
+
   .q{
-    font-size:20px;
-    margin-bottom:22px;
+    font-size:22px;
+    margin-bottom:28px;
     color:#e1ecff;
     text-align:center;
   }
+
   .opt{
     background:#22324b;
     border:1px solid #315d93;
     border-radius:12px;
-    padding:14px;
-    margin:12px 0;
+    padding:16px;
+    margin:14px 0;
     cursor:pointer;
     color:#cfe2ff;
     font-size:18px;
     text-align:center;
-    display:flex;                 /* ✅ 수평/수직 중앙정렬 */
-    align-items:center;           /* ✅ 세로 중앙정렬 */
-    justify-content:center;       /* ✅ 가로 중앙정렬 */
-    height:50px;                  /* ✅ 일정 높이로 통일 */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:55px;
+    width:100%;
+    max-width:700px;
+    margin-left:auto;
+    margin-right:auto;
   }
+
   .opt:hover{
     background:#3969b5;
     color:#fff;
     transform:translateY(-2px);
   }
+
   .info{
     display:flex;
     gap:12px;
     flex-wrap:wrap;
-    margin:18px 0 8px;
+    margin:20px 0 8px;
     color:#a4b6d6;
     justify-content:center;
   }
+
   .bar{
     height:10px;
     border-radius:5px;
@@ -69,7 +92,9 @@
     overflow:hidden;
     width:100%;
     max-width:700px;
+    margin:0 auto;
   }
+
   .bar > span{
     display:block;
     height:100%;
@@ -77,6 +102,7 @@
     background:#6ba7ff;
     transition:width .25s;
   }
+
   a.btn{
     display:inline-block;
     background:#294e80;
@@ -84,7 +110,7 @@
     color:#fff;
     padding:12px 18px;
     border-radius:10px;
-    margin-top:20px;
+    margin-top:24px;
     text-decoration:none;
     font-size:16px;
   }
