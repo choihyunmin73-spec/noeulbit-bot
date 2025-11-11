@@ -1,96 +1,65 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 진단 결과 분석 중...</title>
-  <style>
-    :root {
-      --bg: #0d1420;
-      --brand: #6ba7ff;
-      --track: #22324b;
-      --fill: linear-gradient(90deg, #5b8cff, #6ba7ff);
-      --text: #bcd4ff;
-    }
-    body {
-      font-family: "Pretendard", "Noto Sans KR", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-    h2 {
-      color: var(--brand);
-      font-size: 1.8em;
-      margin-bottom: 30px;
-    }
-    .loader {
-      width: 80%;
-      max-width: 420px;
-      height: 16px;
-      border-radius: 10px;
-      background-color: var(--track);
-      overflow: hidden;
-      margin: 0 auto;
-      position: relative;
-      box-shadow: 0 0 10px rgba(107,167,255,0.3);
-    }
-    .fill {
-      height: 100%;
-      width: 0%;
-      background: var(--fill);
-      border-radius: 10px;
-      transition: width 0.05s linear;
-    }
-    p {
-      margin-top: 25px;
-      font-size: 1.1em;
-      color: var(--text);
-    }
-    @keyframes pulse {
-      0% {opacity: 0.6;}
-      50% {opacity: 1;}
-      100% {opacity: 0.6;}
-    }
-    .hint {
-      margin-top: 18px;
-      font-size: 0.9em;
-      color: #8ea4c6;
-      animation: pulse 2s infinite;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 진단 결과 분석 중...</title>
+<style>
+  :root{
+    --bg:#0d1420;--panel:#121a26;--line:#2a3a55;
+    --brand:#6ba7ff;--white:#fff;--muted:#bcd4ff;
+  }
+  body {
+    font-family:"Pretendard","Noto Sans KR",sans-serif;
+    background:var(--bg);color:var(--white);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    height:100vh;margin:0;text-align:center;
+  }
+  h2 {
+    color:var(--brand);
+    font-size:1.8em;
+    margin-bottom:30px;
+  }
+  .loader {
+    width:80%;max-width:420px;height:16px;
+    border-radius:10px;background-color:#22324b;
+    overflow:hidden;position:relative;margin:0 auto;
+  }
+  .fill {
+    height:100%;width:0%;
+    background:linear-gradient(90deg,#5b8cff,#6ba7ff);
+    border-radius:10px;transition:width 0.1s linear;
+  }
+  p {
+    margin-top:25px;
+    font-size:1.05em;
+    color:var(--muted);
+  }
+</style>
 </head>
 <body>
   <h2>AI 진단결과를 분석 중입니다...</h2>
   <div class="loader"><div class="fill" id="fill"></div></div>
   <p id="progress">0%</p>
-  <div class="hint">잠시만 기다려주세요...</div>
 
   <script>
     let percent = 0;
     const fill = document.getElementById("fill");
     const progress = document.getElementById("progress");
 
-    // ✅ 로딩 애니메이션 (랜덤 증가)
     const timer = setInterval(() => {
-      percent += Math.floor(Math.random() * 5) + 2; // 속도 자연스럽게
+      percent += Math.floor(Math.random() * 7) + 4; // 자연스러운 속도
       if (percent >= 100) {
         percent = 100;
         clearInterval(timer);
-
-        // ✅ 데이터 유지: aiTopic, aiAnswers 그대로 → result.html로 이동
+        // ✅ Render 서버 전용 구조: localStorage 그대로 유지
         setTimeout(() => {
           window.location.href = "result.html";
-        }, 700);
+        }, 600);
       }
       fill.style.width = percent + "%";
       progress.textContent = percent + "%";
-    }, 120);
+    }, 150);
   </script>
 </body>
 </html>
