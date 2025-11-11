@@ -3,165 +3,156 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AI 진단 결과</title>
+<title>노을빛하루 AI 진단 결과</title>
 <style>
-:root {
-  --bg:#0d1420;--panel:#121a26;--panel2:#182235;
-  --line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
-}
-body {
-  font-family:"Pretendard","Noto Sans KR",sans-serif;
-  background:var(--bg);color:var(--white);margin:0;
-}
-.wrap {
-  max-width:1180px;margin:0 auto;padding:40px 60px;
-  display:flex;flex-wrap:wrap;gap:24px;
-}
-.left, .right {
-  flex:1;min-width:320px;background:var(--panel2);
-  border:1px solid var(--line);border-radius:14px;
-  padding:28px;box-sizing:border-box;
-}
-.left {flex:1.8;}
-.right {flex:1.2;}
-h1{color:#98c2ff;margin-top:0;margin-bottom:18px;}
-.sub{color:#b8c9e0;margin-bottom:25px;font-size:1em;}
-.section{margin-bottom:28px;}
-.section h2{color:#6ba7ff;margin-bottom:10px;font-size:1.15em;border-bottom:1px solid var(--line);padding-bottom:6px;}
-.bar-container{height:10px;background:#22324b;border-radius:5px;overflow:hidden;margin-top:6px;}
-.bar-fill{height:100%;background:linear-gradient(90deg,#5b8cff,#6ba7ff);width:0%;transition:width 0.6s ease;}
-.product,.insurance{
-  background:#121a26;border:1px solid #2a3a55;
-  border-radius:10px;padding:14px;margin-bottom:14px;
-  cursor:pointer;transition:0.25s;
-}
-.product:hover,.insurance:hover{background:#1e2b43;}
-.product h3,.insurance h3{color:#9fc5ff;margin:0 0 6px;font-size:1.05em;}
-.product p,.insurance p{color:#b8c9e0;font-size:0.95em;margin:0;}
-footer{text-align:center;color:#6c7b98;font-size:0.8em;margin-top:16px;}
-@media(max-width:900px){
-  .wrap{flex-direction:column;padding:28px;}
-  .left,.right{min-width:100%;}
-}
+  :root{
+    --bg:#0d1420;--panel:#121a26;--panel2:#182235;
+    --line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
+  }
+  body{font-family:"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--white);margin:0}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 40px}
+  h1{color:var(--brand);margin-bottom:10px}
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:28px}
+  .left,.right{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:24px}
+  .section{margin-bottom:28px}
+  h2{color:var(--brand);font-size:1.3em;margin-bottom:12px}
+  p{line-height:1.6em;color:var(--muted)}
+  canvas{width:100%;max-width:400px;height:220px;margin:0 auto 10px auto;display:block}
+  .affiliate-section h3{color:var(--brand);margin-bottom:10px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+  .item .name{font-weight:600;margin-bottom:6px;color:#cde0ff}
+  .item .desc{font-size:0.95em;color:var(--muted);margin-bottom:8px}
+  .item a{color:#7fb4ff;text-decoration:none;font-size:0.9em}
+  .notice{text-align:center;font-size:0.8em;color:#8fa0c0;margin-top:20px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="wrap">
-  <!-- 왼쪽 : 진단 결과 -->
-  <div class="left">
-    <h1>AI 진단결과</h1>
-    <p class="sub" id="topic"></p>
+  <h1>AI 진단 결과</h1>
+  <div class="grid">
+    <!-- 왼쪽 영역 -->
+    <div class="left">
+      <div class="section">
+        <canvas id="riskChart"></canvas>
+        <p id="summaryText"></p>
+        <p id="riskDetail"></p>
+      </div>
 
-    <div class="section">
-      <h2>위험도 지표</h2>
-      <p>응답 수: <span id="answerCount">-</span>개 / 위험단어 수: <span id="riskWordCount">-</span>개</p>
-      <div class="bar-container"><div class="bar-fill" id="riskBar"></div></div>
-      <p id="riskLevel" style="margin-top:6px;">-</p>
+      <div class="section">
+        <h2>상세 진단</h2>
+        <p id="diagnosis"></p>
+      </div>
+
+      <div class="section">
+        <h2>요약</h2>
+        <p id="summary"></p>
+      </div>
+
+      <div class="section">
+        <h2>전문가 의견</h2>
+        <p id="expert"></p>
+      </div>
     </div>
 
-    <div class="section">
-      <h2>상세 진단</h2>
-      <div id="detail" style="white-space:pre-line;color:#d9e6ff;line-height:1.6em;"></div>
-    </div>
+    <!-- 오른쪽 영역 -->
+    <div class="right">
+      <div class="affiliate-section">
+        <h3>제휴상품</h3>
+        <div id="affiliate-products"></div>
 
-    <div class="section">
-      <h2>요약</h2>
-      <div id="summary" style="white-space:pre-line;color:#c6d9ff;line-height:1.6em;"></div>
-    </div>
+        <h3>제휴보험</h3>
+        <div id="affiliate-insurance"></div>
 
-    <div class="section">
-      <h2>전문가 의견</h2>
-      <div id="opinion" style="white-space:pre-line;color:#c6d9ff;line-height:1.6em;"></div>
-    </div>
-  </div>
-
-  <!-- 오른쪽 : 제휴상품 / 보험 -->
-  <div class="right">
-    <div class="section">
-      <h2>추천 제휴상품</h2>
-      <div id="affiliateList"></div>
-      <footer>본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</footer>
-    </div>
-    <div class="section">
-      <h2>추천 제휴보험</h2>
-      <div id="insuranceList"></div>
+        <p class="notice">본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</p>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ✅ 로컬스토리지 데이터 불러오기
-const topic = localStorage.getItem("aiTopic");
+const result = JSON.parse(localStorage.getItem("aiResult") || "{}");
 const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
-document.getElementById("topic").textContent = `주제: ${topic}`;
+const topic = localStorage.getItem("aiTopic") || "AI 건강 진단";
 
-// ✅ 위험도 계산 로직
-const riskWords = ["심함","악화","위험","통증","저림","갑자기","숨","불안"];
-let riskCount = 0;
-answers.forEach(a => riskWords.forEach(r => { if(a.includes(r)) riskCount++; }));
-document.getElementById("answerCount").textContent = answers.length;
-document.getElementById("riskWordCount").textContent = riskCount;
+document.getElementById("summaryText").innerText = `주제: ${topic}`;
+document.getElementById("riskDetail").innerText =
+  `총 응답 수: ${answers.length}개`;
 
-const riskScore = Math.min(100, Math.round((riskCount / (answers.length*0.8)) * 100));
-document.getElementById("riskBar").style.width = riskScore + "%";
-let riskLevel = "Mild";
-if(riskScore > 70) riskLevel = "Severe";
-else if(riskScore > 40) riskLevel = "Moderate";
-document.getElementById("riskLevel").textContent = `위험도: ${riskLevel} (${riskScore}/100)`;
-
-// ✅ 상세 진단 / 요약 / 전문가 의견 자동 생성
-function generateText() {
-  const base = topic || "건강";
-  let detail = `현재 주제는 '${base}'이며, 위험도는 ${riskLevel} 수준으로 평가되었습니다.\n`;
-  detail += riskCount > 0 ? `응답 데이터에서 ${riskCount}개의 주의 단어가 감지되었습니다.\n` : "위험 단어는 감지되지 않았습니다.\n";
-  detail += "생활습관 관리 및 주기적 점검이 중요합니다.\n";
-  detail += "스트레스를 줄이고 충분한 수면과 균형 잡힌 식사를 유지하세요.\n";
-  detail += "가벼운 운동과 수분 섭취로 건강을 보완하세요.\n";
-  detail += "증상이 지속된다면 가까운 의료기관 방문을 권장합니다.\n";
-  detail += "필요 시 영양제나 전문상담을 병행하세요.\n";
-  detail += "생활관리와 경과 관찰을 병행하세요.\n전반적으로 양호하나 세부 관리가 필요합니다.";
-  document.getElementById("detail").textContent = detail;
-
-  const summary = `주제: ${base}\n위험도 수준: ${riskLevel}\n응답 수: ${answers.length}개\n전반적으로 ${riskLevel==="Severe"?"주의가 필요합니다.":"안정적입니다."}\n정기적인 검진과 생활관리로 건강을 유지하세요.`;
-  document.getElementById("summary").textContent = summary;
-
-  const opinion = riskLevel==="Severe"
-    ? "AI 분석 결과, 현재 위험요소가 다소 높게 나타났습니다.\n가까운 병원 진료를 권장드립니다."
-    : "AI 분석 결과, 특별한 위험 요소는 크지 않습니다.\n지속적인 관리와 점검으로 좋은 상태를 유지하세요.";
-  document.getElementById("opinion").textContent = opinion;
-}
-generateText();
-
-// ✅ 제휴상품 및 보험 fetch (Render 서버 절대경로)
-fetch(window.location.origin + "/affiliate.json", { cache: "no-store" })
-  .then(res => res.json())
-  .then(data => {
-    const products = data[topic] || [];
-    const affiliateDiv = document.getElementById("affiliateList");
-    affiliateDiv.innerHTML = "";
-    products.forEach(p => {
-      const box = document.createElement("div");
-      box.className = "product";
-      box.innerHTML = `<h3>${p.name}</h3><p>${p.desc}</p>`;
-      box.onclick = () => window.open(p.link, "_blank");
-      affiliateDiv.appendChild(box);
-    });
-
-    const insList = data["보험"] || [];
-    const insDiv = document.getElementById("insuranceList");
-    insDiv.innerHTML = "";
-    insList.forEach(i => {
-      const box = document.createElement("div");
-      box.className = "insurance";
-      box.innerHTML = `<h3>${i.name}</h3><p>${i.desc}</p>`;
-      box.onclick = () => window.open(i.link, "_blank");
-      insDiv.appendChild(box);
-    });
-  })
-  .catch(err => {
-    console.error("제휴상품 로드 오류:", err);
-    document.getElementById("affiliateList").innerHTML = "<p>제휴상품 정보를 불러오지 못했습니다.</p>";
+const riskWords = ["위험","통증","심함","악화","불안","저림","가슴","호흡","즉시","갑자기"];
+let riskScore = 0;
+answers.forEach(a => {
+  riskWords.forEach(w => {
+    if (a.includes(w)) riskScore++;
   });
+});
+document.getElementById("riskDetail").innerText +=
+  ` / 위험단어 감지 수: ${riskScore}개`;
+
+const riskLevel = riskScore >= 5 ? "High" : riskScore >= 3 ? "Moderate" : "Mild";
+const riskValue = riskScore * 10 > 100 ? 100 : riskScore * 10;
+document.getElementById("summaryText").innerText +=
+  `  /  위험도 지표: ${riskValue}/100 (${riskLevel})`;
+
+// 차트 표시
+const ctx = document.getElementById("riskChart");
+new Chart(ctx,{
+  type:"doughnut",
+  data:{labels:["위험도","안정"],datasets:[{data:[riskValue,100-riskValue],
+  backgroundColor:["#6ba7ff","#22324b"],borderWidth:0}]},
+  options:{plugins:{legend:{display:false}},cutout:"70%"}
+});
+
+// 상세 진단, 요약, 전문가 의견
+document.getElementById("diagnosis").innerText =
+  result.diagnosis || "응답을 기반으로 진단 중입니다. 생활관리와 경과관찰을 병행하세요.";
+document.getElementById("summary").innerText =
+  result.summary || "응답 내용 분석 결과 전반적으로 안정적입니다. 지속적 관리가 필요합니다.";
+document.getElementById("expert").innerText =
+  result.expert || "AI 분석 결과, 현재 상태는 양호합니다. 생활습관 개선을 권장드립니다.";
+
+// 제휴상품 + 보험 표시
+fetch("affiliate.json")
+  .then(res=>res.json())
+  .then(data=>{
+    if(!data[topic]) return;
+
+    // 제휴상품
+    if(data[topic].products && data[topic].products.length>0){
+      const box=document.getElementById("affiliate-products");
+      box.innerHTML="";
+      data[topic].products.forEach(item=>{
+        const div=document.createElement("div");
+        div.className="item";
+        div.innerHTML=`
+          <div class="icon">🛍️</div>
+          <div class="name">${item.name}</div>
+          <div class="desc">${item.desc}</div>
+          <a href="${item.link}" target="_blank">쿠팡 바로가기</a>
+        `;
+        box.appendChild(div);
+      });
+    }
+
+    // 제휴보험
+    if(data[topic].insurance && data[topic].insurance.length>0){
+      const ins=document.getElementById("affiliate-insurance");
+      ins.innerHTML="";
+      data[topic].insurance.forEach(item=>{
+        const div=document.createElement("div");
+        div.className="item";
+        div.innerHTML=`
+          <div class="icon">💼</div>
+          <div class="name">${item.name}</div>
+          <div class="desc">${item.desc}</div>
+          <a href="${item.link}" target="_blank">보험 바로가기</a>
+        `;
+        ins.appendChild(div);
+      });
+    }
+  })
+  .catch(err=>console.error("affiliate.json 로드 오류",err));
 </script>
 </body>
 </html>
