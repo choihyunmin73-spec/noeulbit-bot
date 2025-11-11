@@ -3,53 +3,85 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>노을빛하루 AI 종합 진단 시스템</title>
+<title>노을빛하루 AI 건강 자가진단</title>
 <style>
-  :root{
-    --bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
+  :root {
+    --bg:#0d1420;--panel:#121a26;--panel2:#182235;
+    --line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
   }
-  body{font-family:"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--white);margin:0}
-  h1{margin:34px 0 8px;text-align:center;color:#98c2ff;font-size:32px}
-  p.sub{margin:0 0 26px;text-align:center;color:var(--muted)}
-  .wrap{max-width:980px;margin:0 auto;padding:0 28px 40px}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:.2s;color:#dbe7ff;font-weight:600}
-  .card:hover{transform:translateY(-3px);background:#22304b}
-  footer{color:#7c8eac;text-align:center;margin:28px 0}
-  @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  body {
+    font-family:"Pretendard","Noto Sans KR",sans-serif;
+    background:var(--bg);color:var(--white);
+    margin:0;display:flex;flex-direction:column;
+    align-items:center;min-height:100vh;text-align:center;
+  }
+  header {
+    background:var(--panel2);
+    width:100%;padding:20px 0;
+    border-bottom:1px solid var(--line);
+  }
+  header h1 {
+    color:var(--brand);font-size:1.6em;margin:0;
+  }
+  main {
+    width:90%;max-width:900px;margin-top:40px;
+    background:var(--panel);border-radius:16px;
+    padding:36px 30px 50px;border:1px solid var(--line);
+    box-shadow:0 0 15px rgba(0,0,0,0.4);
+  }
+  h2 {
+    color:#bcd4ff;font-size:1.25em;margin-bottom:30px;
+  }
+  .topics {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px;
+  }
+  .topic {
+    background:#1c273d;border:1px solid #2a3f63;
+    border-radius:12px;padding:20px;
+    color:#dce8ff;cursor:pointer;
+    transition:.25s;
+  }
+  .topic:hover {
+    background:#27406b;border-color:#5b8cff;
+    transform:translateY(-2px);
+  }
+  footer {
+    margin-top:40px;
+    color:var(--muted);
+    font-size:0.9em;
+  }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>노을빛하루 AI 종합 진단 시스템</h1>
-    <p class="sub">진단을 원하는 주제를 선택하세요.</p>
+  <header><h1>노을빛하루 AI 건강 자가진단</h1></header>
 
-    <div class="grid">
-      <div class="card" onclick="go('관절 통증')">관절 통증</div>
-      <div class="card" onclick="go('혈압 관리')">혈압 관리</div>
-      <div class="card" onclick="go('혈당·당뇨')">혈당·당뇨</div>
-
-      <div class="card" onclick="go('불면증·수면장애')">불면증·수면장애</div>
-      <div class="card" onclick="go('어깨·목 통증')">어깨·목 통증</div>
-      <div class="card" onclick="go('심장·호흡·가슴통증')">심장·호흡·가슴통증</div>
-
-      <div class="card" onclick="go('노안·시력저하')">노안·시력저하</div>
-      <div class="card" onclick="go('치매·기억력 문제')">치매·기억력 문제</div>
-      <div class="card" onclick="go('전립선·배뇨 문제')">전립선·배뇨 문제</div>
-
-      <div class="card" onclick="go('종합 건강 체크')">종합 건강 체크</div>
-      <div class="card" onclick="go('보험비용 종합점검')">보험비용 종합점검</div>
-      <div class="card" onclick="go('자동차 견적·보험비용 점검')">자동차 견적·보험비용 점검</div>
+  <main>
+    <h2>원하시는 건강 주제를 선택하세요</h2>
+    <div class="topics">
+      <div class="topic" onclick="goToTopic('관절 통증')">🦵 관절 통증</div>
+      <div class="topic" onclick="goToTopic('혈압 관리')">💓 혈압 관리</div>
+      <div class="topic" onclick="goToTopic('혈당·당뇨')">🍬 혈당·당뇨</div>
+      <div class="topic" onclick="goToTopic('불면증·수면장애')">🌙 불면증·수면장애</div>
+      <div class="topic" onclick="goToTopic('어깨·목 통증')">💪 어깨·목 통증</div>
+      <div class="topic" onclick="goToTopic('심장·호흡·가슴통증')">❤️‍🔥 심장·호흡·가슴통증</div>
+      <div class="topic" onclick="goToTopic('노안·시력저하')">👁️ 노안·시력저하</div>
+      <div class="topic" onclick="goToTopic('치매·기억력 문제')">🧠 치매·기억력 문제</div>
+      <div class="topic" onclick="goToTopic('전립선·배뇨 문제')">🚻 전립선·배뇨 문제</div>
+      <div class="topic" onclick="goToTopic('종합 건강 체크')">💊 종합 건강 체크</div>
     </div>
+  </main>
 
-    <footer>© 2025 노을빛하루 AI 진단 시스템</footer>
-  </div>
+  <footer>
+    ⓒ 2025 노을빛하루 AI 진단 시스템 | 건강검진 대체가 아닌 참고용 서비스입니다.
+  </footer>
 
-<script>
-function go(topic){
-  location.href = `question.html?topic=${encodeURIComponent(topic)}`;
-}
-</script>
+  <script>
+    function goToTopic(topic) {
+      localStorage.setItem("aiTopic", topic);
+      window.location.href = "question.html";
+    }
+  </script>
 </body>
 </html>
