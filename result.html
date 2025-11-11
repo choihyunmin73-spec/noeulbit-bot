@@ -5,154 +5,132 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>노을빛하루 AI 진단 결과</title>
 <style>
-  :root {
-    --bg:#0d1420;
-    --panel:#121a26;
-    --panel2:#182235;
-    --line:#2a3a55;
-    --brand:#6ba7ff;
-    --muted:#9fb1cf;
-    --white:#fff;
+  :root{
+    --bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;
   }
-
-  body {
+  body{
     font-family:"Pretendard","Noto Sans KR",sans-serif;
-    background:var(--bg);
-    color:var(--white);
-    margin:0;
-    padding:0;
+    background:var(--bg);color:var(--white);
+    margin:0;padding:50px;
+    display:flex;flex-direction:row;gap:40px;
+    justify-content:center;align-items:flex-start;
   }
-
-  .container {
-    max-width:720px;
-    margin:0 auto;
-    padding:40px 30px;
-  }
-
-  h1 {
-    font-size:1.8rem;
-    color:var(--brand);
-    margin-bottom:10px;
-  }
-
-  h2 {
-    font-size:1.2rem;
-    color:var(--brand);
-    border-left:4px solid var(--brand);
-    padding-left:8px;
-    margin:24px 0 12px 0;
-  }
-
-  .summary-box {
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:20px 24px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center;
-  }
-
-  .tag {
-    background:var(--panel2);
-    border-radius:20px;
-    padding:6px 12px;
-    font-size:0.9rem;
-  }
-
-  .bar {
-    height:6px;
-    background:var(--line);
-    border-radius:6px;
-    margin-top:8px;
-    overflow:hidden;
-  }
-
-  .fill {
-    height:100%;
-    background:var(--brand);
-    width:13%;
-  }
-
-  ul {
-    list-style:none;
-    padding:0;
-    margin:0;
-  }
-
-  ul li {
-    margin-bottom:8px;
-    line-height:1.6;
-  }
-
-  /* ✅ 모바일 최적화 */
-  @media (max-width:768px) {
-    .container {
-      width:100%;
-      max-width:100%;
-      padding:16px 8px !important; /* 좌우 여백 최소화 */
-    }
-
-    h1 {
-      font-size:1.4rem;
-      margin-bottom:8px;
-    }
-
-    h2 {
-      font-size:1.05rem;
-      margin:20px 0 10px 0;
-    }
-
-    .summary-box {
-      padding:12px 8px;
-      border-radius:8px;
-    }
-
-    .tag {
-      font-size:0.85rem;
-      padding:5px 10px;
-    }
-
-    ul li {
-      text-indent:0 !important;
-      font-size:1rem;
-      line-height:1.7;
-      margin-bottom:6px;
-    }
-
-    .bar {
-      height:5px;
-      border-radius:4px;
-    }
-  }
+  .container{display:flex;max-width:1200px;width:100%;gap:40px;}
+  .left,.right{flex:1;border-radius:16px;padding:30px;box-sizing:border-box;}
+  .left{background:var(--panel);}
+  .right{background:var(--panel2);}
+  h2{color:var(--brand);margin-top:0;font-size:1.4em;}
+  hr{border:0;border-top:1px solid var(--line);margin:20px 0;}
+  .muted{color:var(--muted);font-size:0.9em;}
+  .aff{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer;}
+  .aff img{width:36px;height:36px;}
+  .aff:hover{background:#1d2940;border-radius:10px;}
+  .tiny{color:#6a7ca5;font-size:0.8em;margin-top:15px;text-align:center;}
 </style>
 </head>
 <body>
-  <div class="container">
-    <h1>AI <strong>진단 결과</strong></h1>
-
-    <div class="summary-box">
-      <div class="tag">주제: 치매·기억력 문제</div>
-      <div class="tag">mild</div>
-      <div class="tag">총 응답 수: 8</div>
-      <div class="tag">위험단어 수: 0</div>
-      <div class="tag">위험도 지표: 13/100</div>
-    </div>
-
-    <div class="bar">
-      <div class="fill" style="width:13%;"></div>
-    </div>
-
-    <h2>상세 진단</h2>
-    <ul>
-      <li>치매는 기억력, 사고력, 일상생활에 영향을 미치는 질환입니다.</li>
-      <li>기억력 문제는 노화의 자연스러운 과정일 수 있습니다.</li>
-      <li>일상에서 자주 잊어버리는 것은 스트레스나 피로의 영향을 받을 수 있습니다.</li>
-      <li>최근에 발생한 기억력 문제는 의사의 상담이 필요할 수 있습니다.</li>
-      <li>기억력 저하가 심각하다면 전문적인 평가가 중요합니다.</li>
-      <li>정기적인 운동은 뇌 건강에 도움을 줄 수 있습니다.</li>
-    </ul>
+<div class="container">
+  <div class="left">
+    <h2>AI 진단결과</h2>
+    <div id="summary"></div>
+    <hr>
+    <h3>상세 진단</h3>
+    <div id="detail" class="muted"></div>
+    <hr>
+    <h3>요약</h3>
+    <div id="summaryText" class="muted"></div>
+    <hr>
+    <h3>전문가 의견</h3>
+    <div id="expert" class="muted"></div>
   </div>
+
+  <div class="right">
+    <h2>제휴상품</h2>
+    <div id="supps"></div>
+    <hr>
+    <h2>제휴보험</h2>
+    <div id="ins"></div>
+    <div class="tiny">본 제휴상품 및 제휴보험은 소정의 수수료를 지급받습니다.</div>
+  </div>
+</div>
+
+<script>
+const aiResult = JSON.parse(localStorage.getItem("aiResult") || "{}");
+const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
+const topic = aiResult.topic || localStorage.getItem("aiTopic") || "종합 건강 체크";
+
+document.getElementById("summary").innerHTML = `
+  <div>주제: ${topic}</div>
+  <div>총 응답 수: ${answers.length}개</div>
+  <div>위험도 감지 단어 수: ${aiResult.riskWords || 0}개</div>
+  <div>위험도 지표: ${aiResult.riskScore || 0}/100</div>
+  <div>현재 상태: ${aiResult.level || "Mild"}</div>
+`;
+
+const detailEl = document.getElementById("detail");
+if (aiResult.detail) {
+  detailEl.innerText = aiResult.detail;
+} else {
+  detailEl.innerText = "응답 데이터를 기반으로 상세 분석을 진행했습니다. 생활관리와 정기 검진을 병행하시기 바랍니다.";
+}
+
+const summaryText = document.getElementById("summaryText");
+summaryText.innerText = aiResult.summary || "요약 데이터가 없습니다.";
+
+const expert = document.getElementById("expert");
+expert.innerText = aiResult.expert || "전문가 의견 데이터가 없습니다.";
+
+// ✅ 제휴상품 로드
+fetch("/affiliate.json")
+  .then(r => r.json())
+  .then(map => {
+    const list = map[topic] || [];
+    const supps = document.getElementById("supps");
+    if (!list.length) {
+      supps.innerHTML = `<div class='muted'>해당 주제에 등록된 제휴상품이 없습니다.</div>`;
+      return;
+    }
+    list.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "aff";
+      div.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" alt="supp">
+        <div>
+          <div><strong>${item.name}</strong></div>
+          <div class="muted">${item.desc || ""}</div>
+          <div class="muted">쿠팡 바로가기</div>
+        </div>`;
+      div.onclick = () => window.open(item.link, "_blank");
+      supps.appendChild(div);
+    });
+  })
+  .catch(() => document.getElementById("supps").innerHTML = `<div class='muted'>제휴상품 정보를 불러오지 못했습니다.</div>`);
+
+// ✅ 제휴보험 로드
+fetch("/affiliate.json")
+  .then(r => r.json())
+  .then(map => {
+    const insList = map["보험상품"] || [];
+    const insEl = document.getElementById("ins");
+    if (!insList.length) {
+      insEl.innerHTML = `<div class='muted'>현재 주제에 해당하는 보험 정보가 없습니다.</div>`;
+      return;
+    }
+    insList.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "aff";
+      div.innerHTML = `
+        <img src="https://cdn-icons-png.flaticon.com/512/2966/2966327.png" alt="ins">
+        <div>
+          <div><strong>${item.name}</strong></div>
+          <div class="muted">${item.desc || ""}</div>
+          <div class="muted">바로가기</div>
+        </div>`;
+      div.onclick = () => window.open(item.link, "_blank");
+      insEl.appendChild(div);
+    });
+  })
+  .catch(() => document.getElementById("ins").innerHTML = `<div class='muted'>보험 정보를 불러오지 못했습니다.</div>`);
+</script>
 </body>
 </html>
