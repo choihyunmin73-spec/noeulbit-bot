@@ -5,16 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>노을빛하루 AI 진단 질문</title>
 <style>
-  :root{
-    --bg:#0d1420;
-    --panel:#121a26;
-    --panel2:#182235;
-    --line:#2a3a55;
-    --brand:#6ba7ff;
-    --muted:#9fb1cf;
-    --white:#fff;
-  }
-
+  :root{--bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;}
   body{
     font-family:"Pretendard","Noto Sans KR",sans-serif;
     background:var(--bg);
@@ -23,23 +14,20 @@
     padding:0;
     min-height:100vh;
   }
-
   .wrap{
     width:88%;
-    max-width:720px;  /* ✅ PC 기준 크기 축소 */
+    max-width:720px;
     margin:0 auto;
     padding:24px 0 50px;
     position:relative;
-    top:40px; /* 상단 고정 */
+    top:40px;
   }
-
   h2{
     color:#98c2ff;
     margin:0 0 18px;
     font-size:20px;
     text-align:center;
   }
-
   .box{
     background:var(--panel2);
     border:1px solid var(--line);
@@ -48,7 +36,6 @@
     width:100%;
     box-sizing:border-box;
   }
-
   .q{
     font-size:18px;
     margin-bottom:14px;
@@ -56,7 +43,6 @@
     text-align:center;
     line-height:1.4;
   }
-
   .opt{
     background:#22324b;
     border:1px solid #315d93;
@@ -74,13 +60,11 @@
     min-height:38px;
     transition:all .2s;
   }
-
   .opt:hover{
     background:#3969b5;
     color:#fff;
     transform:translateY(-2px);
   }
-
   .info{
     display:flex;
     gap:10px;
@@ -90,7 +74,6 @@
     justify-content:center;
     font-size:13px;
   }
-
   .bar{
     height:8px;
     border-radius:4px;
@@ -100,7 +83,6 @@
     max-width:500px;
     margin:0 auto;
   }
-
   .bar > span{
     display:block;
     height:100%;
@@ -108,7 +90,6 @@
     background:#6ba7ff;
     transition:width .25s;
   }
-
   a.btn{
     display:inline-block;
     background:#294e80;
@@ -120,7 +101,6 @@
     text-decoration:none;
     font-size:14px;
   }
-
   @media(max-width:768px){
     .wrap{width:94%;top:20px;}
     .box{padding:16px;}
@@ -128,9 +108,8 @@
     .q{font-size:15px;}
     .opt{font-size:14px;min-height:36px;padding:7px;}
   }
-
   @media(min-width:1200px){
-    .wrap{max-width:700px;} /* ✅ PC 더 작게 */
+    .wrap{max-width:700px;}
     .opt{font-size:15px;min-height:40px;}
   }
 </style>
@@ -198,23 +177,10 @@ function choose(ch){
   if (idx < list.length) {
     render();
   } else {
-    fetch("/analyze",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ topic, answers })
-    })
-    .then(r=>r.json())
-    .then(j=>{
-      if(j.ok && j.result){
-        localStorage.setItem("aiTopic", topic);
-        localStorage.setItem("aiAnswers", JSON.stringify(answers));
-        localStorage.setItem("aiResult", JSON.stringify(j.result));
-        location.href = "result.html";
-      }else{
-        alert("분석 처리 중 오류가 발생했습니다.");
-      }
-    })
-    .catch(()=>alert("서버 연결에 실패했습니다."));
+    // ✅ 단순 저장 후 1초 뒤 결과로 이동 (안정형)
+    localStorage.setItem("aiTopic", topic);
+    localStorage.setItem("aiAnswers", JSON.stringify(answers));
+    setTimeout(()=>location.href="result.html",1000);
   }
 }
 </script>
