@@ -1,28 +1,16 @@
 {
-  "name": "noeulbit-haru-ai-diagnosis",
+  "name": "noeulbit-bot-web",
   "version": "1.0.0",
-  "description": "노을빛하루 AI 종합 진단 페이지 - Express 기반 자동 배포 서버",
+  "description": "노을빛하루 AI 진단 시스템 (Render 전용)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "keywords": [
-    "Noeulbit Haru",
-    "AI Diagnosis",
-    "Senior Info",
-    "Express Server",
-    "Render Deploy"
-  ],
-  "author": "ChatGPT & Noeulbit Haru",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.19.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "start": "node server.js"
   },
   "engines": {
-    "node": ">=18.x"
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "openai": "^4.58.1"
   }
 }
