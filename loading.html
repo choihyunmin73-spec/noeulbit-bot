@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 진단결과 분석 중...</title>
+  <style>
+    body {
+      background-color: #0d1420;
+      color: #fff;
+      font-family: "Pretendard","Noto Sans KR",sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    h2 {
+      color: #6ba7ff;
+      font-size: 1.6em;
+      margin-bottom: 30px;
+    }
+    .progress-box {
+      width: 80%;
+      max-width: 400px;
+      height: 20px;
+      background: #22324b;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6ba7ff, #4dd0ff);
+      transition: width 0.05s;
+    }
+    p {
+      color: #b8c9e0;
+      margin-top: 20px;
+      font-size: 1.05em;
+    }
+  </style>
+</head>
+<body>
+  <h2>AI 진단결과를 반영 중입니다...</h2>
+  <div class="progress-box">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <p id="percent-text">0%</p>
+
+  <script>
+    let progress = 0;
+    const fill = document.getElementById("progress-fill");
+    const text = document.getElementById("percent-text");
+
+    const timer = setInterval(() => {
+      progress++;
+      fill.style.width = progress + "%";
+      text.innerText = progress + "%";
+
+      if (progress >= 100) {
+        clearInterval(timer);
+        window.location.href = "result.html";
+      }
+    }, 50); // 0.05초당 1% (총 5초)
+  </script>
+</body>
+</html>
