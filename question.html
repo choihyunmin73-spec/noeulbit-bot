@@ -6,7 +6,18 @@
 <title>노을빛하루 AI 진단 질문</title>
 <style>
   :root{--bg:#0d1420;--panel:#121a26;--panel2:#182235;--line:#2a3a55;--brand:#6ba7ff;--muted:#9fb1cf;--white:#fff;}
-  body{font-family:"Pretendard","Noto Sans KR",sans-serif;background:var(--bg);color:var(--white);margin:0}
+  body{
+    font-family:"Pretendard","Noto Sans KR",sans-serif;
+    background:var(--bg);
+    color:var(--white);
+    margin:0;
+    display:flex;                 
+    flex-direction:column;
+    justify-content:flex-start;   /* ✅ 상단 중앙 정렬 */
+    align-items:center;           
+    min-height:100vh;             
+    padding-top:60px;             /* ✅ 상단 여백 살짝 추가 */
+  }
   .wrap{max-width:900px;margin:0 auto;padding:30px 32px 50px}
   h2{color:#98c2ff;margin:8px 0 14px}
   .box{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:24px}
