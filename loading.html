@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 진단결과 분석 중...</title>
+  <title>AI 진단 결과 분석 중...</title>
   <style>
     body {
+      font-family: "Pretendard", "Noto Sans KR", sans-serif;
       background-color: #0d1420;
       color: #fff;
-      font-family: "Pretendard","Noto Sans KR",sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -19,53 +19,56 @@
     }
     h2 {
       color: #6ba7ff;
-      font-size: 1.6em;
+      font-size: 1.8em;
       margin-bottom: 30px;
     }
-    .progress-box {
+    .loader {
       width: 80%;
       max-width: 400px;
-      height: 20px;
-      background: #22324b;
+      height: 16px;
       border-radius: 10px;
+      background-color: #22324b;
       overflow: hidden;
-      margin-top: 10px;
+      margin: 0 auto;
+      position: relative;
     }
-    .progress-fill {
+    .fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #6ba7ff, #4dd0ff);
-      transition: width 0.05s;
+      background: linear-gradient(90deg, #5b8cff, #6ba7ff);
+      border-radius: 10px;
+      transition: width 0.05s linear;
     }
     p {
-      color: #b8c9e0;
-      margin-top: 20px;
-      font-size: 1.05em;
+      margin-top: 25px;
+      font-size: 1.1em;
+      color: #bcd4ff;
     }
   </style>
 </head>
 <body>
-  <h2>AI 진단결과를 반영 중입니다...</h2>
-  <div class="progress-box">
-    <div class="progress-fill" id="progress-fill"></div>
-  </div>
-  <p id="percent-text">0%</p>
+  <h2>AI 진단결과를 분석 중입니다...</h2>
+  <div class="loader"><div class="fill" id="fill"></div></div>
+  <p id="progress">0%</p>
 
   <script>
-    let progress = 0;
-    const fill = document.getElementById("progress-fill");
-    const text = document.getElementById("percent-text");
+    let percent = 0;
+    const fill = document.getElementById("fill");
+    const progress = document.getElementById("progress");
 
     const timer = setInterval(() => {
-      progress++;
-      fill.style.width = progress + "%";
-      text.innerText = progress + "%";
-
-      if (progress >= 100) {
+      percent += Math.floor(Math.random() * 8) + 3; // 랜덤속도로 증가
+      if (percent >= 100) {
+        percent = 100;
         clearInterval(timer);
-        window.location.href = "result.html";
+        // ✅ localStorage 그대로 유지 → result.html로 이동
+        setTimeout(() => {
+          window.location.href = "result.html";
+        }, 500);
       }
-    }, 50); // 0.05초당 1% (총 5초)
+      fill.style.width = percent + "%";
+      progress.textContent = percent + "%";
+    }, 120);
   </script>
 </body>
 </html>
