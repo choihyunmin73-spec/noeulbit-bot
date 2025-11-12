@@ -28,7 +28,7 @@
   .fill {
     height:100%;width:0%;
     background:linear-gradient(90deg,#5b8cff,#6ba7ff);
-    border-radius:10px;transition:width 0.1s linear;
+    border-radius:10px;transition:width 0.2s linear;
   }
   p {
     margin-top:25px;
@@ -48,18 +48,18 @@
     const progress = document.getElementById("progress");
 
     const timer = setInterval(() => {
-      percent += Math.floor(Math.random() * 7) + 4; // 자연스러운 속도
+      percent += Math.floor(Math.random() * 4) + 2; // 천천히 증가 (자연스러운 속도)
       if (percent >= 100) {
         percent = 100;
         clearInterval(timer);
-        // ✅ Render 서버 전용 구조: localStorage 그대로 유지
+        // ✅ 5초 내외 안정형 (렌더 서버 연동 완충)
         setTimeout(() => {
           window.location.href = "result.html";
-        }, 600);
+        }, 1200);
       }
       fill.style.width = percent + "%";
       progress.textContent = percent + "%";
-    }, 150);
+    }, 300); // 약 5초 전체 진행
   </script>
 </body>
 </html>
