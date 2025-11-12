@@ -14,6 +14,7 @@ app.use(express.static(__dirname));
 /* ✅ 기본 라우팅 */
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 app.get("/question.html", (req, res) => res.sendFile(path.join(__dirname, "question.html")));
+app.get("/loading.html", (req, res) => res.sendFile(path.join(__dirname, "loading.html")));
 app.get("/result.html", (req, res) => res.sendFile(path.join(__dirname, "result.html")));
 
 /* ✅ 제휴상품 JSON 제공 */
@@ -65,11 +66,20 @@ ${summary}
 
     const data = await gptResponse.json();
     let resultText = data?.choices?.[0]?.message?.content || "{}";
+
+    // ✅ 코드블록(````json ... ````) 제거
+    resultText = resultText.replace(/```json|```/g, "").trim();
+
     let result;
     try {
       result = JSON.parse(resultText);
     } catch {
-      result = { detail: resultText, summary: "요약 생성 실패", expert: "전문가 의견 생성 실패" };
+      console.warn("⚠️ JSON 파싱 실패, 원본 텍스트 사용");
+      result = { 
+        detail: resultText, 
+        summary: "요약 생성 실패", 
+        expert: "전문가 의견 생성 실패" 
+      };
     }
 
     res.json({ ok: true, result });
