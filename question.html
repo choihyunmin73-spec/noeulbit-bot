@@ -178,10 +178,25 @@ async function choose(ch){
   if (idx < list.length) {
     render();
   } else {
-    // ✅ Render 서버 전용: 결과 분석 전 로딩페이지로 이동
+    // ✅ GPT 분석을 미리 실행 (로딩 중 서버 요청)
     localStorage.setItem("aiTopic", topic);
     localStorage.setItem("aiAnswers", JSON.stringify(answers));
-    window.location.href = "loading.html";
+
+    // 분석 요청 시작
+    fetch("/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, answers })
+    })
+    .then(r => r.json())
+    .then(data => {
+      localStorage.setItem("aiResult", JSON.stringify(data.result || {}));
+      window.location.href = "loading.html";
+    })
+    .catch(() => {
+      // 실패 시에도 로딩화면으로 이동 (fallback)
+      window.location.href = "loading.html";
+    });
   }
 }
 </script>
