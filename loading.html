@@ -47,20 +47,19 @@
     const fill = document.getElementById("fill");
     const progress = document.getElementById("progress");
 
-    // ✅ 10초 안정형 로딩 속도
+    // ✅ 약 5초 내외로 자연스럽게 진행 (GPT 분석은 이미 완료 상태)
     const timer = setInterval(() => {
-      percent += Math.floor(Math.random() * 3) + 1; // 천천히 증가
+      percent += Math.floor(Math.random() * 5) + 3; // 속도 조정
       if (percent >= 100) {
         percent = 100;
         clearInterval(timer);
-        // ✅ 렌더 서버 완충 시간 포함 (10초 내외)
         setTimeout(() => {
           window.location.href = "result.html";
-        }, 1500);
+        }, 800);
       }
       fill.style.width = percent + "%";
       progress.textContent = percent + "%";
-    }, 400); // 약 9.5~10.5초 전체 진행
+    }, 200); // 총 약 5초
   </script>
 </body>
 </html>
