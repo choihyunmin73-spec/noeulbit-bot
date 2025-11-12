@@ -43,13 +43,26 @@
   <p id="progress">0%</p>
 
   <script>
+    const topic = localStorage.getItem("aiTopic");
+    const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
+
+    // ✅ GPT 분석을 로딩 중에 백그라운드 실행
+    fetch("/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, answers })
+    })
+    .then(r => r.json())
+    .then(data => localStorage.setItem("aiResult", JSON.stringify(data.result || {})))
+    .catch(() => localStorage.setItem("aiResult", JSON.stringify({error:"분석 실패"})));
+
+    // ✅ 5초 로딩 애니메이션
     let percent = 0;
     const fill = document.getElementById("fill");
     const progress = document.getElementById("progress");
 
-    // ✅ 약 5초 내외로 자연스럽게 진행 (GPT 분석은 이미 완료 상태)
     const timer = setInterval(() => {
-      percent += Math.floor(Math.random() * 5) + 3; // 속도 조정
+      percent += Math.floor(Math.random() * 5) + 3;
       if (percent >= 100) {
         percent = 100;
         clearInterval(timer);
@@ -59,7 +72,7 @@
       }
       fill.style.width = percent + "%";
       progress.textContent = percent + "%";
-    }, 200); // 총 약 5초
+    }, 200);
   </script>
 </body>
 </html>
