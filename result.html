@@ -102,14 +102,28 @@
     $("summary").innerHTML = sum.map(s=>`<li>${s.trim()}</li>`).join("") || `<li class="muted">데이터 없음</li>`;
     $("opinion").innerHTML = opn.map(s=>`<li>${s.trim()}</li>`).join("") || `<li class="muted">데이터 없음</li>`;
 
-    // 단순 점수 계산 (위험어 기준)
-    const riskWords = ["심함","위험","통증","저림","호흡","가슴","불안","어지럼","높음","즉시"];
-    const riskCount = answers.filter(a => riskWords.some(w => a.includes(w))).length;
-    const riskPercent = Math.min(100, Math.round((riskCount / answers.length) * 100));
-    $("rk").textContent = riskCount;
-    $("risk").textContent = riskPercent;
-    $("riskBar").style.width = riskPercent + "%";
-    $("level").textContent = riskPercent < 30 ? "mild" : riskPercent < 70 ? "moderate" : "high";
+    // ✅ 단순 점수 계산 (위험어 기준)
+    if (answers && answers.length > 0) {
+      const riskWords = ["심함","위험","통증","저림","호흡","가슴","불안","어지럼","높음","즉시"];
+      let riskCount = 0;
+      answers.forEach(a => {
+        riskWords.forEach(w => {
+          if (a.includes(w)) riskCount++;
+        });
+      });
+      const riskPercent = Math.min(100, Math.round((riskCount / (answers.length * 2)) * 100));
+      $("rk").textContent = riskCount;
+      $("risk").textContent = riskPercent;
+      $("riskBar").style.width = riskPercent + "%";
+      $("level").textContent =
+        riskPercent < 30 ? "mild" :
+        riskPercent < 70 ? "moderate" : "high";
+    } else {
+      $("rk").textContent = "0";
+      $("risk").textContent = "0";
+      $("riskBar").style.width = "0%";
+      $("level").textContent = "mild";
+    }
 
   } catch(e){
     console.error(e);
