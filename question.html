@@ -170,17 +170,44 @@ function render(){
   document.getElementById("barFill").style.width = `${((idx+1)/list.length)*100}%`;
 }
 
-function choose(ch){
+async function choose(ch){
   answers.push(ch);
   idx++;
   const list = survey[topic];
+
   if (idx < list.length) {
     render();
   } else {
-    // ✅ 단순 저장 후 1초 뒤 결과로 이동 (안정형)
-    localStorage.setItem("aiTopic", topic);
-    localStorage.setItem("aiAnswers", JSON.stringify(answers));
-    setTimeout(()=>location.href="result.html",1000);
+    try {
+      // ✅ GPT 분석 서버 호출
+      const res = await fetch("/analyze", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({topic, answers})
+      });
+      const data = await res.json();
+
+      if(data.ok){
+        localStorage.setItem("aiTopic", topic);
+        localStorage.setItem("aiAnswers", JSON.stringify(answers));
+        localStorage.setItem("aiResult", JSON.stringify({
+          topic,
+          level: "mild",
+          answerCount: answers.length,
+          riskWordCount: 0,
+          riskPercent: 0,
+          detail: data.result.detail,
+          summary: data.result.summary,
+          opinion: data.result.expert
+        }));
+        location.href = "result.html";
+      } else {
+        alert("AI 분석 중 오류가 발생했습니다.");
+      }
+    } catch(e){
+      console.error(e);
+      alert("서버 연결 중 오류가 발생했습니다.");
+    }
   }
 }
 </script>
