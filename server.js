@@ -2,7 +2,6 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import fetch from "node-fetch";
-import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,40 +16,46 @@ app.get("/question.html", (req, res) => res.sendFile(path.join(__dirname, "quest
 app.get("/loading.html", (req, res) => res.sendFile(path.join(__dirname, "loading.html")));
 app.get("/result.html", (req, res) => res.sendFile(path.join(__dirname, "result.html")));
 
-/* ✅ 제휴상품 JSON 제공 */
-app.get("/affiliate-live", (req, res) => {
-  try {
-    const data = fs.readFileSync(path.join(__dirname, "affiliate.json"), "utf8");
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.send(data);
-  } catch (err) {
-    console.error("affiliate.json 불러오기 오류:", err);
-    res.status(500).json({ error: "파일 로드 오류" });
-  }
-});
-
 /* ✅ GPT 기반 분석 API */
 app.post("/analyze", async (req, res) => {
   try {
     const { topic, answers } = req.body;
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // 🔐 Render 환경변수 등록 필요
 
     if (!OPENAI_API_KEY) {
-      console.error("❌ OpenAI API 키가 없습니다.");
+      console.error("❌ OpenAI API 키가 설정되어 있지 않습니다.");
       return res.json({ ok: false, error: "API key missing" });
     }
 
-    const summary = answers.map((a, i) => `Q${i + 1}: ${a}`).join("\n");
+    /* ✅ 위험도 계산 */
+    const riskWords = ["심함", "악화", "어려움", "높음", "위험", "즉시", "갑자기", "숨", "통증", "가슴", "저림"];
+    let riskCount = 0;
+    answers.forEach(a => {
+      riskWords.forEach(r => {
+        if (a.includes(r)) riskCount++;
+      });
+    });
+    const riskScore = Math.min(Math.round((riskCount / (answers.length * 0.8)) * 100), 100);
+
+    // 사용자가 선택한 항목 요약
+    const answerSummary = answers.map((a, i) => `Q${i + 1}: ${a}`).join("\n");
+
+    // GPT 프롬프트 구성
     const prompt = `
 당신은 시니어 건강 전문가 AI입니다.
 주제: ${topic}
 사용자의 응답:
-${summary}
+${answerSummary}
 
-다음 세 가지를 JSON 형식으로 만들어 주세요:
-{"detail":"(3~5문장 분석)", "summary":"(핵심요약 2문장)", "expert":"(전문가 조언 2~3문장)"}
-`.trim();
+이 데이터를 기반으로 다음 3가지를 생성하세요:
+1. 상세 진단 결과 (3~5문장, 실제 건강상태 분석처럼 구체적으로)
+2. 핵심 요약 (2문장)
+3. 전문가 조언 (2~3문장, 현실적인 행동 조언)
+출력은 JSON 형태로:
+{"detail":"...","summary":"...","expert":"..."}
+    `.trim();
 
+    // ✅ OpenAI API 호출
     const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -60,42 +65,52 @@ ${summary}
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.7
+        temperature: 0.7,
       })
     });
 
     const data = await gptResponse.json();
+
+    // GPT 응답 파싱
     let resultText = data?.choices?.[0]?.message?.content || "{}";
-
-    // ✅ 코드블록(````json ... ````) 제거
-    resultText = resultText.replace(/```json|```/g, "").trim();
-
+    resultText = resultText.replace(/```json|```/g, "").trim(); // ✅ 백틱 제거
     let result;
     try {
       result = JSON.parse(resultText);
     } catch {
-      console.warn("⚠️ JSON 파싱 실패, 원본 텍스트 사용");
-      result = { 
-        detail: resultText, 
-        summary: "요약 생성 실패", 
-        expert: "전문가 의견 생성 실패" 
+      result = {
+        detail: resultText || "분석 결과를 해석하지 못했습니다.",
+        summary: "요약 생성 실패",
+        expert: "전문가 의견 생성 실패"
       };
     }
 
-    res.json({ ok: true, result });
+    // ✅ 위험도 데이터 포함해서 응답 반환
+    res.json({
+      ok: true,
+      result: {
+        detail: result.detail,
+        summary: result.summary,
+        expert: result.expert,
+        riskCount,
+        riskScore,
+        totalAnswers: answers.length
+      }
+    });
+
   } catch (err) {
-    console.error("분석 오류:", err);
+    console.error("❌ 분석 오류:", err);
     res.json({ ok: false, error: "서버 오류" });
   }
 });
 
-/* ✅ Render 포트 설정 */
+/* ✅ Render 서버 포트 설정 */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ 노을빛하루 AI 서버 실행 중: http://localhost:${PORT}`);
 });
 
-/* ✅ 404 처리 */
+/* ✅ 404 예외 처리 */
 app.use((req, res) => {
   res.status(404).send(`
     <body style="background:#0d1420;color:#fff;font-family:sans-serif;text-align:center;padding:60px">
