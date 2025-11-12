@@ -170,33 +170,17 @@ function render(){
   document.getElementById("barFill").style.width = `${((idx+1)/list.length)*100}%`;
 }
 
-async function choose(ch){
+function choose(ch){
   answers.push(ch);
   idx++;
   const list = survey[topic];
-
   if (idx < list.length) {
     render();
   } else {
-    // ✅ GPT 분석을 미리 실행 (로딩 중 서버 요청)
+    // ✅ 8문항 완료 시 즉시 로딩페이지 이동
     localStorage.setItem("aiTopic", topic);
     localStorage.setItem("aiAnswers", JSON.stringify(answers));
-
-    // 분석 요청 시작
-    fetch("/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, answers })
-    })
-    .then(r => r.json())
-    .then(data => {
-      localStorage.setItem("aiResult", JSON.stringify(data.result || {}));
-      window.location.href = "loading.html";
-    })
-    .catch(() => {
-      // 실패 시에도 로딩화면으로 이동 (fallback)
-      window.location.href = "loading.html";
-    });
+    window.location.href = "loading.html";
   }
 }
 </script>
