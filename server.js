@@ -20,15 +20,15 @@ app.get("/result.html", (req, res) => res.sendFile(path.join(__dirname, "result.
 app.post("/analyze", async (req, res) => {
   try {
     const { topic, answers } = req.body;
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // 🔐 Render 환경변수 등록 필요
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
     if (!OPENAI_API_KEY) {
       console.error("❌ OpenAI API 키가 설정되어 있지 않습니다.");
       return res.json({ ok: false, error: "API key missing" });
     }
 
-    /* ✅ 위험도 계산 */
-    const riskWords = ["심함", "악화", "어려움", "높음", "위험", "즉시", "갑자기", "숨", "통증", "가슴", "저림"];
+    // ✅ 위험도 계산
+    const riskWords = ["심함","악화","어려움","높음","위험","즉시","갑자기","숨","통증","가슴","저림"];
     let riskCount = 0;
     answers.forEach(a => {
       riskWords.forEach(r => {
@@ -37,10 +37,8 @@ app.post("/analyze", async (req, res) => {
     });
     const riskScore = Math.min(Math.round((riskCount / (answers.length * 0.8)) * 100), 100);
 
-    // 사용자가 선택한 항목 요약
+    // ✅ GPT 분석 프롬프트
     const answerSummary = answers.map((a, i) => `Q${i + 1}: ${a}`).join("\n");
-
-    // GPT 프롬프트 구성
     const prompt = `
 당신은 시니어 건강 전문가 AI입니다.
 주제: ${topic}
@@ -48,14 +46,14 @@ app.post("/analyze", async (req, res) => {
 ${answerSummary}
 
 이 데이터를 기반으로 다음 3가지를 생성하세요:
-1. 상세 진단 결과 (3~5문장, 실제 건강상태 분석처럼 구체적으로)
-2. 핵심 요약 (2문장)
+1. 상세 진단 결과 (3~5문장)
+2. 핵심 요약 (1~2문장)
 3. 전문가 조언 (2~3문장, 현실적인 행동 조언)
 출력은 JSON 형태로:
 {"detail":"...","summary":"...","expert":"..."}
     `.trim();
 
-    // ✅ OpenAI API 호출
+    // ✅ OpenAI 호출
     const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -65,36 +63,28 @@ ${answerSummary}
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
+        temperature: 0.7
       })
     });
 
     const data = await gptResponse.json();
-
-    // GPT 응답 파싱
-    let resultText = data?.choices?.[0]?.message?.content || "{}";
-    resultText = resultText.replace(/```json|```/g, "").trim(); // ✅ 백틱 제거
-    let result;
+    let text = data?.choices?.[0]?.message?.content || "{}";
+    let parsed;
     try {
-      result = JSON.parse(resultText);
+      parsed = JSON.parse(text);
     } catch {
-      result = {
-        detail: resultText || "분석 결과를 해석하지 못했습니다.",
-        summary: "요약 생성 실패",
-        expert: "전문가 의견 생성 실패"
-      };
+      parsed = { detail: text, summary: "요약 생성 실패", expert: "전문가 의견 생성 실패" };
     }
 
-    // ✅ 위험도 데이터 포함해서 응답 반환
+    // ✅ 최종 응답
     res.json({
       ok: true,
       result: {
-        detail: result.detail,
-        summary: result.summary,
-        expert: result.expert,
+        detail: parsed.detail,
+        summary: parsed.summary,
+        expert: parsed.expert,
         riskCount,
-        riskScore,
-        totalAnswers: answers.length
+        riskScore
       }
     });
 
