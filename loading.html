@@ -28,7 +28,7 @@
   .fill {
     height:100%;width:0%;
     background:linear-gradient(90deg,#5b8cff,#6ba7ff);
-    border-radius:10px;transition:width 0.2s linear;
+    border-radius:10px;transition:width 0.1s linear;
   }
   p {
     margin-top:25px;
@@ -43,36 +43,47 @@
   <p id="progress">0%</p>
 
   <script>
-    const topic = localStorage.getItem("aiTopic");
-    const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
-
-    // ✅ GPT 분석을 로딩 중에 백그라운드 실행
-    fetch("/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, answers })
-    })
-    .then(r => r.json())
-    .then(data => localStorage.setItem("aiResult", JSON.stringify(data.result || {})))
-    .catch(() => localStorage.setItem("aiResult", JSON.stringify({error:"분석 실패"})));
-
-    // ✅ 5초 로딩 애니메이션
     let percent = 0;
     const fill = document.getElementById("fill");
     const progress = document.getElementById("progress");
 
     const timer = setInterval(() => {
-      percent += Math.floor(Math.random() * 5) + 3;
+      percent += Math.floor(Math.random() * 7) + 4; // 자연스러운 속도
       if (percent >= 100) {
         percent = 100;
         clearInterval(timer);
-        setTimeout(() => {
-          window.location.href = "result.html";
-        }, 800);
+
+        // ✅ Render 서버로 AI 분석 요청
+        const topic = localStorage.getItem("aiTopic");
+        const answers = JSON.parse(localStorage.getItem("aiAnswers") || "[]");
+
+        fetch("/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topic, answers })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.ok) {
+            localStorage.setItem("aiResult", JSON.stringify({
+              topic,
+              level: "mild",
+              answerCount: answers.length,
+              riskWordCount: data.result.riskCount,
+              riskPercent: data.result.riskScore,
+              detail: data.result.detail.split("\n"),
+              summary: [data.result.summary],
+              opinion: [data.result.expert]
+            }));
+          }
+          // ✅ 분석 완료 후 결과 페이지 이동
+          setTimeout(() => window.location.href = "result.html", 500);
+        })
+        .catch(() => window.location.href = "result.html");
       }
       fill.style.width = percent + "%";
       progress.textContent = percent + "%";
-    }, 200);
+    }, 150);
   </script>
 </body>
 </html>
