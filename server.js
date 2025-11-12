@@ -1,121 +1,93 @@
-// server.js — Render 전용 배포 서버 (로컬 기능/핫리로드 없음, 기존 구조 100% 유지)
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import fetch from "node-fetch";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
+
 app.use(express.json());
+app.use(express.static(__dirname));
 
-// 정적 서빙 (index.html, question.html, result.html, loading.html, survey.json, affiliate.json 등)
-app.use(express.static(__dirname, { maxAge: "0" }));
+/* ✅ 기본 라우팅 */
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/question.html", (req, res) => res.sendFile(path.join(__dirname, "question.html")));
+app.get("/loading.html", (req, res) => res.sendFile(path.join(__dirname, "loading.html")));
+app.get("/result.html", (req, res) => res.sendFile(path.join(__dirname, "result.html")));
 
-// ===== 분석 보조 템플릿 로드 (analysis.json) =====
-let ANALYSIS = {};
-try {
-  ANALYSIS = JSON.parse(fs.readFileSync(path.join(__dirname, "analysis.json"), "utf-8"));
-} catch (e) {
-  console.error("[analysis.json] 로드 실패:", e.message);
-  ANALYSIS = {};
-}
-
-// ===== 공통 위험 단어 사전 =====
-const RISK_WORDS = [
-  "심함","악화","어려움","높음","위험","즉시","갑자기","숨","호흡곤란","통증","가슴","저림",
-  "두근거림","부정맥","실신","출혈","마비","부종","열감","발열","장애","응급","수술","검사 필요"
-];
-
-// ===== 유틸: 레벨 계산 =====
-function levelFromPercent(p) {
-  if (p >= 70) return "severe";
-  if (p >= 40) return "moderate";
-  return "mild";
-}
-
-// ===== 유틸: 주제 → 템플릿 키 매핑 =====
-// * 보험/자동차/복지·생활지원금 은 하나의 재정 템플릿 "finance" 로 수렴 (요청 반영)
-function resolveTemplateKey(topic) {
-  const financeSet = new Set(["보험비용 종합점검", "자동차 견적·보험비용 점검", "복지·생활지원금"]);
-  if (financeSet.has(topic)) return "finance";
-  // 그 외는 topic 그대로(analysis.json에 동일 키가 있을 때 사용)
-  return topic;
-}
-
-// ===== 메인 분석 엔드포인트 =====
-app.post("/analyze", (req, res) => {
+/* ✅ GPT 기반 분석 API */
+app.post("/analyze", async (req, res) => {
   try {
-    const { topic, answers } = req.body || {};
-    const safeTopic = typeof topic === "string" ? topic.trim() : "진단";
-    const list = Array.isArray(answers) ? answers : [];
+    const { topic, answers } = req.body;
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // 🔐 Render 환경변수 등록 필요
 
-    // 위험 단어 스캔
-    let riskHits = 0;
-    const lowered = list.map(a => String(a || "").toLowerCase());
-    for (const ans of lowered) {
-      for (const w of RISK_WORDS) {
-        if (ans.includes(w.toLowerCase())) riskHits++;
-      }
+    if (!OPENAI_API_KEY) {
+      console.error("❌ OpenAI API 키가 설정되어 있지 않습니다.");
+      return res.json({ ok: false, error: "API key missing" });
     }
 
-    // 위험 점수/레벨
-    // - 선택 8문항 기준: 위험 단어 1개당 10~12p 가중치, 상한 100
-    const base = Math.min(100, Math.round(riskHits * 12.5));
-    const riskPercent = base;
-    const level = levelFromPercent(riskPercent);
+    // 사용자가 선택한 항목 요약
+    const answerSummary = answers.map((a, i) => `Q${i + 1}: ${a}`).join("\n");
 
-    // 템플릿 결정
-    const key = resolveTemplateKey(safeTopic);
-    const tpl = ANALYSIS[key] || {};
+    // GPT 프롬프트 구성
+    const prompt = `
+당신은 시니어 건강 전문가 AI입니다.
+주제: ${topic}
+사용자의 응답:
+${answerSummary}
 
-    // 상세/요약/전문가 의견 생성
-    // - analysis.json 에 배열로 존재하면 랜덤 샘플링 및 길이 보정
-    const pickLines = (arr = [], want = 15) => {
-      if (!Array.isArray(arr) || arr.length === 0) return [];
-      if (arr.length >= want) return arr.slice(0, want);
-      // 부족하면 뒤를 반복 채우되 문장 중복 3회 이상 방지
-      const out = [...arr];
-      let guard = 0;
-      while (out.length < want && guard < 100) {
-        out.push(arr[out.length % arr.length]);
-        guard++;
-      }
-      return out.slice(0, want);
-    };
+이 데이터를 기반으로 다음 3가지를 생성하세요:
+1. 상세 진단 결과 (3~5문장, 실제 건강상태 분석처럼 구체적으로)
+2. 핵심 요약 (2문장)
+3. 전문가 조언 (2~3문장, 현실적인 행동 조언)
+출력은 JSON 형태로:
+{"detail":"...","summary":"...","expert":"..."}
+    `.trim();
 
-    // 상세(문단) 15줄, 요약 7줄, 전문가의견 2줄 — 요청 스펙 고정
-    const detailLines = pickLines(tpl.detail, 15);
-    const summaryLines = pickLines(tpl.summary, 7);
-    const expertLines = pickLines(tpl.expert || tpl.opinion, 2);
+    // ✅ OpenAI API 호출
+    const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+      })
+    });
 
-    // 응답 수/위험 단어 수 보강(클라이언트에 그대로 표시됨)
-    const result = {
-      topic: safeTopic,
-      answers: list,
-      riskPercent,
-      level, // "mild" | "moderate" | "severe"
-      answerCount: list.length,
-      riskWordCount: riskHits,
+    const data = await gptResponse.json();
 
-      // 클라이언트(result.html) 호환 필드명
-      detail: detailLines.join("\n"),
-      summary: summaryLines,
-      opinion: expertLines
-    };
+    // GPT 응답 파싱
+    let resultText = data?.choices?.[0]?.message?.content || "{}";
+    let result;
+    try {
+      result = JSON.parse(resultText);
+    } catch {
+      result = { detail: resultText, summary: "요약 생성 실패", expert: "전문가 의견 생성 실패" };
+    }
 
-    return res.json({ ok: true, result });
-  } catch (e) {
-    console.error("/analyze error:", e);
-    return res.status(500).json({ ok: false, error: "internal_error" });
+    res.json({ ok: true, result });
+  } catch (err) {
+    console.error("❌ 분석 오류:", err);
+    res.json({ ok: false, error: "서버 오류" });
   }
 });
-
-// ===== 기본 라우팅 =====
-app.get("/", (_, r) => r.sendFile(path.join(__dirname, "index.html")));
-app.get("/question.html", (_, r) => r.sendFile(path.join(__dirname, "question.html")));
-app.get("/result.html",   (_, r) => r.sendFile(path.join(__dirname, "result.html")));
-app.get("/loading.html",  (_, r) => r.sendFile(path.join(__dirname, "loading.html")));
-
-// ===== 서버 기동 =====
+/* ✅ Render 서버 포트 설정 */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Noeulbit Haru server running on :${PORT}`);
+  console.log(`✅ 노을빛하루 AI 서버 실행 중: http://localhost:${PORT}`);
+});
+
+/* ✅ 404 예외 처리 */
+app.use((req, res) => {
+  res.status(404).send(`
+    <body style="background:#0d1420;color:#fff;font-family:sans-serif;text-align:center;padding:60px">
+      <h2>🚫 페이지를 찾을 수 없습니다.</h2>
+      <p>주소를 다시 확인해 주세요.</p>
+    </body>
+  `);
 });
