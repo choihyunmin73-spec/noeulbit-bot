@@ -46,4 +46,51 @@ app.post("/analyze", async (req, res) => {
 사용자의 응답:
 ${summary}
 
-다음 세 가지를 JSON 형식
+다음 세 가지를 JSON 형식으로 만들어 주세요:
+{"detail":"(3~5문장 분석)", "summary":"(핵심요약 2문장)", "expert":"(전문가 조언 2~3문장)"}
+`.trim();
+
+    const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7
+      })
+    });
+
+    const data = await gptResponse.json();
+    let resultText = data?.choices?.[0]?.message?.content || "{}";
+    let result;
+    try {
+      result = JSON.parse(resultText);
+    } catch {
+      result = { detail: resultText, summary: "요약 생성 실패", expert: "전문가 의견 생성 실패" };
+    }
+
+    res.json({ ok: true, result });
+  } catch (err) {
+    console.error("분석 오류:", err);
+    res.json({ ok: false, error: "서버 오류" });
+  }
+});
+
+/* ✅ Render 포트 설정 */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ 노을빛하루 AI 서버 실행 중: http://localhost:${PORT}`);
+});
+
+/* ✅ 404 처리 */
+app.use((req, res) => {
+  res.status(404).send(`
+    <body style="background:#0d1420;color:#fff;font-family:sans-serif;text-align:center;padding:60px">
+      <h2>🚫 페이지를 찾을 수 없습니다.</h2>
+      <p>주소를 다시 확인해 주세요.</p>
+    </body>
+  `);
+});
